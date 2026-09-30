@@ -13,11 +13,7 @@ from spanchor.models.document import Document
 @pytest.fixture
 def single_doc() -> dict[str, Document]:
     """Single document with well-known content."""
-    return {
-        "doc1": Document.from_text(
-            "doc1", "The quick brown fox jumps over the lazy dog."
-        )
-    }
+    return {"doc1": Document.from_text("doc1", "The quick brown fox jumps over the lazy dog.")}
 
 
 @pytest.fixture
@@ -29,9 +25,7 @@ def multi_doc() -> dict[str, Document]:
             "doc2",
             "The quick brown fox appears in doc2. The quick brown fox is here again.",
         ),
-        "doc3": Document.from_text(
-            "doc3", "Text with   extra    whitespace   is   here."
-        ),
+        "doc3": Document.from_text("doc3", "Text with   extra    whitespace   is   here."),
     }
 
 
@@ -63,9 +57,7 @@ class TestLocateTextExact:
         m = matches[0]
         assert doc.text[m.start : m.end] == m.matched_text
 
-    def test_text_hash_is_sha256_of_matched_text(
-        self, single_doc: dict[str, Document]
-    ) -> None:
+    def test_text_hash_is_sha256_of_matched_text(self, single_doc: dict[str, Document]) -> None:
         """text_hash must be SHA256 of the matched substring."""
         import hashlib
 
@@ -75,9 +67,7 @@ class TestLocateTextExact:
         expected_hash = hashlib.sha256(m.matched_text.encode("utf-8")).hexdigest()
         assert m.text_hash == expected_hash
 
-    def test_multiple_occurrences_in_same_document(
-        self, multi_doc: dict[str, Document]
-    ) -> None:
+    def test_multiple_occurrences_in_same_document(self, multi_doc: dict[str, Document]) -> None:
         """Multiple occurrences in one document are all returned."""
         matches = locate_text("quick brown fox", {"doc2": multi_doc["doc2"]})
         assert len(matches) == 2
@@ -92,9 +82,7 @@ class TestLocateTextExact:
         matches = locate_text("quick brown fox", {"doc2": multi_doc["doc2"]})
         assert [m.occurrence_number for m in matches] == [1, 2]
 
-    def test_matches_across_multiple_documents(
-        self, multi_doc: dict[str, Document]
-    ) -> None:
+    def test_matches_across_multiple_documents(self, multi_doc: dict[str, Document]) -> None:
         """Matches are returned from all documents that contain the text."""
         # "quick brown fox" appears in doc1 (once) and doc2 (twice)
         docs = {k: multi_doc[k] for k in ("doc1", "doc2")}
@@ -108,9 +96,7 @@ class TestLocateTextExact:
         matches = locate_text("absolutely not here at all zzz", single_doc)
         assert matches == []
 
-    def test_empty_search_text_returns_empty(
-        self, single_doc: dict[str, Document]
-    ) -> None:
+    def test_empty_search_text_returns_empty(self, single_doc: dict[str, Document]) -> None:
         """Empty search string returns empty list without error."""
         assert locate_text("", single_doc) == []
 
@@ -118,9 +104,7 @@ class TestLocateTextExact:
         """No documents → no matches."""
         assert locate_text("anything", {}) == []
 
-    def test_context_before_and_after_populated(
-        self, single_doc: dict[str, Document]
-    ) -> None:
+    def test_context_before_and_after_populated(self, single_doc: dict[str, Document]) -> None:
         """Context fields are non-empty when there is surrounding text."""
         matches = locate_text("quick brown fox", single_doc)
         m = matches[0]
@@ -148,9 +132,7 @@ class TestLocateTextExact:
         assert len(m.context_before) == 10
         assert len(m.context_after) == 10
 
-    def test_sorted_by_document_id_then_start(
-        self, multi_doc: dict[str, Document]
-    ) -> None:
+    def test_sorted_by_document_id_then_start(self, multi_doc: dict[str, Document]) -> None:
         """Results are sorted alphabetically by document_id, then by start offset."""
         docs = {k: multi_doc[k] for k in ("doc1", "doc2")}
         matches = locate_text("quick brown fox", docs)
@@ -169,18 +151,14 @@ class TestLocateTextExact:
 class TestLocateTextNormalizedFallback:
     """Tests for whitespace-normalized fallback search (Requirement 15.3)."""
 
-    def test_normalizes_when_no_exact_match(
-        self, multi_doc: dict[str, Document]
-    ) -> None:
+    def test_normalizes_when_no_exact_match(self, multi_doc: dict[str, Document]) -> None:
         """Falls back to normalized search when exact match fails."""
         # "extra    whitespace" in doc3 has multiple spaces
         matches = locate_text("extra whitespace", {"doc3": multi_doc["doc3"]})
         assert len(matches) == 1
         assert matches[0].is_normalized_match is True
 
-    def test_normalized_match_offsets_slice_correctly(
-        self, multi_doc: dict[str, Document]
-    ) -> None:
+    def test_normalized_match_offsets_slice_correctly(self, multi_doc: dict[str, Document]) -> None:
         """Offsets from normalized match correctly slice original document text."""
         matches = locate_text("extra whitespace", {"doc3": multi_doc["doc3"]})
         doc = multi_doc["doc3"]
@@ -217,14 +195,12 @@ class TestFormatMatches:
         result = format_matches([])
         assert "no matches" in result.lower()
 
-    def test_single_match_contains_key_fields(
-        self, single_doc: dict[str, Document]
-    ) -> None:
+    def test_single_match_contains_key_fields(self, single_doc: dict[str, Document]) -> None:
         """Single match output includes document_id, offsets, and hash."""
         matches = locate_text("quick brown fox", single_doc)
         output = format_matches(matches)
         assert "doc1" in output
-        assert "4" in output   # start offset
+        assert "4" in output  # start offset
         assert "19" in output  # end offset
         assert matches[0].text_hash[:8] in output
 
@@ -236,9 +212,7 @@ class TestFormatMatches:
         assert "1/" in output
         assert "2/" in output
 
-    def test_show_context_false_omits_context(
-        self, single_doc: dict[str, Document]
-    ) -> None:
+    def test_show_context_false_omits_context(self, single_doc: dict[str, Document]) -> None:
         """Passing show_context=False omits context lines from output."""
         matches = locate_text("quick brown fox", single_doc)
         output = format_matches(matches, show_context=False)

@@ -82,9 +82,9 @@ class TestRecallPrecisionProperties:
 
         # Additional verification: recall should be 0.0 when no retrieved spans
         if not retrieved_spans:
-            assert recall == 0.0, (
-                f"Recall@{k} should be 0.0 when no spans retrieved, got {recall:.6f}"
-            )
+            assert (
+                recall == 0.0
+            ), f"Recall@{k} should be 0.0 when no spans retrieved, got {recall:.6f}"
 
         # Additional verification: recall should be 1.0 when retrieved fully covers gold
         # This is a best-case scenario check - we can't guarantee it happens in random data,
@@ -140,9 +140,9 @@ class TestRecallPrecisionProperties:
 
         # Additional verification: precision should be 0.0 when no retrieved spans
         if not retrieved_spans:
-            assert precision == 0.0, (
-                f"Precision@{k} should be 0.0 when no spans retrieved, got {precision:.6f}"
-            )
+            assert (
+                precision == 0.0
+            ), f"Precision@{k} should be 0.0 when no spans retrieved, got {precision:.6f}"
 
         # Additional verification: precision should be 1.0 when all retrieved are relevant
         # This is a best-case scenario check
@@ -168,7 +168,9 @@ class TestRecallPrecisionProperties:
 
     @given(
         gold_spans=intervals_strategy(min_intervals=1, max_intervals=10),  # Non-empty gold
-        retrieved_spans=intervals_strategy(min_intervals=3, max_intervals=20),  # At least 3 for K and K+1
+        retrieved_spans=intervals_strategy(
+            min_intervals=3, max_intervals=20
+        ),  # At least 3 for K and K+1
         k=st.integers(min_value=1, max_value=10),  # Independently generate K
     )
     @settings(suppress_health_check=[HealthCheck.filter_too_much])

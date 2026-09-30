@@ -24,9 +24,7 @@ def document_and_exact_substring(draw: st.DrawFn) -> tuple[str, str]:
     """
     # Use a text that contains at least one non-whitespace character so the
     # canonical form is guaranteed to have a mappable substring.
-    raw_text = draw(
-        st.text(min_size=1).filter(lambda t: any(not c.isspace() for c in t))
-    )
+    raw_text = draw(st.text(min_size=1).filter(lambda t: any(not c.isspace() for c in t)))
     doc = Document.from_text("doc1", raw_text)
     doc_text = doc.text
 
@@ -51,9 +49,7 @@ class TestChunkMapperExactSubstringProperties:
 
     @given(doc_and_sub=document_and_exact_substring())
     @settings(max_examples=200)
-    def test_exact_substring_maps_to_mapped_exact(
-        self, doc_and_sub: tuple[str, str]
-    ) -> None:
+    def test_exact_substring_maps_to_mapped_exact(self, doc_and_sub: tuple[str, str]) -> None:
         """Property 10: Chunk Mapper Exact Substring Detection.
 
         **Validates: Requirements 5.1, 5.2**
@@ -81,8 +77,7 @@ class TestChunkMapperExactSubstringProperties:
 
         # PROPERTY: at least one span must be returned
         assert len(result.spans) >= 1, (
-            f"Expected at least one span, got {result.spans}. "
-            f"substring={substring!r}"
+            f"Expected at least one span, got {result.spans}. " f"substring={substring!r}"
         )
 
         # PROPERTY: the matched span text equals the original substring
@@ -96,9 +91,9 @@ class TestChunkMapperExactSubstringProperties:
         )
 
         # PROPERTY: span offsets are valid half-open intervals within the document
-        assert 0 <= start < end <= len(doc.text), (
-            f"Span [{start}, {end}) out of bounds for document of length {len(doc.text)}"
-        )
+        assert (
+            0 <= start < end <= len(doc.text)
+        ), f"Span [{start}, {end}) out of bounds for document of length {len(doc.text)}"
 
 
 class TestChunkMapperPolicyProperties:
@@ -157,9 +152,9 @@ class TestChunkMapperPolicyProperties:
                 f"Call {call_idx + 1}: expected MAPPED_EXACT, got {result.status!r}. "
                 f"chunk_text={chunk_text!r}, doc_text={doc_text!r}"
             )
-            assert len(result.spans) == 1, (
-                f"Call {call_idx + 1}: expected exactly 1 span, got {result.spans}"
-            )
+            assert (
+                len(result.spans) == 1
+            ), f"Call {call_idx + 1}: expected exactly 1 span, got {result.spans}"
 
             span = result.spans[0]
 
@@ -171,9 +166,9 @@ class TestChunkMapperPolicyProperties:
             collected_spans.append(span)
 
         # Verify all N spans are mutually distinct
-        assert len(set(collected_spans)) == N, (
-            f"Expected {N} unique spans, but got duplicates: {collected_spans}"
-        )
+        assert (
+            len(set(collected_spans)) == N
+        ), f"Expected {N} unique spans, but got duplicates: {collected_spans}"
 
         # --- (N+1)th call: all occurrences are claimed → should return AMBIGUOUS ---
         overflow_result = mapper.map_chunk(chunk_text, document_id="doc1")
@@ -194,9 +189,7 @@ class TestChunkMapperPolicyProperties:
             max_size=20,
         ).filter(lambda t: t.strip()),  # non-empty, non-whitespace-only
     )
-    def test_all_occurrences_policy_returns_n_spans(
-        self, chunk_text: str
-    ) -> None:
+    def test_all_occurrences_policy_returns_n_spans(self, chunk_text: str) -> None:
         """Property 15: Chunk Mapper Policy Enforcement - All Occurrences.
 
         **Validates: Requirements 5.6**

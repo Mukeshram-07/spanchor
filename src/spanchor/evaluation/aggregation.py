@@ -101,7 +101,9 @@ def aggregate_metrics(
                         for q in queries
                         if q.query_id in per_query_metrics
                     )
-                    micro_metrics_dict[f"micro_{metric_name}"] = weighted_sum / total_retrieved_chars
+                    micro_metrics_dict[f"micro_{metric_name}"] = (
+                        weighted_sum / total_retrieved_chars
+                    )
 
                 # Add total retrieved chars
                 micro_metrics_dict["micro_retrieved_chars"] = total_retrieved_chars

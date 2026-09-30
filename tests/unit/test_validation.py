@@ -25,6 +25,7 @@ from spanchor.validation import CorpusIssue, check_corpus
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _doc(doc_id: str, text: str) -> Document:
     return Document.from_text(doc_id, text)
 
@@ -47,6 +48,7 @@ def _query(query_id: str, *anchors: Anchor) -> Query:
 # ---------------------------------------------------------------------------
 # Tests: happy path
 # ---------------------------------------------------------------------------
+
 
 class TestCheckCorpusHealthy:
     def test_empty_queries_returns_no_issues(self) -> None:
@@ -73,8 +75,8 @@ class TestCheckCorpusHealthy:
         """Multiple valid anchors across multiple queries produce no issues."""
         doc1 = _doc("doc1", "Hello world")
         doc2 = _doc("doc2", "Goodbye world")
-        a1 = _valid_anchor(doc1, 0, 5)   # "Hello"
-        a2 = _valid_anchor(doc2, 0, 7)   # "Goodbye"
+        a1 = _valid_anchor(doc1, 0, 5)  # "Hello"
+        a2 = _valid_anchor(doc2, 0, 7)  # "Goodbye"
         queries = [_query("q1", a1), _query("q2", a2)]
         issues = check_corpus({"doc1": doc1, "doc2": doc2}, queries)
         assert issues == []
@@ -88,6 +90,7 @@ class TestCheckCorpusHealthy:
 # ---------------------------------------------------------------------------
 # Tests: missing document (req 20.1)
 # ---------------------------------------------------------------------------
+
 
 class TestMissingDocument:
     def test_missing_document_creates_issue(self) -> None:
@@ -122,6 +125,7 @@ class TestMissingDocument:
 # Tests: hash / text mismatch (req 20.1, 20.3)
 # ---------------------------------------------------------------------------
 
+
 class TestHashMismatch:
     def test_wrong_text_hash_creates_issue(self) -> None:
         """Anchor whose expected_text_hash does not match actual text generates a CorpusIssue."""
@@ -148,6 +152,7 @@ class TestHashMismatch:
 # ---------------------------------------------------------------------------
 # Tests: offset out of bounds (req 20.2)
 # ---------------------------------------------------------------------------
+
 
 class TestOffsetBounds:
     def test_end_beyond_document_length_creates_issue(self) -> None:
@@ -199,6 +204,7 @@ class TestOffsetBounds:
 # Tests: all errors collected (req 20.4 behaviour)
 # ---------------------------------------------------------------------------
 
+
 class TestAllErrorsCollected:
     def test_multiple_bad_anchors_all_reported(self) -> None:
         """All invalid anchors are reported, not just the first one."""
@@ -239,6 +245,7 @@ class TestAllErrorsCollected:
 # Tests: CorpusIssue dataclass
 # ---------------------------------------------------------------------------
 
+
 class TestCorpusIssue:
     def test_corpus_issue_is_frozen(self) -> None:
         """CorpusIssue is immutable."""
@@ -258,19 +265,23 @@ class TestCorpusIssue:
 # Tests: public API export (req 26.6)
 # ---------------------------------------------------------------------------
 
+
 class TestPublicAPIExport:
     def test_check_corpus_exported_from_spanchor(self) -> None:
         """check_corpus is importable from the top-level spanchor package."""
         import spanchor
+
         assert hasattr(spanchor, "check_corpus")
         assert callable(spanchor.check_corpus)
 
     def test_corpus_issue_exported_from_spanchor(self) -> None:
         """CorpusIssue is importable from the top-level spanchor package."""
         import spanchor
+
         assert hasattr(spanchor, "CorpusIssue")
 
     def test_check_corpus_in_all(self) -> None:
         """check_corpus is listed in spanchor.__all__."""
         import spanchor
+
         assert "check_corpus" in spanchor.__all__

@@ -45,9 +45,7 @@ class TestQueryProperties:
         anchors_list = []
         for i in range(num_anchors):
             # Generate anchor fields
-            doc_id = data.draw(
-                st.text(min_size=1, max_size=50).filter(lambda x: x.strip())
-            )
+            doc_id = data.draw(st.text(min_size=1, max_size=50).filter(lambda x: x.strip()))
             # Generate a valid text snippet for the anchor
             anchor_text = data.draw(st.text(min_size=1, max_size=100))
             text_hash = compute_hash(anchor_text)
@@ -81,9 +79,7 @@ class TestQueryProperties:
         }
 
         # Deserialize from dict (reconstruct Query and Anchors)
-        deserialized_anchors = tuple(
-            Anchor(**anchor_dict) for anchor_dict in serialized["anchors"]
-        )
+        deserialized_anchors = tuple(Anchor(**anchor_dict) for anchor_dict in serialized["anchors"])
         deserialized = Query(
             query_id=serialized["query_id"],
             question=serialized["question"],
@@ -92,13 +88,13 @@ class TestQueryProperties:
         )
 
         # Assert all fields are preserved exactly
-        assert deserialized.query_id == original.query_id, (
-            f"query_id changed: {original.query_id!r} → {deserialized.query_id!r}"
-        )
+        assert (
+            deserialized.query_id == original.query_id
+        ), f"query_id changed: {original.query_id!r} → {deserialized.query_id!r}"
 
-        assert deserialized.question == original.question, (
-            f"question changed: {original.question!r} → {deserialized.question!r}"
-        )
+        assert (
+            deserialized.question == original.question
+        ), f"question changed: {original.question!r} → {deserialized.question!r}"
 
         assert deserialized.schema_version == original.schema_version, (
             f"schema_version changed: {original.schema_version!r} → "
@@ -106,9 +102,9 @@ class TestQueryProperties:
         )
 
         # Assert anchor count is preserved
-        assert len(deserialized.anchors) == len(original.anchors), (
-            f"Anchor count changed: {len(original.anchors)} → {len(deserialized.anchors)}"
-        )
+        assert len(deserialized.anchors) == len(
+            original.anchors
+        ), f"Anchor count changed: {len(original.anchors)} → {len(deserialized.anchors)}"
 
         # Assert each anchor is preserved exactly
         for idx, (orig_anchor, deser_anchor) in enumerate(
@@ -120,13 +116,11 @@ class TestQueryProperties:
             )
 
             assert deser_anchor.start == orig_anchor.start, (
-                f"Anchor {idx} start changed: "
-                f"{orig_anchor.start} → {deser_anchor.start}"
+                f"Anchor {idx} start changed: " f"{orig_anchor.start} → {deser_anchor.start}"
             )
 
             assert deser_anchor.end == orig_anchor.end, (
-                f"Anchor {idx} end changed: "
-                f"{orig_anchor.end} → {deser_anchor.end}"
+                f"Anchor {idx} end changed: " f"{orig_anchor.end} → {deser_anchor.end}"
             )
 
             assert deser_anchor.expected_text_hash == orig_anchor.expected_text_hash, (
@@ -140,11 +134,7 @@ class TestQueryProperties:
             )
 
             # Verify anchor equality
-            assert deser_anchor == orig_anchor, (
-                f"Anchor {idx} is not equal after deserialization"
-            )
+            assert deser_anchor == orig_anchor, f"Anchor {idx} is not equal after deserialization"
 
         # Verify complete query equality
-        assert deserialized == original, (
-            "Deserialized query is not equal to original"
-        )
+        assert deserialized == original, "Deserialized query is not equal to original"

@@ -73,14 +73,18 @@ class TestRegressionGateValidation:
 
     def test_aggregate_metric_computed_not_gated(self):
         """Aggregate deltas computed for reporting but not for regression gate."""
-        baseline = make_run({
-            "q1": {"recall@5": 0.90},
-            "q2": {"recall@5": 0.90},
-        })
-        candidate = make_run({
-            "q1": {"recall@5": 0.85},
-            "q2": {"recall@5": 0.85},
-        })
+        baseline = make_run(
+            {
+                "q1": {"recall@5": 0.90},
+                "q2": {"recall@5": 0.90},
+            }
+        )
+        candidate = make_run(
+            {
+                "q1": {"recall@5": 0.85},
+                "q2": {"recall@5": 0.85},
+            }
+        )
 
         result = compare(baseline, candidate, {"recall@5": 0.05})
 
@@ -93,16 +97,20 @@ class TestRegressionGateValidation:
 
     def test_per_query_regression_triggered_by_aggregate_drop(self):
         """When many queries drop slightly, each individually triggers REGRESSION."""
-        baseline = make_run({
-            "q1": {"recall@5": 0.90},
-            "q2": {"recall@5": 0.90},
-            "q3": {"recall@5": 0.90},
-        })
-        candidate = make_run({
-            "q1": {"recall@5": 0.84},  # drop 0.06 > threshold 0.05
-            "q2": {"recall@5": 0.84},
-            "q3": {"recall@5": 0.84},
-        })
+        baseline = make_run(
+            {
+                "q1": {"recall@5": 0.90},
+                "q2": {"recall@5": 0.90},
+                "q3": {"recall@5": 0.90},
+            }
+        )
+        candidate = make_run(
+            {
+                "q1": {"recall@5": 0.84},  # drop 0.06 > threshold 0.05
+                "q2": {"recall@5": 0.84},
+                "q3": {"recall@5": 0.84},
+            }
+        )
 
         result = compare(baseline, candidate, {"recall@5": 0.05})
 
@@ -114,12 +122,12 @@ class TestRegressionGateValidation:
 
     def test_multiple_metrics_different_thresholds(self):
         """Each metric can have different thresholds."""
-        baseline = make_run({
-            "q1": {"recall@5": 0.90, "precision@5": 0.80}
-        })
-        candidate = make_run({
-            "q1": {"recall@5": 0.84, "precision@5": 0.75}  # both drop 0.06
-        })
+        baseline = make_run({"q1": {"recall@5": 0.90, "precision@5": 0.80}})
+        candidate = make_run(
+            {
+                "q1": {"recall@5": 0.84, "precision@5": 0.75}  # both drop 0.06
+            }
+        )
 
         # recall threshold 0.05, precision threshold 0.10
         result = compare(baseline, candidate, {"recall@5": 0.05, "precision@5": 0.10})
@@ -166,16 +174,20 @@ class TestRegressionGateValidation:
 
     def test_mixed_improved_unchanged_regressed(self):
         """Mixed scenario: some improve, some unchanged, some regress."""
-        baseline = make_run({
-            "q1": {"recall@5": 0.70},  # will improve
-            "q2": {"recall@5": 0.80},  # will regress
-            "q3": {"recall@5": 0.75},  # will stay unchanged
-        })
-        candidate = make_run({
-            "q1": {"recall@5": 0.77},  # improvement 0.07 > 0.05
-            "q2": {"recall@5": 0.74},  # regression 0.06 > 0.05
-            "q3": {"recall@5": 0.75},  # unchanged
-        })
+        baseline = make_run(
+            {
+                "q1": {"recall@5": 0.70},  # will improve
+                "q2": {"recall@5": 0.80},  # will regress
+                "q3": {"recall@5": 0.75},  # will stay unchanged
+            }
+        )
+        candidate = make_run(
+            {
+                "q1": {"recall@5": 0.77},  # improvement 0.07 > 0.05
+                "q2": {"recall@5": 0.74},  # regression 0.06 > 0.05
+                "q3": {"recall@5": 0.75},  # unchanged
+            }
+        )
 
         result = compare(baseline, candidate, {"recall@5": 0.05})
 
@@ -225,14 +237,18 @@ class TestRegressionGateValidation:
 
     def test_per_query_deltas_computation(self):
         """Per-query deltas are computed independently."""
-        baseline = make_run({
-            "q1": {"recall@5": 0.80, "precision@5": 0.70},
-            "q2": {"recall@5": 0.85, "precision@5": 0.75},
-        })
-        candidate = make_run({
-            "q1": {"recall@5": 0.75, "precision@5": 0.68},
-            "q2": {"recall@5": 0.90, "precision@5": 0.80},
-        })
+        baseline = make_run(
+            {
+                "q1": {"recall@5": 0.80, "precision@5": 0.70},
+                "q2": {"recall@5": 0.85, "precision@5": 0.75},
+            }
+        )
+        candidate = make_run(
+            {
+                "q1": {"recall@5": 0.75, "precision@5": 0.68},
+                "q2": {"recall@5": 0.90, "precision@5": 0.80},
+            }
+        )
 
         result = compare(baseline, candidate, {})
 
@@ -246,14 +262,18 @@ class TestRegressionGateValidation:
 
     def test_aggregate_deltas_macro_average(self):
         """Aggregate deltas are computed as macro-average across queries."""
-        baseline = make_run({
-            "q1": {"recall@5": 0.90},
-            "q2": {"recall@5": 0.80},
-        })
-        candidate = make_run({
-            "q1": {"recall@5": 0.85},  # delta -0.05
-            "q2": {"recall@5": 0.82},  # delta +0.02
-        })
+        baseline = make_run(
+            {
+                "q1": {"recall@5": 0.90},
+                "q2": {"recall@5": 0.80},
+            }
+        )
+        candidate = make_run(
+            {
+                "q1": {"recall@5": 0.85},  # delta -0.05
+                "q2": {"recall@5": 0.82},  # delta +0.02
+            }
+        )
 
         result = compare(baseline, candidate, {})
 
@@ -262,14 +282,18 @@ class TestRegressionGateValidation:
 
     def test_only_common_queries_compared(self):
         """Only queries present in both runs are compared."""
-        baseline = make_run({
-            "q1": {"recall@5": 0.90},
-            "q2": {"recall@5": 0.80},
-        })
-        candidate = make_run({
-            "q1": {"recall@5": 0.85},
-            # q2 is missing in candidate
-        })
+        baseline = make_run(
+            {
+                "q1": {"recall@5": 0.90},
+                "q2": {"recall@5": 0.80},
+            }
+        )
+        candidate = make_run(
+            {
+                "q1": {"recall@5": 0.85},
+                # q2 is missing in candidate
+            }
+        )
 
         result = compare(baseline, candidate, {})
 
@@ -285,14 +309,18 @@ class TestRegressionGateValidation:
         # Aggregate: (-0.10 + 99 * 0.01) / 100 = 0.89 / 100 = 0.0089
         # But: has_regression should be TRUE (1 query regressed per-query policy)
 
-        baseline = make_run({
-            **{"q_regress": {"recall@5": 0.90}},
-            **{f"q{i}": {"recall@5": 0.50} for i in range(99)},
-        })
-        candidate = make_run({
-            **{"q_regress": {"recall@5": 0.80}},  # drop 0.10
-            **{f"q{i}": {"recall@5": 0.51} for i in range(99)},  # improve 0.01
-        })
+        baseline = make_run(
+            {
+                **{"q_regress": {"recall@5": 0.90}},
+                **{f"q{i}": {"recall@5": 0.50} for i in range(99)},
+            }
+        )
+        candidate = make_run(
+            {
+                **{"q_regress": {"recall@5": 0.80}},  # drop 0.10
+                **{f"q{i}": {"recall@5": 0.51} for i in range(99)},  # improve 0.01
+            }
+        )
 
         result = compare(baseline, candidate, {"recall@5": 0.05})
 

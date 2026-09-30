@@ -300,14 +300,14 @@ class TestIoUComputationDetails:
         """IoU = |G ∩ R| / |G ∪ R| (Requirement 9.1)."""
         gold = [(0, 10), (20, 30)]  # 20 chars total
         retrieved = [(5, 15), (25, 35)]  # 20 chars total
-        
+
         # Manual computation:
         # G merged: [(0, 10), (20, 30)]
         # R merged: [(5, 15), (25, 35)]
         # G ∩ R: [(5, 10), (25, 30)] = 5 + 5 = 10 chars
         # G ∪ R: [(0, 15), (20, 35)] = 15 + 15 = 30 chars
         # IoU = 10/30
-        
+
         expected = 10 / 30
         assert abs(iou(gold, retrieved) - expected) < 1e-9
 
@@ -315,7 +315,7 @@ class TestIoUComputationDetails:
         """When |G ∪ R| = 0, IoU = 0 (Requirement 9.3)."""
         # Both empty
         assert iou([], []) == 0.0
-        
+
         # Zero-length spans (invalid but testing edge case)
         # Note: In practice, zero-length spans shouldn't occur
         gold = [(5, 5)]  # Zero-length
@@ -370,7 +370,7 @@ class TestIoUDiagnosticNature:
         # IoU = 10/100 = 0.1 (reflects poor alignment)
         result = iou(gold, retrieved)
         assert result == 0.1
-        
+
         # Scenario: poor recall, good precision
         gold = [(0, 100)]
         retrieved = [(0, 10)]
@@ -379,7 +379,7 @@ class TestIoUDiagnosticNature:
         # IoU = 10/100 = 0.1 (reflects poor alignment)
         result = iou(gold, retrieved)
         assert result == 0.1
-        
+
         # IoU treats both scenarios the same (symmetric)
 
 

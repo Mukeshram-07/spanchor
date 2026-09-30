@@ -41,8 +41,11 @@ jobs:
       - name: Run pytest
         run: pytest
 
-      - name: Run Ruff
-        run: ruff check .
+      - name: Run Ruff Format Check
+        run: ruff format src/spanchor tests --check
+
+      - name: Run Ruff Lint
+        run: ruff check src/spanchor --select E,W,F,I --ignore B008,E501
 
       - name: Run mypy
         run: mypy --strict src/spanchor

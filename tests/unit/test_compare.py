@@ -18,6 +18,7 @@ from spanchor.models.run import Run
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def make_run(
     per_query_metrics: dict[str, dict[str, float]],
     aggregate_metrics: dict[str, float] | None = None,
@@ -48,6 +49,7 @@ def make_run(
 # ---------------------------------------------------------------------------
 # Per-query delta computation (Req 12.1)
 # ---------------------------------------------------------------------------
+
 
 class TestPerQueryDeltas:
     """Tests for per-query delta computation."""
@@ -96,14 +98,18 @@ class TestPerQueryDeltas:
 
     def test_multiple_queries_deltas(self):
         """Deltas are computed independently for each query. (Req 12.1)"""
-        baseline = make_run({
-            "q1": {"recall@5": 0.80},
-            "q2": {"recall@5": 0.60},
-        })
-        candidate = make_run({
-            "q1": {"recall@5": 0.90},
-            "q2": {"recall@5": 0.50},
-        })
+        baseline = make_run(
+            {
+                "q1": {"recall@5": 0.80},
+                "q2": {"recall@5": 0.60},
+            }
+        )
+        candidate = make_run(
+            {
+                "q1": {"recall@5": 0.90},
+                "q2": {"recall@5": 0.50},
+            }
+        )
 
         result = compare(baseline, candidate, {})
 
@@ -128,6 +134,7 @@ class TestPerQueryDeltas:
 # ---------------------------------------------------------------------------
 # Classification: IMPROVED (Req 12.4)
 # ---------------------------------------------------------------------------
+
 
 class TestClassificationImproved:
     """Tests for IMPROVED classification."""
@@ -165,6 +172,7 @@ class TestClassificationImproved:
 # Classification: REGRESSION (Req 12.3)
 # ---------------------------------------------------------------------------
 
+
 class TestClassificationRegression:
     """Tests for REGRESSION classification."""
 
@@ -199,14 +207,18 @@ class TestClassificationRegression:
 
     def test_regression_on_one_query_not_others(self):
         """REGRESSION on one query doesn't affect others. (Req 12.3)"""
-        baseline = make_run({
-            "q1": {"recall@5": 0.90},
-            "q2": {"recall@5": 0.70},
-        })
-        candidate = make_run({
-            "q1": {"recall@5": 0.75},  # drops 0.15 → REGRESSION
-            "q2": {"recall@5": 0.85},  # improves 0.15 → IMPROVED
-        })
+        baseline = make_run(
+            {
+                "q1": {"recall@5": 0.90},
+                "q2": {"recall@5": 0.70},
+            }
+        )
+        candidate = make_run(
+            {
+                "q1": {"recall@5": 0.75},  # drops 0.15 → REGRESSION
+                "q2": {"recall@5": 0.85},  # improves 0.15 → IMPROVED
+            }
+        )
 
         result = compare(baseline, candidate, {"recall@5": 0.05})
 
@@ -217,6 +229,7 @@ class TestClassificationRegression:
 # ---------------------------------------------------------------------------
 # Classification: UNCHANGED (Req 12.5)
 # ---------------------------------------------------------------------------
+
 
 class TestClassificationUnchanged:
     """Tests for UNCHANGED classification."""
@@ -232,14 +245,18 @@ class TestClassificationUnchanged:
 
     def test_all_unchanged_with_empty_policy(self):
         """Empty policy means every query is UNCHANGED regardless of delta. (Default policy)"""
-        baseline = make_run({
-            "q1": {"recall@5": 0.90},
-            "q2": {"recall@5": 0.50},
-        })
-        candidate = make_run({
-            "q1": {"recall@5": 0.10},  # huge drop
-            "q2": {"recall@5": 0.99},  # huge gain
-        })
+        baseline = make_run(
+            {
+                "q1": {"recall@5": 0.90},
+                "q2": {"recall@5": 0.50},
+            }
+        )
+        candidate = make_run(
+            {
+                "q1": {"recall@5": 0.10},  # huge drop
+                "q2": {"recall@5": 0.99},  # huge gain
+            }
+        )
 
         result = compare(baseline, candidate, {})  # empty policy
 
@@ -260,19 +277,24 @@ class TestClassificationUnchanged:
 # Aggregate deltas (Req 12.6)
 # ---------------------------------------------------------------------------
 
+
 class TestAggregateDeltas:
     """Tests for aggregate delta computation."""
 
     def test_aggregate_delta_is_macro_average(self):
         """Aggregate delta is the macro-average of per-query deltas. (Req 12.6)"""
-        baseline = make_run({
-            "q1": {"recall@5": 0.80},
-            "q2": {"recall@5": 0.60},
-        })
-        candidate = make_run({
-            "q1": {"recall@5": 0.90},  # +0.10
-            "q2": {"recall@5": 0.70},  # +0.10
-        })
+        baseline = make_run(
+            {
+                "q1": {"recall@5": 0.80},
+                "q2": {"recall@5": 0.60},
+            }
+        )
+        candidate = make_run(
+            {
+                "q1": {"recall@5": 0.90},  # +0.10
+                "q2": {"recall@5": 0.70},  # +0.10
+            }
+        )
 
         result = compare(baseline, candidate, {})
 
@@ -281,14 +303,18 @@ class TestAggregateDeltas:
 
     def test_aggregate_delta_mixed_values(self):
         """Aggregate delta handles mix of positive and negative deltas. (Req 12.6)"""
-        baseline = make_run({
-            "q1": {"recall@5": 0.80},
-            "q2": {"recall@5": 0.80},
-        })
-        candidate = make_run({
-            "q1": {"recall@5": 0.90},  # +0.10
-            "q2": {"recall@5": 0.70},  # -0.10
-        })
+        baseline = make_run(
+            {
+                "q1": {"recall@5": 0.80},
+                "q2": {"recall@5": 0.80},
+            }
+        )
+        candidate = make_run(
+            {
+                "q1": {"recall@5": 0.90},  # +0.10
+                "q2": {"recall@5": 0.70},  # -0.10
+            }
+        )
 
         result = compare(baseline, candidate, {})
 
@@ -297,14 +323,18 @@ class TestAggregateDeltas:
 
     def test_aggregate_delta_multiple_metrics(self):
         """Aggregate deltas are computed for each metric independently. (Req 12.6)"""
-        baseline = make_run({
-            "q1": {"recall@5": 0.80, "hit@5": 0.70},
-            "q2": {"recall@5": 0.60, "hit@5": 0.50},
-        })
-        candidate = make_run({
-            "q1": {"recall@5": 0.90, "hit@5": 0.80},  # recall +0.10, hit +0.10
-            "q2": {"recall@5": 0.40, "hit@5": 0.60},  # recall -0.20, hit +0.10
-        })
+        baseline = make_run(
+            {
+                "q1": {"recall@5": 0.80, "hit@5": 0.70},
+                "q2": {"recall@5": 0.60, "hit@5": 0.50},
+            }
+        )
+        candidate = make_run(
+            {
+                "q1": {"recall@5": 0.90, "hit@5": 0.80},  # recall +0.10, hit +0.10
+                "q2": {"recall@5": 0.40, "hit@5": 0.60},  # recall -0.20, hit +0.10
+            }
+        )
 
         result = compare(baseline, candidate, {})
 
@@ -327,19 +357,24 @@ class TestAggregateDeltas:
 # has_regression flag (Req 12.7 implied)
 # ---------------------------------------------------------------------------
 
+
 class TestHasRegression:
     """Tests for the has_regression flag."""
 
     def test_has_regression_true_when_any_query_is_regression(self):
         """has_regression is True when at least one query is REGRESSION."""
-        baseline = make_run({
-            "q1": {"recall@5": 0.90},  # will REGRESS
-            "q2": {"recall@5": 0.70},  # will be IMPROVED
-        })
-        candidate = make_run({
-            "q1": {"recall@5": 0.75},
-            "q2": {"recall@5": 0.90},
-        })
+        baseline = make_run(
+            {
+                "q1": {"recall@5": 0.90},  # will REGRESS
+                "q2": {"recall@5": 0.70},  # will be IMPROVED
+            }
+        )
+        candidate = make_run(
+            {
+                "q1": {"recall@5": 0.75},
+                "q2": {"recall@5": 0.90},
+            }
+        )
 
         result = compare(baseline, candidate, {"recall@5": 0.05})
 
@@ -377,19 +412,24 @@ class TestHasRegression:
 # Only common queries included
 # ---------------------------------------------------------------------------
 
+
 class TestCommonQueries:
     """Tests that only queries common to both runs are compared."""
 
     def test_only_common_queries_in_result(self):
         """Queries only in baseline or only in candidate are excluded."""
-        baseline = make_run({
-            "q1": {"recall@5": 0.80},
-            "q_only_baseline": {"recall@5": 0.50},
-        })
-        candidate = make_run({
-            "q1": {"recall@5": 0.85},
-            "q_only_candidate": {"recall@5": 0.90},
-        })
+        baseline = make_run(
+            {
+                "q1": {"recall@5": 0.80},
+                "q_only_baseline": {"recall@5": 0.50},
+            }
+        )
+        candidate = make_run(
+            {
+                "q1": {"recall@5": 0.85},
+                "q_only_candidate": {"recall@5": 0.90},
+            }
+        )
 
         result = compare(baseline, candidate, {})
 
@@ -412,6 +452,7 @@ class TestCommonQueries:
 # Return type and structure
 # ---------------------------------------------------------------------------
 
+
 class TestReturnStructure:
     """Tests that ComparisonResult has all required fields."""
 
@@ -431,16 +472,20 @@ class TestReturnStructure:
     def test_status_values_are_valid_literals(self):
         """All per_query_status values are one of the three valid literals."""
         valid_statuses = {"IMPROVED", "REGRESSION", "UNCHANGED"}
-        baseline = make_run({
-            "q1": {"recall@5": 0.80},
-            "q2": {"recall@5": 0.90},
-            "q3": {"recall@5": 0.70},
-        })
-        candidate = make_run({
-            "q1": {"recall@5": 0.90},  # IMPROVED
-            "q2": {"recall@5": 0.78},  # REGRESSION (drop 0.12 > 0.05)
-            "q3": {"recall@5": 0.72},  # UNCHANGED (drop 0.02 < 0.05)
-        })
+        baseline = make_run(
+            {
+                "q1": {"recall@5": 0.80},
+                "q2": {"recall@5": 0.90},
+                "q3": {"recall@5": 0.70},
+            }
+        )
+        candidate = make_run(
+            {
+                "q1": {"recall@5": 0.90},  # IMPROVED
+                "q2": {"recall@5": 0.78},  # REGRESSION (drop 0.12 > 0.05)
+                "q3": {"recall@5": 0.72},  # UNCHANGED (drop 0.02 < 0.05)
+            }
+        )
 
         result = compare(baseline, candidate, {"recall@5": 0.05})
 
@@ -449,14 +494,18 @@ class TestReturnStructure:
 
     def test_per_query_deltas_and_status_have_same_keys(self):
         """per_query_deltas and per_query_status cover the exact same query IDs."""
-        baseline = make_run({
-            "q1": {"recall@5": 0.80},
-            "q2": {"recall@5": 0.70},
-        })
-        candidate = make_run({
-            "q1": {"recall@5": 0.85},
-            "q2": {"recall@5": 0.60},
-        })
+        baseline = make_run(
+            {
+                "q1": {"recall@5": 0.80},
+                "q2": {"recall@5": 0.70},
+            }
+        )
+        candidate = make_run(
+            {
+                "q1": {"recall@5": 0.85},
+                "q2": {"recall@5": 0.60},
+            }
+        )
 
         result = compare(baseline, candidate, {})
 

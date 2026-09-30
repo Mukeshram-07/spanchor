@@ -36,9 +36,7 @@ class TestReadRun:
                     "schema_version": "0.1.0",
                 }
             ],
-            "per_query_metrics": {
-                "q1": {"recall@5": 0.85, "precision@5": 0.72}
-            },
+            "per_query_metrics": {"q1": {"recall@5": 0.85, "precision@5": 0.72}},
             "aggregate_metrics": {
                 "mean_recall@5": 0.85,
                 "mean_precision@5": 0.72,
@@ -521,9 +519,7 @@ class TestReadRun:
         assert "must be int" in str(exc_info.value)
         assert "start" in str(exc_info.value)
 
-    def test_per_query_metrics_wrong_structure_raises_error(
-        self, tmp_path: Path
-    ) -> None:
+    def test_per_query_metrics_wrong_structure_raises_error(self, tmp_path: Path) -> None:
         """Test that per_query_metrics with wrong structure raises error."""
         json_file = tmp_path / "run.json"
         data = {
@@ -567,9 +563,7 @@ class TestReadRun:
         assert "must be numeric" in str(exc_info.value)
         assert "recall@5" in str(exc_info.value)
 
-    def test_aggregate_metric_value_wrong_type_raises_error(
-        self, tmp_path: Path
-    ) -> None:
+    def test_aggregate_metric_value_wrong_type_raises_error(self, tmp_path: Path) -> None:
         """Test that aggregate metric value with wrong type raises error."""
         json_file = tmp_path / "run.json"
         data = {
@@ -875,9 +869,5 @@ class TestWriteRun:
         write_run(json_file, run)
         loaded_run = read_run(json_file)
 
-        assert loaded_run.per_query_metrics["q1"]["recall@5"] == pytest.approx(
-            0.85123456
-        )
-        assert loaded_run.per_query_metrics["q1"]["precision@5"] == pytest.approx(
-            0.72987654
-        )
+        assert loaded_run.per_query_metrics["q1"]["recall@5"] == pytest.approx(0.85123456)
+        assert loaded_run.per_query_metrics["q1"]["precision@5"] == pytest.approx(0.72987654)

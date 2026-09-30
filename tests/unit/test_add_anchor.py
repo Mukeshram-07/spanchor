@@ -114,9 +114,7 @@ class TestUniqueTextAdd:
         assert len(query.anchors) == 1
 
     def test_anchor_offsets_match_document_text(self, docs, gold_path):
-        query, match = add_anchor(
-            "q1", "Fox question", "quick brown fox", docs, gold_path
-        )
+        query, match = add_anchor("q1", "Fox question", "quick brown fox", docs, gold_path)
         anchor = query.anchors[0]
         doc = docs[anchor.document_id]
         assert doc.text[anchor.start : anchor.end] == "quick brown fox"
@@ -124,9 +122,7 @@ class TestUniqueTextAdd:
     def test_anchor_text_hash_is_correct(self, docs, gold_path):
         from spanchor.canonical.normalize import compute_hash
 
-        query, match = add_anchor(
-            "q1", "Fox question", "quick brown fox", docs, gold_path
-        )
+        query, match = add_anchor("q1", "Fox question", "quick brown fox", docs, gold_path)
         anchor = query.anchors[0]
         doc = docs[anchor.document_id]
         expected_hash = compute_hash(doc.text[anchor.start : anchor.end])
@@ -145,18 +141,14 @@ class TestUniqueTextAdd:
     def test_appends_to_existing_file(self, docs, existing_gold_path):
         add_anchor("q2", "New question", "quick brown fox", docs, existing_gold_path)
         lines = [
-            ln
-            for ln in existing_gold_path.read_text(encoding="utf-8").splitlines()
-            if ln.strip()
+            ln for ln in existing_gold_path.read_text(encoding="utf-8").splitlines() if ln.strip()
         ]
         assert len(lines) == 2
         ids = {json.loads(ln)["query_id"] for ln in lines}
         assert ids == {"existing-q1", "q2"}
 
     def test_returned_match_has_correct_offsets(self, docs, gold_path):
-        query, match = add_anchor(
-            "q1", "Fox question", "quick brown fox", docs, gold_path
-        )
+        query, match = add_anchor("q1", "Fox question", "quick brown fox", docs, gold_path)
         doc = docs["doc1"]
         assert doc.text[match.start : match.end] == "quick brown fox"
 
@@ -203,25 +195,17 @@ class TestAmbiguousText:
 
 class TestOccurrenceSelection:
     def test_occurrence_1_picks_first_match(self, docs, gold_path):
-        query, match = add_anchor(
-            "q1", "question", "Repeat me", docs, gold_path, occurrence=1
-        )
+        query, match = add_anchor("q1", "question", "Repeat me", docs, gold_path, occurrence=1)
         assert match.occurrence_number == 1
 
     def test_occurrence_2_picks_second_match(self, docs, gold_path):
-        query, match = add_anchor(
-            "q1", "question", "Repeat me", docs, gold_path, occurrence=2
-        )
+        query, match = add_anchor("q1", "question", "Repeat me", docs, gold_path, occurrence=2)
         assert match.occurrence_number == 2
 
     def test_occurrence_differs_in_offsets(self, docs, gold_path):
-        _, match1 = add_anchor(
-            "q1", "q", "Repeat me", docs, gold_path, occurrence=1
-        )
+        _, match1 = add_anchor("q1", "q", "Repeat me", docs, gold_path, occurrence=1)
         gold_path2 = gold_path.parent / "gold2.jsonl"
-        _, match2 = add_anchor(
-            "q1", "q", "Repeat me", docs, gold_path2, occurrence=2
-        )
+        _, match2 = add_anchor("q1", "q", "Repeat me", docs, gold_path2, occurrence=2)
         assert match1.start != match2.start
 
     def test_occurrence_on_unique_text_uses_first(self, docs, gold_path):

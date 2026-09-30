@@ -14,9 +14,7 @@ def sample_docs() -> dict[str, Document]:
     doc2 = Document.from_text(
         "doc2", "The quick brown fox appears twice. The quick brown fox is here again."
     )
-    doc3 = Document.from_text(
-        "doc3", "Text with   extra    whitespace   in it."
-    )
+    doc3 = Document.from_text("doc3", "Text with   extra    whitespace   in it.")
     return {"doc1": doc1, "doc2": doc2, "doc3": doc3}
 
 
@@ -51,9 +49,7 @@ class TestChunkMapperExactMatching:
         assert len(result2.spans) == 1
         assert result2.spans[0][1] == 39  # Second occurrence at position 39
 
-    def test_exact_match_multiple_occurrences_all(
-        self, sample_docs: dict[str, Document]
-    ) -> None:
+    def test_exact_match_multiple_occurrences_all(self, sample_docs: dict[str, Document]) -> None:
         """Test mapping with all_occurrences policy."""
         mapper = ChunkMapper(sample_docs, ambiguity_policy="all_occurrences")
         result = mapper.map_chunk("quick brown fox", document_id="doc2")
@@ -64,9 +60,7 @@ class TestChunkMapperExactMatching:
         assert result.spans[0][1] == 4
         assert result.spans[1][1] == 39
 
-    def test_exact_match_multiple_occurrences_fail(
-        self, sample_docs: dict[str, Document]
-    ) -> None:
+    def test_exact_match_multiple_occurrences_fail(self, sample_docs: dict[str, Document]) -> None:
         """Test mapping with fail policy raises error on ambiguity."""
         mapper = ChunkMapper(sample_docs, ambiguity_policy="fail")
 
@@ -116,9 +110,7 @@ class TestChunkMapperExactMatching:
 class TestChunkMapperNormalizedMatching:
     """Test whitespace-normalized matching."""
 
-    def test_normalized_match_extra_whitespace(
-        self, sample_docs: dict[str, Document]
-    ) -> None:
+    def test_normalized_match_extra_whitespace(self, sample_docs: dict[str, Document]) -> None:
         """Test matching with extra whitespace."""
         mapper = ChunkMapper(sample_docs)
         # Search for text with different whitespace than original
@@ -153,9 +145,7 @@ class TestChunkMapperNormalizedMatching:
         assert result.status == "MAPPED_EXACT" or result.status == "MAPPED_NORMALIZED"
         assert len(result.spans) == 1
 
-    def test_normalized_fallback_after_exact_fails(
-        self, sample_docs: dict[str, Document]
-    ) -> None:
+    def test_normalized_fallback_after_exact_fails(self, sample_docs: dict[str, Document]) -> None:
         """Test that normalized matching is tried after exact matching fails."""
         mapper = ChunkMapper(sample_docs)
         # This won't match exactly due to extra spaces
@@ -166,9 +156,7 @@ class TestChunkMapperNormalizedMatching:
 
     def test_normalized_match_multiple_occurrences(self) -> None:
         """Test normalized matching with ambiguity."""
-        doc = Document.from_text(
-            "doc1", "Hello  world. Some text. Hello   world again."
-        )
+        doc = Document.from_text("doc1", "Hello  world. Some text. Hello   world again.")
         mapper = ChunkMapper({"doc1": doc}, ambiguity_policy="all_occurrences")
 
         result = mapper.map_chunk("Hello world", document_id="doc1")
@@ -233,9 +221,7 @@ class TestChunkMapperClaimsTracking:
         result2 = mapper.map_chunk("quick brown fox", document_id="doc2")
         assert result2.spans[0][1] == 4  # First occurrence again
 
-    def test_claims_persist_across_different_chunks(
-        self, sample_docs: dict[str, Document]
-    ) -> None:
+    def test_claims_persist_across_different_chunks(self, sample_docs: dict[str, Document]) -> None:
         """Test that claims persist when mapping different chunks."""
         mapper = ChunkMapper(sample_docs, ambiguity_policy="first_unclaimed")
 

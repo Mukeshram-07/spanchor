@@ -74,8 +74,7 @@ class TestCanonicalProperties:
 
         # Assert idempotence: applying normalization twice == applying once
         assert canonical_once == canonical_twice, (
-            "Canonicalization is not idempotent: "
-            "normalize(normalize(text)) != normalize(text)"
+            "Canonicalization is not idempotent: " "normalize(normalize(text)) != normalize(text)"
         )
 
         # Assert hash stability: hash is stable after canonicalization
@@ -85,9 +84,7 @@ class TestCanonicalProperties:
         )
 
         # Verify output is in canonical form
-        assert unicodedata.is_normalized("NFC", canonical_once), (
-            "Output is not in NFC form"
-        )
+        assert unicodedata.is_normalized("NFC", canonical_once), "Output is not in NFC form"
 
         # Verify all line endings are normalized to \n
         assert "\r\n" not in canonical_once, "Found CRLF in canonical text"
@@ -109,9 +106,7 @@ class TestCanonicalProperties:
         hash2 = compute_hash(canonical)
         hash3 = compute_hash(canonical)
 
-        assert hash1 == hash2 == hash3, (
-            "Hash computation is not deterministic"
-        )
+        assert hash1 == hash2 == hash3, "Hash computation is not deterministic"
 
     @given(st.text(min_size=0, max_size=500))
     def test_normalized_output_is_nfc(self, text: str) -> None:
@@ -123,9 +118,7 @@ class TestCanonicalProperties:
         Unicode normalization form.
         """
         result = normalize_text(text)
-        assert unicodedata.is_normalized("NFC", result), (
-            f"Output is not NFC normalized: {result!r}"
-        )
+        assert unicodedata.is_normalized("NFC", result), f"Output is not NFC normalized: {result!r}"
 
     @given(st.text(min_size=0, max_size=500))
     def test_normalized_output_has_only_lf(self, text: str) -> None:
@@ -182,6 +175,6 @@ class TestCanonicalProperties:
         assert len(hash_value) == 64, f"Hash length is {len(hash_value)}, expected 64"
 
         # Check all characters are lowercase hex
-        assert all(c in "0123456789abcdef" for c in hash_value), (
-            f"Hash contains non-hex characters: {hash_value}"
-        )
+        assert all(
+            c in "0123456789abcdef" for c in hash_value
+        ), f"Hash contains non-hex characters: {hash_value}"

@@ -169,10 +169,12 @@ class TestValidateCommand:
         hash1 = compute_hash(doc.text[0:5])
         hash2 = compute_hash(doc.text[6:11])
 
-        lines = "\n".join([
-            _make_gold_line("q1", "doc1", 0, 5, hash1, "Query one"),
-            _make_gold_line("q2", "doc1", 6, 11, hash2, "Query two"),
-        ])
+        lines = "\n".join(
+            [
+                _make_gold_line("q1", "doc1", 0, 5, hash1, "Query one"),
+                _make_gold_line("q2", "doc1", 6, 11, hash2, "Query two"),
+            ]
+        )
         gold = tmp_path / "gold.jsonl"
         gold.write_text(lines, encoding="utf-8")
 
@@ -236,10 +238,12 @@ class TestValidateCommand:
         doc1 = Document.from_text("doc1", "Alpha beta gamma")
         doc2 = Document.from_text("doc2", "Delta epsilon")
 
-        lines = "\n".join([
-            _make_gold_line("q1", "doc1", 0, 5, compute_hash(doc1.text[0:5])),
-            _make_gold_line("q2", "doc2", 0, 5, compute_hash(doc2.text[0:5])),
-        ])
+        lines = "\n".join(
+            [
+                _make_gold_line("q1", "doc1", 0, 5, compute_hash(doc1.text[0:5])),
+                _make_gold_line("q2", "doc2", 0, 5, compute_hash(doc2.text[0:5])),
+            ]
+        )
         gold = tmp_path / "gold.jsonl"
         gold.write_text(lines, encoding="utf-8")
 
@@ -317,10 +321,12 @@ class TestValidateCommandErrors:
         (docs_dir / "doc1.txt").write_text("Hello world", encoding="utf-8")
 
         # Both anchors have wrong hashes → should collect 2 errors
-        lines = "\n".join([
-            _make_gold_line("q1", "doc1", 0, 5, "wrong_hash_1"),
-            _make_gold_line("q2", "doc1", 6, 11, "wrong_hash_2"),
-        ])
+        lines = "\n".join(
+            [
+                _make_gold_line("q1", "doc1", 0, 5, "wrong_hash_1"),
+                _make_gold_line("q2", "doc1", 6, 11, "wrong_hash_2"),
+            ]
+        )
         gold = tmp_path / "gold.jsonl"
         gold.write_text(lines, encoding="utf-8")
 
@@ -339,10 +345,12 @@ class TestValidateCommandErrors:
 
         doc = Document.from_text("doc1", "Hello world")
         text_hash = compute_hash(doc.text[0:5])
-        lines = "\n".join([
-            _make_gold_line("q1", "doc1", 0, 5, text_hash),
-            _make_gold_line("q1", "doc1", 0, 5, text_hash),  # duplicate
-        ])
+        lines = "\n".join(
+            [
+                _make_gold_line("q1", "doc1", 0, 5, text_hash),
+                _make_gold_line("q1", "doc1", 0, 5, text_hash),  # duplicate
+            ]
+        )
         gold = tmp_path / "gold.jsonl"
         gold.write_text(lines, encoding="utf-8")
 

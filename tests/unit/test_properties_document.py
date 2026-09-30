@@ -19,9 +19,7 @@ class TestDocumentProperties:
         st.text(min_size=1, max_size=100).filter(lambda x: x.strip()),  # document_id
         st.text(min_size=0, max_size=1000),  # text content
     )
-    def test_document_serialization_round_trip(
-        self, document_id: str, text_content: str
-    ) -> None:
+    def test_document_serialization_round_trip(self, document_id: str, text_content: str) -> None:
         """Property 2: Document Serialization Round-Trip.
 
         **Validates: Requirements 1.5**
@@ -44,17 +42,17 @@ class TestDocumentProperties:
         deserialized = Document(**serialized)
 
         # Assert all fields are preserved exactly
-        assert deserialized.document_id == original.document_id, (
-            f"document_id changed: {original.document_id!r} → {deserialized.document_id!r}"
-        )
+        assert (
+            deserialized.document_id == original.document_id
+        ), f"document_id changed: {original.document_id!r} → {deserialized.document_id!r}"
 
-        assert deserialized.text == original.text, (
-            f"text changed: {original.text!r} → {deserialized.text!r}"
-        )
+        assert (
+            deserialized.text == original.text
+        ), f"text changed: {original.text!r} → {deserialized.text!r}"
 
-        assert deserialized.sha256 == original.sha256, (
-            f"sha256 changed: {original.sha256!r} → {deserialized.sha256!r}"
-        )
+        assert (
+            deserialized.sha256 == original.sha256
+        ), f"sha256 changed: {original.sha256!r} → {deserialized.sha256!r}"
 
         assert deserialized.schema_version == original.schema_version, (
             f"schema_version changed: {original.schema_version!r} → "
@@ -62,6 +60,4 @@ class TestDocumentProperties:
         )
 
         # Verify complete equality
-        assert deserialized == original, (
-            "Deserialized document is not equal to original"
-        )
+        assert deserialized == original, "Deserialized document is not equal to original"

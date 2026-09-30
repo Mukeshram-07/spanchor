@@ -20,14 +20,14 @@ class TestMacroAverageAggregation:
             "q1": {"recall@5": 0.8, "precision@5": 0.9, "retrieved_chars": 100.0},
             "q2": {"recall@5": 1.0, "precision@5": 0.7, "retrieved_chars": 200.0},
         }
-        
+
         queries = [
             Query("q1", "test1", ()),
             Query("q2", "test2", ()),
         ]
-        
+
         result = aggregate_metrics(per_query_metrics, queries, "macro")
-        
+
         # Macro-average: (0.8 + 1.0) / 2 = 0.9
         assert result["mean_recall@5"] == 0.9
         # Macro-average: (0.9 + 0.7) / 2 = 0.8
@@ -40,11 +40,11 @@ class TestMacroAverageAggregation:
         per_query_metrics = {
             "q1": {"recall@5": 0.75, "precision@5": 0.85, "retrieved_chars": 120.0},
         }
-        
+
         queries = [Query("q1", "test", ())]
-        
+
         result = aggregate_metrics(per_query_metrics, queries, "macro")
-        
+
         assert result["mean_recall@5"] == 0.75
         assert result["mean_precision@5"] == 0.85
         assert result["mean_retrieved_chars"] == 120.0
@@ -59,14 +59,14 @@ class TestMacroAverageAggregation:
         per_query_metrics = {
             "q1": {"recall@5": 0.8, "precision@5": 0.9},
         }
-        
+
         queries = [
             Query("q1", "test1", ()),
             Query("q2", "test2", ()),  # Missing from per_query_metrics
         ]
-        
+
         result = aggregate_metrics(per_query_metrics, queries, "macro")
-        
+
         # Should only average q1 since q2 is missing
         assert result["mean_recall@5"] == 0.8
         assert result["mean_precision@5"] == 0.9
@@ -84,14 +84,14 @@ class TestMicroAverageAggregation:
             "q1": {"recall@5": 0.8, "precision@5": 0.9, "retrieved_chars": 100.0},
             "q2": {"recall@5": 0.6, "precision@5": 0.7, "retrieved_chars": 200.0},
         }
-        
+
         queries = [
             Query("q1", "test1", ()),
             Query("q2", "test2", ()),
         ]
-        
+
         result = aggregate_metrics(per_query_metrics, queries, "micro")
-        
+
         # Micro-average: (0.8 * 100 + 0.6 * 200) / (100 + 200) = 200 / 300 = 0.6667
         assert abs(result["micro_recall@5"] - 0.6667) < 0.001
         # Micro-average: (0.9 * 100 + 0.7 * 200) / (100 + 200) = 230 / 300 = 0.7667
@@ -104,11 +104,11 @@ class TestMicroAverageAggregation:
         per_query_metrics = {
             "q1": {"recall@5": 0.75, "precision@5": 0.85, "retrieved_chars": 120.0},
         }
-        
+
         queries = [Query("q1", "test", ())]
-        
+
         result = aggregate_metrics(per_query_metrics, queries, "micro")
-        
+
         # With single query, micro and macro should be the same
         assert result["micro_recall@5"] == 0.75
         assert result["micro_precision@5"] == 0.85
@@ -120,14 +120,14 @@ class TestMicroAverageAggregation:
             "q1": {"recall@5": 0.8, "precision@5": 0.9, "retrieved_chars": 0.0},
             "q2": {"recall@5": 1.0, "precision@5": 0.7, "retrieved_chars": 0.0},
         }
-        
+
         queries = [
             Query("q1", "test1", ()),
             Query("q2", "test2", ()),
         ]
-        
+
         result = aggregate_metrics(per_query_metrics, queries, "micro")
-        
+
         # Should fall back to macro-average
         assert "mean_recall@5" in result
         assert result["mean_recall@5"] == 0.9
@@ -142,8 +142,10 @@ class TestInvalidAggregationMethod:
             "q1": {"recall@5": 0.8},
         }
         queries = [Query("q1", "test", ())]
-        
-        with pytest.raises(ValueError, match="Invalid aggregation_method.*Must be 'macro' or 'micro'"):
+
+        with pytest.raises(
+            ValueError, match="Invalid aggregation_method.*Must be 'macro' or 'micro'"
+        ):
             aggregate_metrics(per_query_metrics, queries, "invalid")  # type: ignore
 
 
@@ -160,9 +162,9 @@ class TestComputeMeanRetrievedChars:
             Query("q1", "test1", ()),
             Query("q2", "test2", ()),
         ]
-        
+
         result = compute_mean_retrieved_chars(per_query_metrics, queries)
-        
+
         assert result == 400.0
 
     def test_compute_mean_retrieved_chars_empty(self) -> None:
@@ -176,9 +178,9 @@ class TestComputeMeanRetrievedChars:
             "q1": {"recall@5": 0.8},  # No retrieved_chars field
         }
         queries = [Query("q1", "test", ())]
-        
+
         result = compute_mean_retrieved_chars(per_query_metrics, queries)
-        
+
         # Should default to 0.0 for missing field
         assert result == 0.0
 
@@ -206,14 +208,14 @@ class TestAggregationWithRealMetrics:
                 "retrieved_chars": 180.0,
             },
         }
-        
+
         queries = [
             Query("q1", "test1", ()),
             Query("q2", "test2", ()),
         ]
-        
+
         result = aggregate_metrics(per_query_metrics, queries, "macro")
-        
+
         # Check all metrics are present
         assert "mean_recall@5" in result
         assert "mean_precision@5" in result
@@ -221,7 +223,7 @@ class TestAggregationWithRealMetrics:
         assert "mean_full_evidence@5" in result
         assert "mean_iou" in result
         assert "mean_retrieved_chars" in result
-        
+
         # Check macro-average values
         assert result["mean_recall@5"] == 0.80
         assert abs(result["mean_precision@5"] - 0.85) < 0.0001

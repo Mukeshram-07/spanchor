@@ -76,8 +76,8 @@ class TestMinQueryCountGuard:
             compare(baseline, candidate, {}, min_query_count=10)
 
         msg = str(exc_info.value)
-        assert "10" in msg   # required minimum
-        assert "2" in msg    # actual common count
+        assert "10" in msg  # required minimum
+        assert "2" in msg  # actual common count
 
     def test_passes_when_common_queries_equal_min(self):
         """No error when common query count exactly equals min_query_count. (Req 13.5)"""
@@ -151,12 +151,15 @@ class TestLoadPolicy:
 
     def test_loads_thresholds_from_nested_format(self, tmp_path):
         """load_policy reads nested thresholds dict correctly. (Req 13.1)"""
-        p = write_json_policy(tmp_path, {
-            "thresholds": {
-                "recall@5": 0.05,
-                "hit@5": 0.10,
-            }
-        })
+        p = write_json_policy(
+            tmp_path,
+            {
+                "thresholds": {
+                    "recall@5": 0.05,
+                    "hit@5": 0.10,
+                }
+            },
+        )
 
         policy = load_policy(p)
 
@@ -165,10 +168,13 @@ class TestLoadPolicy:
 
     def test_loads_thresholds_from_flat_format(self, tmp_path):
         """load_policy reads flat metric-key format correctly."""
-        p = write_json_policy(tmp_path, {
-            "recall@5": 0.05,
-            "precision@5": 0.08,
-        })
+        p = write_json_policy(
+            tmp_path,
+            {
+                "recall@5": 0.05,
+                "precision@5": 0.08,
+            },
+        )
 
         policy = load_policy(p)
 
@@ -177,10 +183,13 @@ class TestLoadPolicy:
 
     def test_loads_min_query_count(self, tmp_path):
         """load_policy reads min_query_count field. (Req 13.5)"""
-        p = write_json_policy(tmp_path, {
-            "thresholds": {"recall@5": 0.05},
-            "min_query_count": 30,
-        })
+        p = write_json_policy(
+            tmp_path,
+            {
+                "thresholds": {"recall@5": 0.05},
+                "min_query_count": 30,
+            },
+        )
 
         policy = load_policy(p)
 
@@ -255,10 +264,13 @@ class TestLoadPolicy:
 
     def test_nested_and_flat_metrics_combined(self, tmp_path):
         """Nested thresholds and top-level flat keys are merged."""
-        p = write_json_policy(tmp_path, {
-            "thresholds": {"recall@5": 0.05},
-            "hit@5": 0.10,
-        })
+        p = write_json_policy(
+            tmp_path,
+            {
+                "thresholds": {"recall@5": 0.05},
+                "hit@5": 0.10,
+            },
+        )
 
         policy = load_policy(p)
 
@@ -349,11 +361,14 @@ class TestMergePolicy:
         """Multiple override keys are all applied in one call. (Req 13.2)"""
         base = RegressionPolicy(thresholds={"recall@5": 0.05}, min_query_count=10)
 
-        merged = merge_policy(base, {
-            "recall@5": 0.02,
-            "hit@5": 0.08,
-            "min_query_count": 30,
-        })
+        merged = merge_policy(
+            base,
+            {
+                "recall@5": 0.02,
+                "hit@5": 0.08,
+                "min_query_count": 30,
+            },
+        )
 
         assert merged.thresholds["recall@5"] == pytest.approx(0.02)
         assert merged.thresholds["hit@5"] == pytest.approx(0.08)

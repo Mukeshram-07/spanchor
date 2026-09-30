@@ -29,9 +29,7 @@ class TestEvaluateBasic:
         query = Query("q1", "What is the greeting?", (anchor,))
 
         # Perfect retrieval - exact match
-        result = RetrievalResult(
-            rank=1, score=0.95, document_id="doc1", start=0, end=11
-        )
+        result = RetrievalResult(rank=1, score=0.95, document_id="doc1", start=0, end=11)
 
         # Evaluate
         run = evaluate(
@@ -573,6 +571,7 @@ class TestEvaluateSmallSampleWarning:
         with pytest.warns(Warning) as warning_list:
             # emit a dummy warning so pytest.warns doesn't fail on empty
             import warnings as _warnings
+
             _warnings.warn("sentinel", UserWarning)
             evaluate(
                 documents=documents,
@@ -582,10 +581,7 @@ class TestEvaluateSmallSampleWarning:
             )
 
         # Filter out the sentinel; no spanchor warning should be present
-        spanchor_warns = [
-            w for w in warning_list.list
-            if "Gold set has only" in str(w.message)
-        ]
+        spanchor_warns = [w for w in warning_list.list if "Gold set has only" in str(w.message)]
         assert spanchor_warns == []
 
     def test_no_warning_for_more_than_30_queries(self):
@@ -603,6 +599,7 @@ class TestEvaluateSmallSampleWarning:
 
         with pytest.warns(Warning) as warning_list:
             import warnings as _warnings
+
             _warnings.warn("sentinel", UserWarning)
             evaluate(
                 documents=documents,
@@ -611,8 +608,5 @@ class TestEvaluateSmallSampleWarning:
                 k=5,
             )
 
-        spanchor_warns = [
-            w for w in warning_list.list
-            if "Gold set has only" in str(w.message)
-        ]
+        spanchor_warns = [w for w in warning_list.list if "Gold set has only" in str(w.message)]
         assert spanchor_warns == []

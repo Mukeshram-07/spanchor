@@ -163,9 +163,7 @@ class TestEvalReportRetrievedCharCounts:
 
     def test_char_count_metrics_shown_when_present_in_aggregate(self):
         """mean_retrieved_chars in aggregate should appear in char count section. (Req 21.3)"""
-        run = make_run(
-            aggregate_metrics={"mean_recall@5": 0.8, "mean_retrieved_chars": 1500.0}
-        )
+        run = make_run(aggregate_metrics={"mean_recall@5": 0.8, "mean_retrieved_chars": 1500.0})
         report = generate_evaluation_report(run)
         assert "mean_retrieved_chars" in report
 
@@ -234,7 +232,12 @@ class TestEvalReportMapperStatistics:
     def test_unmapped_rate_shown_when_totals_nonzero(self):
         """When there are chunks, the unmapped rate should be shown. (Req 21.4)"""
         run = make_run(
-            mapper_stats={"MAPPED_EXACT": 40, "MAPPED_NORMALIZED": 5, "AMBIGUOUS": 5, "UNMAPPED": 10}
+            mapper_stats={
+                "MAPPED_EXACT": 40,
+                "MAPPED_NORMALIZED": 5,
+                "AMBIGUOUS": 5,
+                "UNMAPPED": 10,
+            }
         )
         report = generate_evaluation_report(run)
         assert "Unmapped rate" in report
@@ -458,12 +461,8 @@ class TestComparisonReportAggregateSummary:
             per_query_status={"q1": "IMPROVED"},
             aggregate_deltas={"recall@5": 0.05, "hit@5": 0.10},
         )
-        baseline = make_run(
-            aggregate_metrics={"mean_recall@5": 0.80, "mean_hit@5": 0.70}
-        )
-        candidate = make_run(
-            aggregate_metrics={"mean_recall@5": 0.85, "mean_hit@5": 0.80}
-        )
+        baseline = make_run(aggregate_metrics={"mean_recall@5": 0.80, "mean_hit@5": 0.70})
+        candidate = make_run(aggregate_metrics={"mean_recall@5": 0.85, "mean_hit@5": 0.80})
         report = generate_comparison_report(comparison, baseline, candidate)
         assert "mean_recall@5" in report
         assert "mean_hit@5" in report

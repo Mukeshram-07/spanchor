@@ -62,9 +62,7 @@ def _make_gold_line(
 def _make_results(query_id: str, doc_id: str, start: int, end: int, rank: int = 1) -> dict:
     """Produce a retrieval results dict (span form)."""
     return {
-        query_id: [
-            {"rank": rank, "score": 0.9, "document_id": doc_id, "start": start, "end": end}
-        ]
+        query_id: [{"rank": rank, "score": 0.9, "document_id": doc_id, "start": start, "end": end}]
     }
 
 
@@ -154,7 +152,9 @@ class TestEvaluateCommandSuccess:
         docs_dir, gold, results = _setup_corpus(tmp_path)
         report_path = tmp_path / "report.md"
         result = _invoke_evaluate(
-            docs_dir, gold, results,
+            docs_dir,
+            gold,
+            results,
             ["--report", str(report_path), "--redact"],
         )
         assert result.exit_code == 0
@@ -167,7 +167,9 @@ class TestEvaluateCommandSuccess:
         docs_dir, gold, results = _setup_corpus(tmp_path)
         out_path = tmp_path / "run.json"
         result = _invoke_evaluate(
-            docs_dir, gold, results,
+            docs_dir,
+            gold,
+            results,
             ["--output", str(out_path), "--redact"],
         )
         assert result.exit_code == 0
@@ -181,7 +183,9 @@ class TestEvaluateCommandSuccess:
         docs_dir, gold, results = _setup_corpus(tmp_path)
         out_path = tmp_path / "run.json"
         result = _invoke_evaluate(
-            docs_dir, gold, results,
+            docs_dir,
+            gold,
+            results,
             ["--k", "10", "--output", str(out_path)],
         )
         assert result.exit_code == 0
@@ -278,21 +282,25 @@ class TestEvaluateCommandErrors:
         # Chunk-text result that won't map to anything in the doc
         results = tmp_path / "results.json"
         results.write_text(
-            json.dumps({
-                "q1": [
-                    {
-                        "rank": 1,
-                        "score": 0.5,
-                        "text": "zzz_completely_unrecognizable_text_that_wont_map_anywhere",
-                    }
-                ]
-            }),
+            json.dumps(
+                {
+                    "q1": [
+                        {
+                            "rank": 1,
+                            "score": 0.5,
+                            "text": "zzz_completely_unrecognizable_text_that_wont_map_anywhere",
+                        }
+                    ]
+                }
+            ),
             encoding="utf-8",
         )
 
         # Set max_unmapped_rate to 0 so any unmapped result triggers exit 3
         result = _invoke_evaluate(
-            docs_dir, gold, results,
+            docs_dir,
+            gold,
+            results,
             ["--max-unmapped-rate", "0.0"],
         )
         assert result.exit_code == 3

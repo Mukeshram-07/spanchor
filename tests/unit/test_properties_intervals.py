@@ -197,7 +197,7 @@ class TestIntervalProperties:
         # (when accounting for overlaps)
         original_length = sum(end - start for start, end in intervals)
         result_length = sum(end - start for start, end in result)
-        
+
         # The result length should never exceed the original length
         # (it can be less due to overlaps being removed)
         assert result_length <= original_length, (
@@ -253,8 +253,7 @@ class TestIntervalProperties:
         # PROPERTY 3: Empty interval set has length 0
         if not intervals:
             assert computed_length == 0, (
-                f"Empty interval set should have length 0:\n"
-                f"Computed length: {computed_length}"
+                f"Empty interval set should have length 0:\n" f"Computed length: {computed_length}"
             )
 
         # PROPERTY 4: Length should never exceed the sum of all interval lengths
@@ -287,4 +286,3 @@ class TestIntervalProperties:
             f"Intervals: {zero_length_intervals}\n"
             f"Computed length: {zero_length}"
         )
-

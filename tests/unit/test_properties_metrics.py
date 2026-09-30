@@ -90,9 +90,7 @@ class TestMetricProperties:
 
         # Additional verification: recall should be a float
         assert isinstance(recall, float), (
-            f"Recall@K should return a float:\n"
-            f"Type: {type(recall)}\n"
-            f"Value: {recall}"
+            f"Recall@K should return a float:\n" f"Type: {type(recall)}\n" f"Value: {recall}"
         )
 
         # Additional verification: perfect recall (1.0) only when all gold is covered
@@ -208,17 +206,12 @@ class TestMetricProperties:
         error = exc_info.value
         error_msg = str(error)
         assert "gold" in error_msg.lower() and (
-            "empty" in error_msg.lower()
-            or "cannot be empty" in error_msg.lower()
-        ), (
-            f"Error message should mention empty gold spans:\n"
-            f"Error message: {error_msg}"
-        )
+            "empty" in error_msg.lower() or "cannot be empty" in error_msg.lower()
+        ), f"Error message should mention empty gold spans:\n" f"Error message: {error_msg}"
 
         # Verify the metric name is included
         assert error.metric_name == "Recall@K", (
-            f"Error metric_name should be 'Recall@K':\n"
-            f"Got: {error.metric_name}"
+            f"Error metric_name should be 'Recall@K':\n" f"Got: {error.metric_name}"
         )
 
     @given(
@@ -251,19 +244,16 @@ class TestMetricProperties:
         error = exc_info.value
         error_msg = str(error)
         assert "K" in error_msg or "k" in error_msg, (
-            f"Error message should mention K:\n"
-            f"Error message: {error_msg}"
+            f"Error message should mention K:\n" f"Error message: {error_msg}"
         )
 
         assert "positive" in error_msg.lower(), (
-            f"Error message should mention K must be positive:\n"
-            f"Error message: {error_msg}"
+            f"Error message should mention K must be positive:\n" f"Error message: {error_msg}"
         )
 
         # Verify the metric name is included
         assert error.metric_name == "Recall@K", (
-            f"Error metric_name should be 'Recall@K':\n"
-            f"Got: {error.metric_name}"
+            f"Error metric_name should be 'Recall@K':\n" f"Got: {error.metric_name}"
         )
 
         # Verify the invalid K value is included in the error
@@ -303,19 +293,16 @@ class TestMetricProperties:
         error = exc_info.value
         error_msg = str(error)
         assert "K" in error_msg or "k" in error_msg, (
-            f"Error message should mention K:\n"
-            f"Error message: {error_msg}"
+            f"Error message should mention K:\n" f"Error message: {error_msg}"
         )
 
         assert "positive" in error_msg.lower(), (
-            f"Error message should mention K must be positive:\n"
-            f"Error message: {error_msg}"
+            f"Error message should mention K must be positive:\n" f"Error message: {error_msg}"
         )
 
         # Verify the metric name is included
         assert error.metric_name == "Precision@K", (
-            f"Error metric_name should be 'Precision@K':\n"
-            f"Got: {error.metric_name}"
+            f"Error metric_name should be 'Precision@K':\n" f"Got: {error.metric_name}"
         )
 
         # Verify the invalid K value is included in the error

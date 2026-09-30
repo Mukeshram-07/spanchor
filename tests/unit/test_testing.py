@@ -21,10 +21,7 @@ def _make_run(per_query_metrics: dict[str, dict[str, float]]) -> Run:
     """Build a minimal Run with the given per_query_metrics."""
     return Run(
         timestamp="2024-01-01T00:00:00Z",
-        queries=tuple(
-            Query(query_id=qid, question="?", anchors=())
-            for qid in per_query_metrics
-        ),
+        queries=tuple(Query(query_id=qid, question="?", anchors=()) for qid in per_query_metrics),
         per_query_metrics=per_query_metrics,
         aggregate_metrics={},
         config={},
@@ -40,11 +37,13 @@ def _make_run(per_query_metrics: dict[str, dict[str, float]]) -> Run:
 class TestModuleExports:
     def test_importable_from_spanchor_testing(self) -> None:
         from spanchor.testing import assert_no_regression as fn  # noqa: F401
+
         assert callable(fn)
 
     def test_importable_from_spanchor_package(self) -> None:
         # spanchor.testing is a sub-module; direct import is the contract
         import spanchor.testing as m
+
         assert hasattr(m, "assert_no_regression")
 
 
@@ -168,9 +167,7 @@ class TestFailureMessageContents:
         baseline = _make_run({"q1": {"recall@5": 0.9, "hit@5": 0.8}})
         candidate = _make_run({"q1": {"recall@5": 0.5, "hit@5": 0.3}})
         with pytest.raises(AssertionError) as exc_info:
-            assert_no_regression(
-                baseline, candidate, policy={"recall@5": 0.05, "hit@5": 0.05}
-            )
+            assert_no_regression(baseline, candidate, policy={"recall@5": 0.05, "hit@5": 0.05})
         msg = str(exc_info.value)
         assert "recall@5" in msg
         assert "hit@5" in msg

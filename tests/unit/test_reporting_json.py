@@ -588,9 +588,7 @@ class TestComparisonJsonRedaction:
             per_query_deltas={"q1": {"recall@5": 0.0}},
             per_query_status={"q1": "UNCHANGED"},
         )
-        result = generate_comparison_json(
-            comparison, make_run(), make_run(), redact=True
-        )
+        result = generate_comparison_json(comparison, make_run(), make_run(), redact=True)
         assert result["per_query"]["q1"]["status"] == "UNCHANGED"
 
     def test_query_id_still_present_when_redacted(self):
@@ -599,9 +597,7 @@ class TestComparisonJsonRedaction:
             per_query_deltas={"specific-query-id": {"recall@5": 0.05}},
             per_query_status={"specific-query-id": "IMPROVED"},
         )
-        result = generate_comparison_json(
-            comparison, make_run(), make_run(), redact=True
-        )
+        result = generate_comparison_json(comparison, make_run(), make_run(), redact=True)
         assert "specific-query-id" in result["per_query"]
 
 
@@ -615,8 +611,9 @@ class TestEdgeCases:
 
     def test_eval_json_multiple_queries_multiple_metrics(self):
         """Should handle many queries and metrics without error."""
-        pq = {f"q{i}": {f"metric_{j}": float(i * j) / 100 for j in range(1, 6)}
-              for i in range(1, 11)}
+        pq = {
+            f"q{i}": {f"metric_{j}": float(i * j) / 100 for j in range(1, 6)} for i in range(1, 11)
+        }
         run = make_run(per_query_metrics=pq)
         result = generate_evaluation_json(run)
         assert len(result["per_query_metrics"]) == 10

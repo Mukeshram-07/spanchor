@@ -73,9 +73,9 @@ class TestStorageProperties:
 
             # Verify error message contains the duplicate ID
             error_message = str(exc_info.value)
-            assert "Duplicate query_id" in error_message, (
-                f"Error message should mention 'Duplicate query_id', got: {error_message}"
-            )
+            assert (
+                "Duplicate query_id" in error_message
+            ), f"Error message should mention 'Duplicate query_id', got: {error_message}"
 
             assert duplicate_id in error_message, (
                 f"Error message should include the duplicated query_id '{duplicate_id}', "
@@ -83,24 +83,21 @@ class TestStorageProperties:
             )
 
             # Verify error includes line number information
-            assert "Line:" in error_message, (
-                f"Error message should include line number, got: {error_message}"
-            )
+            assert (
+                "Line:" in error_message
+            ), f"Error message should include line number, got: {error_message}"
 
             # Verify the field name is included
-            assert "query_id" in error_message, (
-                f"Error message should mention field 'query_id', got: {error_message}"
-            )
+            assert (
+                "query_id" in error_message
+            ), f"Error message should mention field 'query_id', got: {error_message}"
 
             # Verify the exception has the expected attributes
             assert exc_info.value.field_name == "query_id", (
-                f"Exception field_name should be 'query_id', "
-                f"got: {exc_info.value.field_name}"
+                f"Exception field_name should be 'query_id', " f"got: {exc_info.value.field_name}"
             )
 
-            assert exc_info.value.line_number is not None, (
-                "Exception should have line_number set"
-            )
+            assert exc_info.value.line_number is not None, "Exception should have line_number set"
 
             # The line number should be where the duplicate appears (1-indexed)
             # Line numbers are 1-indexed, so dup_index + 1 gives us the line number

@@ -45,8 +45,7 @@ class TestRetrievalResultProperties:
 
         # PROPERTY: chunk-text form SHALL indicate it needs mapping
         assert chunk_result.needs_mapping() is True, (
-            f"Chunk-text form should need mapping: "
-            f"text={text!r}, document_id=None"
+            f"Chunk-text form should need mapping: " f"text={text!r}, document_id=None"
         )
 
         # Additional verification: confirm the result is actually in chunk-text form
@@ -154,9 +153,7 @@ class TestRetrievalResultProperties:
         st.floats(min_value=0.0, max_value=1.0, allow_nan=False, allow_infinity=False),  # score
         st.text(min_size=1, max_size=1000),  # text content
     )
-    def test_retrieval_result_rank_validation(
-        self, rank: int, score: float, text: str
-    ) -> None:
+    def test_retrieval_result_rank_validation(self, rank: int, score: float, text: str) -> None:
         """Property 9: Retrieval Result Rank Validation.
 
         **Validates: Requirements 4.6**

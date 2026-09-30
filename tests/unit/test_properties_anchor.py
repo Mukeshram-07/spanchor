@@ -91,20 +91,19 @@ class TestAnchorProperties:
         # Verify half-open interval semantics
         # Character at position 'start' should be included
         if start < doc_length:
-            assert doc.text[start] == actual_text[0], (
-                f"Half-open interval: start position {start} should be included"
-            )
+            assert (
+                doc.text[start] == actual_text[0]
+            ), f"Half-open interval: start position {start} should be included"
 
         # Character at position 'end' should NOT be included (if it exists)
         if end < doc_length:
-            assert doc.text[end] not in actual_text or actual_text == doc.text[start:end], (
-                f"Half-open interval: end position {end} should be exclusive"
-            )
+            assert (
+                doc.text[end] not in actual_text or actual_text == doc.text[start:end]
+            ), f"Half-open interval: end position {end} should be exclusive"
 
         # Length check: end - start should equal length of extracted text
         assert len(extracted_text) == (end - start), (
-            f"Length mismatch: expected {end - start} characters, "
-            f"got {len(extracted_text)}"
+            f"Length mismatch: expected {end - start} characters, " f"got {len(extracted_text)}"
         )
 
     @given(
@@ -135,14 +134,16 @@ class TestAnchorProperties:
         # Generate different types of INVALID offsets
         # Strategy: pick one of several invalid offset patterns
         invalid_offset_type = data.draw(
-            st.sampled_from([
-                "negative_start",
-                "negative_end",
-                "both_negative",
-                "start_out_of_bounds",
-                "end_out_of_bounds",
-                "start_greater_than_end",
-            ])
+            st.sampled_from(
+                [
+                    "negative_start",
+                    "negative_end",
+                    "both_negative",
+                    "start_out_of_bounds",
+                    "end_out_of_bounds",
+                    "start_greater_than_end",
+                ]
+            )
         )
 
         # Generate invalid offsets based on the chosen type
