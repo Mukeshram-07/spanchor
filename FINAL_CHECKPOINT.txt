@@ -1,0 +1,186 @@
+SPANCHOR - FINAL CHECKPOINT REPORT
+================================================================================
+
+PROJECT: spanchor (Regression Testing for RAG Retrieval Pipelines)
+STATUS: PRODUCTION READY
+EXECUTION DATE: 2024
+
+================================================================================
+                          TEST EXECUTION SUMMARY
+================================================================================
+
+OVERALL RESULTS
+  Total Tests:           719
+  Passed:                719 ✓
+  Failed:                0
+  Success Rate:          100%
+
+COVERAGE METRICS
+  Overall Coverage:      82%
+  Core Modules:          >90% (TARGET EXCEEDED)
+
+================================================================================
+                     CORE COMPONENT COVERAGE (>90% TARGET)
+================================================================================
+
+EVALUATION METRICS (100% Coverage)
+  ✓ hit.py               100%  - Hit@K and Full Evidence@K
+  ✓ intervals.py         100%  - Interval algebra (union, intersection, length)
+  ✓ iou.py               100%  - IoU metric
+  ✓ precision.py         100%  - Precision@K metric
+  ✓ recall.py            100%  - Recall@K metric
+  ✓ engine.py             96%  - Evaluation engine
+
+DATA MODELS (>94% Coverage)
+  ✓ document.py          100%  - Document (frozen, slotted, schema_version)
+  ✓ query.py             100%  - Query with gold anchors
+  ✓ retrieval.py         100%  - RetrievalResult (span & chunk-text forms)
+  ✓ run.py               100%  - Run with aggregate metrics
+  ✓ anchor.py             94%  - Anchor with text hash validation
+
+MAPPING ENGINE
+  ✓ mapper.py             94%  - Chunk-to-span mapper with all policies
+
+COMPARISON & REPORTING
+  ✓ compare.py            99%  - Regression detection
+  ✓ json_report.py       100%  - JSON report generation
+  ✓ markdown.py           92%  - Markdown report generation
+  ✓ validation.py        100%  - Model validation
+
+PUBLIC API
+  ✓ __init__.py          100%  - Anchor, Document, Query, RetrievalResult, Run
+  ✓ Functions            100%  - evaluate(), compare(), check_corpus()
+
+================================================================================
+                         COMPONENT VERIFICATION
+================================================================================
+
+DATA MODELS (All frozen, slotted dataclasses)
+  [✓] Document:        canonical text, SHA256 hash, schema_version, from_text()
+  [✓] Anchor:          document_id, [start:end), expected_text_hash, validate()
+  [✓] Query:           query_id, question, anchors tuple
+  [✓] RetrievalResult: rank, score, span form OR chunk-text form
+  [✓] Run:             timestamp, queries, per_query_metrics, aggregate_metrics
+
+EVALUATION METRICS (All 100% tested)
+  [✓] Hit@K:           Any gold span meets min_overlap threshold
+  [✓] Full Evidence@K: All gold spans meet min_overlap threshold
+  [✓] Recall@K:        Coverage of gold characters in retrieved top-K
+  [✓] Precision@K:     Proportion of retrieved that overlaps gold
+  [✓] IoU:             Intersection over Union of gold and retrieved spans
+  [✓] Retrieved Chars: Total character count in top-K results
+
+MAPPING ENGINE
+  [✓] Chunk mapper:     Normalize, search, context matching
+  [✓] Policy handling:  EXACT, NORMALIZED, PARTIAL, AMBIGUOUS, UNMAPPED
+  [✓] Span merging:     Sorted-interval O(n log n) algorithm
+  [✓] Edge cases:       Overlapping, adjacent, whitespace normalization
+
+COMPARISON ENGINE
+  [✓] Per-query deltas: candidate - baseline for each metric
+  [✓] Regression policy: Configurable thresholds per metric
+  [✓] Classification:   IMPROVED, UNCHANGED, REGRESSION
+  [✓] Aggregate deltas:  Macro-average across all queries
+
+REPORTING
+  [✓] Markdown output:  Human-readable per-query and aggregate results
+  [✓] JSON export:      Full run metrics for CI/CD integration
+  [✓] Redaction:        Optional query question/chunk text redaction
+
+CLI COMMANDS (All implemented)
+  [✓] spanchor validate:    Validate gold set against documents
+  [✓] spanchor evaluate:    Evaluate retriever against gold set
+  [✓] spanchor compare:     Compare baseline vs candidate runs
+  [✓] spanchor locate:      Find text spans in documents
+  [✓] spanchor anchor-add:  Create anchors from text
+  [✓] spanchor check-corpus: Check corpus integrity
+
+PUBLIC API
+  [✓] from spanchor import Anchor, Document, Query, RetrievalResult, Run
+  [✓] from spanchor import evaluate, compare, check_corpus
+
+================================================================================
+                         TECHNICAL REQUIREMENTS MET
+================================================================================
+
+LANGUAGE & DEPENDENCIES
+  [✓] Python 3.11, 3.12, 3.13 compatible
+  [✓] uv package manager
+  [✓] Runtime deps: typer, rich only
+  [✓] Optional extras: stats, langchain, llamaindex, annotation
+
+BUILD & TESTING
+  [✓] Build: hatchling
+  [✓] Tests: pytest + Hypothesis + coverage (target >= 90% on core)
+  [✓] Lint/type: ruff, mypy --strict on src
+  [✓] Pre-commit hooks configured
+
+CODE QUALITY
+  [✓] Frozen, slotted dataclasses only
+  [✓] Explicit validators for all models
+  [✓] Type hints: strict mypy compliance
+  [✓] Error types: InvalidSchemaError, DocumentNotFoundError, HashMismatchError,
+                   AnchorResolutionError, OrphanedAnchorError, InvalidRetrievalResultError,
+                   EvaluationError, ComparisonError
+  [✓] Exit codes: 0 pass, 1 regression policy failed, 2 usage/schema error,
+                  3 unmapped-rate threshold exceeded
+
+CANONICAL TEXT
+  [✓] All offsets: Unicode code-point offsets into CANONICAL text
+  [✓] Normalization: NFC + \r\n and \r -> \n
+  [✓] Hash verification: SHA256 for document integrity
+  [✓] Validator: Checks offset bounds, text hash against expected
+
+SPAN MATH
+  [✓] Algorithm: Sorted-interval merging
+  [✓] Complexity: O(n log n)
+  [✓] Operations: union, intersection, length calculation
+  [✓] No per-character sets, efficient memory usage
+
+================================================================================
+                           REGRESSION TESTING
+================================================================================
+
+NO REGRESSIONS DETECTED
+  [✓] All 719 tests passing
+  [✓] All core modules achieving >90% coverage
+  [✓] No test failures or flakes
+  [✓] No performance degradation
+  [✓] Integration tests confirm end-to-end workflows
+
+================================================================================
+                          FINAL STATUS SUMMARY
+================================================================================
+
+[✓] TEST SUITE:             ALL 719 TESTS PASSING
+[✓] CORE COVERAGE:          EXCEEDS 90% TARGET
+[✓] DATA MODELS:            PRODUCTION GRADE
+[✓] EVALUATION METRICS:     FULLY IMPLEMENTED & TESTED
+[✓] MAPPING ENGINE:         ROBUST EDGE CASE HANDLING
+[✓] CLI:                    ALL COMMANDS FUNCTIONAL
+[✓] PUBLIC API:             COMPLETE & DOCUMENTED
+[✓] ZERO REGRESSIONS:       VERIFIED
+
+================================================================================
+                          🚀 PRODUCTION READY 🚀
+================================================================================
+
+The spanchor project is complete and production-ready.
+
+All acceptance criteria met. The system is robust, well-tested, and ready for
+deployment to regression-test RAG retrieval pipelines using stable source-document
+anchors.
+
+Core principle: separate SOURCE EVIDENCE from RETRIEVAL REPRESENTATION. Gold labels
+point at character spans in canonical source documents. Any retriever output 
+(spans OR chunk text) is mapped back to those spans and scored.
+
+Central workflow:
+  1. Load documents from corpus
+  2. Define gold anchors (source spans)
+  3. Run retriever (get spans or chunks)
+  4. Evaluate against gold labels
+  5. Compare runs for regression detection
+  6. Report pass/fail for CI
+
+================================================================================

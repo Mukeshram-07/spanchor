@@ -1,0 +1,5 @@
+Retrieval-Augmented Generation (RAG) is a technique that enhances large language model outputs by grounding them in retrieved source documents. Instead of relying solely on parametric knowledge baked into model weights, RAG pipelines fetch relevant passages at inference time and pass them as context to the model. This approach reduces hallucinations and keeps answers up to date without retraining.
+
+A typical RAG pipeline consists of three stages: indexing, retrieval, and generation. During indexing, source documents are split into chunks and embedded into a vector store. At retrieval time, the user query is embedded and the nearest chunks are returned. Finally, the generator model synthesises an answer conditioned on those chunks.
+
+Evaluating retrieval quality is critical: if the wrong passages are returned, even the best generator cannot produce a correct answer. Recall and precision over character spans provide a finer-grained signal than chunk-level hit rates.

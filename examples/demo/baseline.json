@@ -1,0 +1,110 @@
+{
+  "schema_version": "0.1.0",
+  "timestamp": "2024-01-15T10:00:00Z",
+  "queries": [
+    {
+      "schema_version": "0.1.0",
+      "query_id": "q1",
+      "question": "What is RAG?",
+      "anchors": [
+        {
+          "document_id": "intro_to_rag",
+          "start": 0,
+          "end": 142,
+          "expected_text_hash": "d683b95eb560195e72b52c018fa329219ed65ea27c77806933f3f1b3174d47c0",
+          "schema_version": "0.1.0"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.0",
+      "query_id": "q2",
+      "question": "What stages does a RAG pipeline have?",
+      "anchors": [
+        {
+          "document_id": "intro_to_rag",
+          "start": 402,
+          "end": 486,
+          "expected_text_hash": "1d162a2f4d867b2dc1d86c695c84b4b6cd994617f6b8dbd8157f1a6885e572bf",
+          "schema_version": "0.1.0"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.0",
+      "query_id": "q3",
+      "question": "What does an anchor store?",
+      "anchors": [
+        {
+          "document_id": "anchor_concepts",
+          "start": 257,
+          "end": 412,
+          "expected_text_hash": "27546503711072740803bd7f4acc51011da0b066a44f1dbf878b6c97e2231ad8",
+          "schema_version": "0.1.0"
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1.0",
+      "query_id": "q4",
+      "question": "What are Unicode code-point offsets?",
+      "anchors": [
+        {
+          "document_id": "anchor_concepts",
+          "start": 556,
+          "end": 651,
+          "expected_text_hash": "55bb50bf7525fb0a32f7321cf4a8bd8468a9eae5789c9771fc4a46befa08c061",
+          "schema_version": "0.1.0"
+        }
+      ]
+    }
+  ],
+  "per_query_metrics": {
+    "q1": {
+      "recall@5": 0.88,
+      "precision@5": 0.8,
+      "hit@5": 1.0,
+      "full_evidence@5": 1.0,
+      "iou": 0.75
+    },
+    "q2": {
+      "recall@5": 0.75,
+      "precision@5": 0.7,
+      "hit@5": 1.0,
+      "full_evidence@5": 0.0,
+      "iou": 0.6
+    },
+    "q3": {
+      "recall@5": 0.92,
+      "precision@5": 0.85,
+      "hit@5": 1.0,
+      "full_evidence@5": 1.0,
+      "iou": 0.82
+    },
+    "q4": {
+      "recall@5": 0.65,
+      "precision@5": 0.6,
+      "hit@5": 0.0,
+      "full_evidence@5": 0.0,
+      "iou": 0.5
+    }
+  },
+  "aggregate_metrics": {
+    "recall@5": 0.8,
+    "precision@5": 0.74,
+    "hit@5": 0.75,
+    "full_evidence@5": 0.5,
+    "iou": 0.67
+  },
+  "config": {
+    "k": 5,
+    "min_overlap": 0.5,
+    "ambiguity_policy": "first_unclaimed"
+  },
+  "mapper_stats": {
+    "MAPPED_EXACT": 4,
+    "MAPPED_NORMALIZED": 0,
+    "AMBIGUOUS": 0,
+    "UNMAPPED": 0
+  }
+}

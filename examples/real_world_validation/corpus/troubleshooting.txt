@@ -1,0 +1,169 @@
+Troubleshooting Guide
+
+This guide covers common issues and their solutions.
+
+## Sync Not Starting
+
+If synchronization doesn't start after adding a directory, check the following:
+
+### Check Disk Space
+Ensure you have sufficient free disk space. CloudSync requires at least 100 MB of free space to operate.
+
+### Verify Directory Permissions
+CloudSync needs read/write permissions on all directories being synchronized. On Linux and macOS, ensure your user owns the directory:
+
+```
+chmod -R u+rw /path/to/directory
+```
+
+On Windows, right-click the directory, select Properties > Security > Edit, and ensure your user has Full Control.
+
+### Check Network Connectivity
+If you're behind a corporate firewall, ensure outbound HTTPS (port 443) is allowed. If you're behind a proxy, configure the proxy in CloudSync settings:
+
+```
+cloudsync config set proxy.host proxy.example.com
+cloudsync config set proxy.port 8080
+```
+
+### Restart the CloudSync Daemon
+Stop and restart the CloudSync service:
+
+```
+cloudsync stop
+sleep 2
+cloudsync start
+```
+
+After restarting, check status:
+
+```
+cloudsync status
+```
+
+## Slow Synchronization
+
+If synchronization is proceeding slower than expected, several factors could be involved:
+
+### Network Bandwidth
+Check your network connection speed. CloudSync requires at minimum 1 Mbps for reliable operation. If you're on a slow connection, you can throttle bandwidth:
+
+```
+cloudsync config set bandwidth.limit 512KB
+```
+
+This limits sync to 512 KB/second.
+
+### Large File Transfers
+Transferring very large files (>10 GB) can take considerable time. CloudSync uses delta sync to minimize transfer size, but the initial sync of massive files may take hours depending on network speed.
+
+### CPU and Disk I/O
+CloudSync uses compression and encryption, which are CPU-intensive. If you're syncing many small files, CPU usage can be high. Monitor system resources:
+
+```
+cloudsync stats --detailed
+```
+
+### Antivirus Software
+Antivirus software scanning files during sync can significantly slow performance. If possible, exclude CloudSync directories from real-time scanning.
+
+## Authentication Errors
+
+### Token Expired
+API tokens expire after the configured time period (default 90 days). Generate a new token:
+
+```
+cloudsync token create --name "my_token"
+```
+
+### Invalid Credentials
+Ensure your username and password are correct. Reset your password via the web console if needed.
+
+### Two-Factor Authentication
+If MFA is enabled, ensure you're providing the correct TOTP code. The code changes every 30 seconds, so time synchronization is critical.
+
+## Storage Quota Exceeded
+
+If you receive a "storage quota exceeded" error:
+
+1. Check your current usage: `cloudsync quota`
+2. Remove unnecessary files or purchase additional storage
+3. For enterprise customers, contact your account manager to increase the limit
+
+## Disk Space Errors
+
+CloudSync requires space for temporary files during synchronization. If you see disk space errors:
+
+1. Free up disk space on your device
+2. Configure a temporary directory with more available space: `cloudsync config set temp.dir /path/with/space`
+3. Reduce the number of concurrent syncs: `cloudsync config set concurrency.max 2`
+
+## Files Not Appearing on Other Devices
+
+If files synced on one device don't appear on others after several minutes:
+
+1. Verify all devices are connected to the internet
+2. Check that all devices are connected to the same workspace
+3. Verify file permissions - CloudSync cannot sync files you don't have read access to
+4. Check sync status on the other device: `cloudsync status --verbose`
+
+## Version History Issues
+
+### Cannot Restore Older Versions
+Version history retention depends on your subscription:
+- Free: 30 days
+- Pro: 90 days
+- Enterprise: configurable
+
+Versions older than the retention period are automatically deleted.
+
+### Restoring Causes Conflicts
+When restoring a file, if it has changed since the version snapshot, CloudSync creates a conflict. Both versions are preserved:
+- Original file: `filename.ext`
+- Conflicted version: `filename.conflict.ext`
+
+Resolve conflicts by manually deleting the unwanted version or contact support for help.
+
+## Encryption Key Issues
+
+### Lost Encryption Key (BYOK)
+If using Bring Your Own Key (BYOK) and you lose access to your encryption key:
+
+1. You can still view encrypted file names and timestamps
+2. File contents cannot be accessed without the key
+3. Contact CloudSync support - encrypted data can be restored from backups if you have encryption key backups
+
+If you don't have key backups, data cannot be recovered.
+
+## Performance Optimization
+
+### Reduce Unnecessary Syncing
+Exclude temporary files and build artifacts from synchronization:
+
+```
+cloudsync exclude "*.tmp" "*.log" "node_modules/" ".git/"
+```
+
+### Adjust Compression Settings
+For networks with ample bandwidth, disable compression to reduce CPU usage:
+
+```
+cloudsync config set compression enabled=false
+```
+
+### Use Selective Sync
+If a workspace contains many directories, sync only what you need:
+
+```
+cloudsync sync disable /path/to/large/directory
+```
+
+## Report a Problem
+
+If you can't resolve your issue, contact support@cloudsync.io with:
+- CloudSync version: `cloudsync version`
+- Full error message
+- System information: `cloudsync system-info`
+- Recent logs: `cloudsync logs --tail 100`
+
+Include these details to help support team diagnose the issue faster.

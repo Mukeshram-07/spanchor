@@ -1,0 +1,14 @@
+{
+  "timestamp": "2026-09-30T17:10:23.625147+00:00",
+  "aggregate_metrics": {
+    "mean_recall@5": 0.24871708998329314,
+    "mean_precision@5": 0.01735300327596791,
+    "mean_hit@5": 0.26,
+    "mean_full_evidence@5": 0.26,
+    "mean_iou": 0.017233291625350346,
+    "mean_retrieved_chars": 860.16
+  },
+  "mapper_stats": {
+    "MAPPED_EXACT": 500
+  }
+}

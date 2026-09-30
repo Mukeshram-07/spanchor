@@ -1,0 +1,5 @@
+An anchor is a stable reference to a character span within a canonical source document. Unlike chunk IDs, which change whenever a document is re-chunked, anchors survive re-indexing because they point directly to immutable text using byte-precise offsets.
+
+Every anchor stores four fields: the document identifier, a start offset (inclusive), an end offset (exclusive), and the SHA256 hash of the referenced text. The hash acts as a checksum: if the underlying document changes, validation fails immediately rather than silently returning wrong evidence.
+
+Offsets in spanchor are Unicode code-point offsets into the canonical form of the document text. Canonicalization applies NFC Unicode normalization and converts all line endings to a single newline character. This ensures that anchors created on one platform remain valid when the same document is read on another platform.
