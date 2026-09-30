@@ -62,3 +62,6 @@ Thumbs.db
 # Project specific
 examples/demo/output/
 benchmarks/results/
+
+# Local archive (task reports, temporary documentation)
+.archive_docs/
