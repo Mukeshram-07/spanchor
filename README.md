@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://ibb.co/ycMj267N" alt="SPANCHOR logo" width="300" />
+  <img src="https://i.ibb.co/W4dJCkjH/Chat-GPT-Image-Sep-30-2026-11-35-30-PM.png" alt="SPANCHOR logo" width="300" />
 </div>
 
 # SPANCHOR
