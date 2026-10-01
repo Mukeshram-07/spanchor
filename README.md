@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/branding/spanchor-logo.png" alt="SPANCHOR logo" width="300" />
+  <img src="https://ibb.co/ycMj267N" alt="SPANCHOR logo" width="300" />
 </div>
 
 # SPANCHOR
