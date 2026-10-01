@@ -12,10 +12,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
-from spanchor import evaluate, compare
+from spanchor import compare, evaluate
+from spanchor.models.anchor import Anchor
 from spanchor.models.document import Document
 from spanchor.models.query import Query
-from spanchor.models.anchor import Anchor
 from spanchor.models.retrieval import RetrievalResult
 
 
@@ -33,7 +33,7 @@ def load_documents(corpus_dir: Path) -> dict[str, Document]:
 def load_gold_set(gold_path: Path) -> list[Query]:
     """Load gold queries from JSONL."""
     queries = []
-    with open(gold_path, 'r', encoding='utf-8') as f:
+    with open(gold_path, encoding="utf-8") as f:
         for line in f:
             if not line.strip():
                 continue
@@ -57,7 +57,7 @@ def load_gold_set(gold_path: Path) -> list[Query]:
 def load_retrieval_results(results_path: Path) -> dict[str, list[RetrievalResult]]:
     """Load retrieval results from JSONL."""
     query_results = {}
-    with open(results_path, 'r', encoding='utf-8') as f:
+    with open(results_path, encoding="utf-8") as f:
         for line in f:
             if not line.strip():
                 continue
@@ -107,7 +107,9 @@ def main():
     baseline_results = load_retrieval_results(baseline_path)
     candidate_results = load_retrieval_results(candidate_path)
     print(f"  -> Baseline: {len(baseline_results)} queries")
-    print(f"  -> Candidate: {len(candidate_results)} queries (safe config: chunk_size=240, overlap=10)")
+    print(
+        f"  -> Candidate: {len(candidate_results)} queries (safe config: chunk_size=240, overlap=10)"
+    )
     print()
 
     # Evaluate baseline
@@ -126,7 +128,7 @@ def main():
         policy={
             "recall@5": 0.05,
             "precision@5": 0.05,
-        }
+        },
     )
 
     # Count classifications

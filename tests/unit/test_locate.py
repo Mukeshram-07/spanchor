@@ -3,7 +3,6 @@
 import pytest
 
 from spanchor.annotation.locate import (
-    LocateMatch,
     format_matches,
     locate_text,
 )

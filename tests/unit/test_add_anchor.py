@@ -24,7 +24,6 @@ from spanchor.annotation.add import (
 from spanchor.models.document import Document
 from spanchor.models.query import Query
 
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------

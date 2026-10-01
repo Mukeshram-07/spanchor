@@ -31,7 +31,7 @@ from spanchor.evaluation.engine import evaluate
 from spanchor.models import Anchor, Document, Query, RetrievalResult, Run
 from spanchor.validation import CorpusIssue, check_corpus
 
-__version__ = "0.1.1"
+__version__ = "0.2.0"
 
 __all__ = [
     # Models (req 26.1, 26.2, 26.3)

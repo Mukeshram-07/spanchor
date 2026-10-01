@@ -15,7 +15,6 @@ from spanchor.models.query import Query
 from spanchor.models.retrieval import RetrievalResult
 from spanchor.models.run import Run
 
-
 # ---------------------------------------------------------------------------
 # Document fixtures
 # ---------------------------------------------------------------------------

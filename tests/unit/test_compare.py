@@ -13,7 +13,6 @@ from spanchor.errors import ComparisonError
 from spanchor.models.query import Query
 from spanchor.models.run import Run
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------

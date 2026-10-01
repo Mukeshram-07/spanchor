@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "spanchor"
-version = "0.1.1"
+version = "0.2.0"
 description = "Source-anchored regression testing for RAG retrieval pipelines"
 readme = "README.md"
 license = "Apache-2.0"
@@ -30,9 +30,8 @@ dependencies = [
 
 [project.optional-dependencies]
 stats = ["numpy>=1.24.0"]
-annotation = []
-langchain = []
-llamaindex = []
+langchain = ["langchain>=0.1.0", "langchain-core>=0.1.0"]
+llamaindex = ["llama-index-core>=0.9.0"]
 dev = [
     "pytest>=7.4.0",
     "pytest-cov>=4.1.0",
@@ -93,6 +92,13 @@ mypy_path = "src"
 module = "tests.*"
 disallow_untyped_defs = false
 disallow_untyped_calls = false
+
+[[tool.mypy.overrides]]
+module = [
+    "spanchor.adapters.langchain",
+    "spanchor.adapters.llamaindex",
+]
+ignore_errors = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

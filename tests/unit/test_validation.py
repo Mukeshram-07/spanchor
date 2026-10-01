@@ -20,7 +20,6 @@ from spanchor.models.document import Document
 from spanchor.models.query import Query
 from spanchor.validation import CorpusIssue, check_corpus
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------

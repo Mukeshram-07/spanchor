@@ -6,7 +6,6 @@ Tests for macro-average and micro-average aggregation of per-query metrics.
 import pytest
 
 from spanchor.evaluation.aggregation import aggregate_metrics, compute_mean_retrieved_chars
-from spanchor.models.anchor import Anchor
 from spanchor.models.query import Query
 
 

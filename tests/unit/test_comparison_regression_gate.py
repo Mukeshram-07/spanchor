@@ -18,7 +18,6 @@ Validates: Requirements 12.1-12.8, 13.1-13.8
 import pytest
 
 from spanchor.comparison.compare import compare
-from spanchor.models.query import Query
 from spanchor.models.run import Run
 
 

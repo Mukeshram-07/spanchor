@@ -11,7 +11,6 @@ Validates: Requirements 13.1, 13.2, 13.5, 13.6
 from __future__ import annotations
 
 import json
-import textwrap
 from pathlib import Path
 
 import pytest
@@ -20,7 +19,6 @@ from spanchor.comparison.compare import compare
 from spanchor.comparison.policy import RegressionPolicy, load_policy, merge_policy
 from spanchor.errors import ComparisonError
 from spanchor.models.run import Run
-
 
 # ---------------------------------------------------------------------------
 # Helpers

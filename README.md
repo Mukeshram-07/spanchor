@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/branding/spanchor-logo.png" alt="SPANCHOR logo" width="300" />
+  <img src="https://i.ibb.co/W4dJCkjH/Chat-GPT-Image-Sep-30-2026-11-35-30-PM.png" alt="SPANCHOR logo" width="300" />
 </div>
 
 # SPANCHOR
@@ -13,277 +13,364 @@
 
 SPANCHOR is a Python library and CLI tool for regression-testing RAG retrieval systems. Instead of comparing chunk IDs or chunk boundaries, SPANCHOR anchors expected evidence to character spans in canonical source documents and evaluates retrieved results against those stable source anchors.
 
-**Core Principle:** Separate SOURCE EVIDENCE from RETRIEVAL REPRESENTATION.
+## The Problem
 
-## Problem
+When building RAG systems, retrieval quality can degrade unexpectedly:
+- Changing chunk size breaks chunk-ID-based evaluation
+- Modifying overlap or indexing strategy invalidates chunk boundaries
+- Comparing results using chunk IDs doesn't reflect actual evidence retrieval
+- Silent regressions go undetected until users report issues
 
-Traditional retrieval evaluation couples gold labels to implementation details:
-- Chunk IDs change when chunking strategy changes
-- Chunk boundaries shift with overlap or chunk-size adjustments
-- Comparing "did we get chunk c_0042?" breaks silently when pipeline changes
+SPANCHOR decouples evaluation from retrieval implementation by anchoring expected evidence to character positions in canonical source documents. Any retrieval strategy (chunks, spans, reranked results) is mapped back to source evidence and evaluated against stable anchors.
 
-SPANCHOR decouples gold labels from retrieval representation. Expected evidence is anchored to character positions in canonical source documents. Any retrieval output (chunks or spans) is mapped back to source positions and evaluated against the expected evidence.
+**Result**: Change your chunking, retriever, ranking, or indexing strategy and still measure whether you're retrieving the same source evidence.
 
-This lets you change your retriever, chunking, ranking, or indexing strategy and still measure whether the retrieval outcome still covers the same source evidence.
+## Why Source Anchors?
+
+| Approach | Fragile | Reason |
+|----------|---------|--------|
+| Chunk IDs | ❌ Yes | IDs change with re-chunking |
+| Chunk boundaries | ❌ Yes | Boundaries shift with overlap/size changes |
+| Embedding similarity | ❌ Yes | Embeddings change with model updates |
+| Source spans | ✅ No | Character positions in canonical text are stable |
+
+SPANCHOR uses character-level spans in canonical source documents. These remain valid across retrieval strategy changes, making evaluation truly configuration-agnostic.
 
 ## Key Features
 
 - **Stable Source Anchors**: Gold labels point to character spans in canonical documents (NFC-normalized, hash-verified)
 - **Character-Level Metrics**: Recall@K, Precision@K, Hit@K, FullEvidence@K, IoU for span coverage
-- **Chunk-to-Source Mapping**: Automatically maps chunk-text retrieval results back to source spans
-- **Per-Query Regression Detection**: Detects when individual queries degrade below configured thresholds
+- **Chunk-to-Source Mapping**: Automatically maps retrieval results back to source spans
+- **Per-Query Regression Detection**: Identifies individual queries that degrade beyond thresholds
+- **Framework Integrations**: Generic dict, LangChain, LlamaIndex adapters (optional dependencies)
 - **CI-Ready**: Exit codes (0=pass, 1=regression, 2=error, 3=unmapped-rate exceeded)
-- **Local-First**: No network calls, no telemetry, no API keys
-- **Deterministic**: Character offsets on canonical text, reproducible span algebra
+- **Local-First**: No network, no telemetry, no API keys — runs entirely offline
+- **Deterministic**: Reproducible span algebra and character-level offsets
+- **Type-Safe**: Full mypy --strict compliance
 
 ## Installation
 
+### Core Library
 ```bash
 pip install spanchor
 ```
 
-For development:
+### With Framework Integrations (Optional)
+```bash
+# LangChain support
+pip install "spanchor[langchain]"
+
+# LlamaIndex support
+pip install "spanchor[llamaindex]"
+
+# Development
+pip install -e "spanchor[dev]"
+```
+
+Core `spanchor` has minimal dependencies (typer, rich). Framework integrations are optional and only loaded when needed.
+
+## Quick Start
+
+### 1. Create a Gold Set
+
+Define expected evidence using source anchors:
+
+```python
+from spanchor import Document, Anchor, Query
+from spanchor.canonical.normalize import compute_hash
+
+# Load source documents
+doc = Document.from_text("doc1", "CloudSync is a cloud storage service...")
+documents = {"doc1": doc}
+
+# Define gold question with source anchor
+anchor = Anchor(
+    document_id="doc1",
+    start=0,
+    end=36,  # "CloudSync is a cloud storage service"
+    expected_text_hash=compute_hash("CloudSync is a cloud storage service")
+)
+query = Query(query_id="q1", question="What is CloudSync?", anchors=(anchor,))
+queries = [query]
+```
+
+### 2. Evaluate Retrieval Results
+
+```python
+from spanchor import evaluate
+from spanchor.adapters.generic import dicts_to_retrieval_results
+
+# Your retrieval results (from any retriever)
+results = [
+    {"text": "CloudSync is a cloud storage service...", "score": 0.95, "document_id": "doc1"},
+]
+retrieval_results = {"q1": dicts_to_retrieval_results(results)}
+
+# Evaluate baseline
+baseline_run = evaluate(
+    documents=documents,
+    queries=queries,
+    retrieval_results=retrieval_results,
+    k=5
+)
+
+print(f"Recall@5: {baseline_run.aggregate_metrics['mean_recall@5']:.3f}")
+```
+
+### 3. Compare Baseline vs Candidate
+
+```python
+from spanchor import compare
+
+# Evaluate candidate configuration
+candidate_run = evaluate(documents, queries, candidate_results, k=5)
+
+# Compare and detect regressions
+comparison = compare(
+    baseline=baseline_run,
+    candidate=candidate_run,
+    policy={"recall@5": 0.05}  # Allow ≤5% drop per-query
+)
+
+if comparison.has_regression:
+    print(f"REGRESSION DETECTED")
+    print(f"Regressed queries: {sum(1 for s in comparison.per_query_status.values() if s == 'REGRESSION')}")
+else:
+    print(f"NO REGRESSION")
+```
+
+## Real Regression Example
+
+This example is from the validated SPANCHOR test suite (100 queries, 4 technical documents):
+
+### Baseline Configuration
+- Chunk size: 250 characters
+- Overlap: 0
+- Metrics: Recall@5=0.405, Hit@5=0.410
+
+### Candidate Configuration (Regressed)
+- Chunk size: 200 characters (smaller)
+- Overlap: 50 characters (added overlap)
+- Metrics: Recall@5=0.249, Hit@5=0.260
+
+### Regression Result
+```
+Baseline Recall:  0.405
+Candidate Recall: 0.249
+Drop:             -0.156 (-15.6%)
+Policy threshold: 0.05 (-5%)
+Result:           REGRESSION (19 queries exceeded threshold)
+Exit code:        1
+```
+
+Smaller chunks with overlap degraded recall for this corpus because they fragmented evidence across multiple results. SPANCHOR detected this automatically.
+
+## Metrics
+
+SPANCHOR computes character-level overlap metrics:
+
+- **Recall@K**: Fraction of gold evidence characters covered by top-K retrieved spans: |G ∩ R| / |G|
+- **Precision@K**: Fraction of retrieved characters overlapping gold: |G ∩ R| / |R|
+- **Hit@K**: Whether ≥1 gold span has ≥50% overlap with retrieved spans
+- **FullEvidence@K**: Whether ALL gold spans have ≥50% overlap
+- **IoU**: Intersection-over-union diagnostic metric
+
+**Important**: SPANCHOR uses **per-query regression detection**:
+- Aggregate metrics are computed for trending/reporting
+- Regression gate is triggered by individual queries exceeding policy thresholds
+- A single query regressing prevents deployment
+
+This prevents aggregate improvements from masking individual query regressions.
+
+## Architecture
+
+```
+Your RAG Pipeline
+  ├── Retriever → Chunks
+  │                  ↓
+  │         SPANCHOR Evaluation
+  │              ├── Map chunks to source spans
+  │              ├── Compute per-query metrics
+  │              └── Per-query comparison
+  │                  ↓
+  │         Regression Gate
+  │              ├── Policy thresholds per metric
+  │              └── Per-query classification
+  │                  ↓
+  │         CI Decision (exit 0 or 1)
+```
+
+SPANCHOR integrates as a post-retrieval evaluation layer. It takes retrieved text and compares it against source-anchored evidence.
+
+## Framework Integrations
+
+### Generic Dictionary Results
+```python
+from spanchor.adapters.generic import dicts_to_retrieval_results
+
+results = [
+    {"text": "...", "score": 0.95, "document_id": "doc1"},
+]
+spanchor_results = dicts_to_retrieval_results(results)
+```
+
+Supports flexible field names: text/chunk/content/body, score/relevance_score/similarity, etc.
+
+### LangChain
+```python
+from langchain_community.retrievers import BM25Retriever
+from spanchor.adapters.langchain import documents_to_retrieval_results
+
+retriever = BM25Retriever.from_texts(texts)
+docs = retriever.invoke("query")
+spanchor_results = documents_to_retrieval_results(docs)
+```
+
+Install: `pip install "spanchor[langchain]"`
+
+### LlamaIndex
+```python
+from llama_index.core import SimpleDirectoryReader
+from spanchor.adapters.llamaindex import nodes_to_retrieval_results
+
+reader = SimpleDirectoryReader("./data")
+docs = reader.load_data()
+nodes = retriever.retrieve("query")
+spanchor_results = nodes_to_retrieval_results(nodes)
+```
+
+Install: `pip install "spanchor[llamaindex]"`
+
+## Integration Example
+
+Full end-to-end adoption demo showing baseline vs candidate comparison:
+
+```bash
+cd examples/adoption_demo
+python run_demo.py
+```
+
+Demo includes:
+- Loading 4 technical documents (18KB)
+- Evaluating 100 gold queries
+- Baseline vs candidate comparison
+- Regression detection demonstration
+- Exit codes (0 for pass, 1 for regression)
+
+See [examples/adoption_demo/README.md](examples/adoption_demo/README.md) for details.
+
+## CLI Commands
+
+```bash
+# Validate documents and anchors
+spanchor validate docs/ gold.jsonl
+
+# Evaluate retrieval results
+spanchor evaluate docs/ gold.jsonl results.json --report evaluation.md
+
+# Compare baseline vs candidate
+spanchor compare baseline.json candidate.json --policy policy.json --report comparison.md
+
+# Locate text for anchoring
+spanchor locate "search phrase" docs/
+
+# Check corpus for issues
+spanchor check-corpus docs/
+```
+
+Exit codes:
+- **0**: Success (evaluate, validate) or no regressions (compare)
+- **1**: Regressions detected (compare)
+- **2**: Schema/usage error
+- **3**: Unmapped chunk rate exceeded
+
+## What SPANCHOR Is
+
+✓ Regression-testing framework for RAG retrieval pipelines  
+✓ Per-query metric comparison with configurable thresholds  
+✓ Source-anchored evaluation (stable across configuration changes)  
+✓ Character-level span coverage analysis  
+✓ CI-ready with exit codes  
+✓ Offline and deterministic  
+✓ Framework-agnostic (works with any retriever)  
+
+## What SPANCHOR Is NOT
+
+✗ A retriever (use your own: BM25, embeddings, reranker, etc.)  
+✗ An embeddings provider (bring your own model)  
+✗ A chunking strategy (use your preferred approach)  
+✗ An LLM (needed only for generation, not evaluation)  
+✗ A data pipeline (you provide documents and queries)  
+✗ Production perfect (alpha/early development)  
+
+## Documentation
+
+- [User Guide](docs/USER_GUIDE.md) - Detailed workflow documentation
+- [API Reference](docs/API.md) - Complete API documentation
+- [Real-World Example](examples/real_world_validation/README.md) - 100-query validation demo
+- [Adoption Guide](examples/adoption_demo/README.md) - Integration patterns
+
+## Development
 
 ```bash
 git clone https://github.com/Mukeshram-07/spanchor.git
 cd spanchor
+
+# Setup
 pip install -e ".[dev]"
+pre-commit install
+
+# Test
+pytest
+mypy --strict src/
+ruff check src/
+
+# Build
+python -m build
 ```
 
-## Quick Start
-
-### 1. Validate Your Document Corpus
-
-```bash
-spanchor validate docs/ gold.jsonl
-```
-
-Checks that all anchors resolve to the expected text in their source documents.
-
-### 2. Evaluate Retrieval Results
-
-```bash
-spanchor evaluate docs/ gold.jsonl results.json --report evaluation.md
-```
-
-Computes Recall@K, Precision@K, Hit@K, FullEvidence@K, and IoU for each query. Generates a markdown report.
-
-### 3. Compare Baseline vs Candidate
-
-```bash
-spanchor compare baseline.json candidate.json --policy policy.json --report comparison.md
-```
-
-Detects per-query regressions using configurable thresholds. Exits with code 0 (pass) or 1 (regression).
-
-### 4. Find Text for Anchoring
-
-```bash
-spanchor locate "search phrase" docs/
-```
-
-Finds matching text spans in documents to help create anchors.
-
-## Core Concepts
-
-| Term | Meaning |
-|------|---------|
-| **Document** | A source file with canonical text (NFC-normalized, hash-verified) |
-| **Canonical Text** | Unicode text in NFC form with normalized newlines (\r\n and \r → \n) |
-| **Span** | Half-open character interval [start, end) in canonical text |
-| **Anchor** | Links a query to expected source evidence: {document_id, start, end, hash} |
-| **Gold Set** | Collection of anchors for validated evaluation questions |
-| **Retrieval Result** | Retrieved chunk text, ranked by retriever |
-| **Evaluation Run** | Per-query metrics (Recall@K, Precision@K, etc.) for a single run |
-| **Baseline** | Established retrieval performance (before change) |
-| **Candidate** | New retrieval performance (after change) |
-| **Regression** | Query where candidate performance falls below baseline by policy threshold |
-| **Regression Policy** | Per-metric max_drop thresholds (e.g., {"recall@5": 0.05, "precision@5": 0.05}) |
-
-## Metrics
-
-All metrics operate on character-level span coverage:
-
-- **Recall@K**: Fraction of gold evidence characters covered by top-K retrieved spans: |G ∩ R| / |G|
-- **Precision@K**: Fraction of retrieved characters that overlap gold: |G ∩ R| / |R|
-- **Hit@K**: Whether at least one gold span has ≥50% character overlap with retrieved spans
-- **FullEvidence@K**: Whether ALL gold spans meet ≥50% character overlap
-- **IoU**: Intersection-over-union of gold and retrieved spans for diagnostic overlap analysis
-
-Metrics are computed per-query. Aggregate metrics (mean, std, min, max) are reported for trends and diagnostics but do not drive the regression gate. Regression detection operates on per-query deltas.
-
-## CLI Reference
-
-```bash
-spanchor --help
-```
-
-Shows all commands. Each command has detailed help:
-
-```bash
-spanchor validate --help
-spanchor evaluate --help
-spanchor compare --help
-spanchor locate --help
-spanchor check-corpus --help
-spanchor anchor --help
-```
-
-### Exit Codes
-
-- **0**: Success (evaluate, validate) or no regressions (compare)
-- **1**: Regressions detected (compare)
-- **2**: Schema error or usage error
-- **3**: Unmapped chunk rate exceeded (evaluate)
-
-## Regression Testing Workflow
-
-1. **Establish Baseline**: Run evaluate on current retriever
-   ```bash
-   spanchor evaluate docs/ gold.jsonl current_results.json -o baseline.json
-   ```
-
-2. **Make a Change**: Modify retriever, chunking, ranking, etc.
-
-3. **Evaluate Candidate**: Run same gold set against modified pipeline
-   ```bash
-   spanchor evaluate docs/ gold.jsonl new_results.json -o candidate.json
-   ```
-
-4. **Compare & Gate**: Detect per-query regressions
-   ```bash
-   spanchor compare baseline.json candidate.json --policy policy.json
-   ```
-
-5. **CI Decision**: Exit code determines pass/fail
-   - Exit 0: Changes safe (no regressions)
-   - Exit 1: Regressions detected (block deployment)
-
-## Integration with RAG Pipelines
-
-SPANCHOR evaluates the **retrieval stage** of RAG systems. It does not replace:
-
-- Your vector database or retriever
-- Embedding models
-- Chunking strategy or document processor
-- LLM or answer-generation layer
-- RAG framework
-
-Typical integration:
-
-```
-Existing RAG → Retriever → Retrieved Chunks
-                                    ↓
-                        SPANCHOR Evaluation
-                                    ↓
-                        Map to Source Spans
-                                    ↓
-                        Compute Metrics
-                                    ↓
-                        Compare Baseline/Candidate
-                                    ↓
-                        Regression Gate → CI Pass/Fail
-```
-
-SPANCHOR integrates as a post-retrieval evaluation layer. It takes retrieved chunks and maps them back to source document spans for evaluation.
-
-## Design Principles
-
-### Source Anchors Are Stable (With Caveats)
-
-Source anchors remain stable as long as:
-- The canonical source document text does not change
-- Document identity (doc_id) remains consistent
-
-If the source document is updated, anchors need to be recreated. If a document is renamed or removed, anchors become orphaned.
-
-### Per-Query Regression Detection
-
-Regression detection operates on **per-query metrics**, not aggregates.
-
-Example:
-- Query 1: Recall drops from 0.8 → 0.7 (policy: max 0.05 drop) → **REGRESSION**
-- Query 2: Recall improves from 0.5 → 0.9 → **IMPROVED**
-- Query 3: Recall unchanged → **UNCHANGED**
-
-Result: Exit 1 (regression detected). Aggregate mean might still be 0.8, but the gate catches the per-query drop.
-
-### Local, Deterministic, Offline
-
-- Character offsets are absolute positions in canonical text
-- Text normalization (NFC, newlines) is deterministic
-- Span algebra (union, intersection) is deterministic
-- No external services, embeddings, or LLM calls
-- Reproducible results for CI/CD
-
-## Example: Changing Chunk Size
-
-### Scenario
-
-**Baseline Pipeline:**
-- Chunk size: 250 characters
-- Overlap: 0
-
-**Candidate Pipeline:**
-- Chunk size: 200 characters
-- Overlap: 50
-
-Chunks have different boundaries. Traditional chunk-ID comparison fails silently.
-
-**SPANCHOR Approach:**
-
-1. Gold set: Anchors to source character spans (e.g., "Getting Started" section is [120, 450))
-2. Baseline retrieval returns: chunks c_0 and c_1
-3. SPANCHOR maps: c_0 and c_1 → spans [100, 300) and [280, 450)
-4. Evaluation: Recall@5 = covered / total
-5. Candidate retrieval returns: chunks c_0, c_1, c_2 (different boundaries)
-6. SPANCHOR maps: c_0, c_1, c_2 → spans [110, 310), [270, 430), [420, 470)
-7. Evaluation: Recall@5 = covered / total
-8. Comparison: If coverage drops, regression detected
-
-The evaluation remains stable even though chunk boundaries shifted.
-
-## Project Status
-
-SPANCHOR v0.1.0 is the initial public release. It establishes the core source-anchored retrieval evaluation workflow and is ready for experimentation and integration.
-
-v0.1.0 covers:
-- Stable source-document anchors
-- Character-level span coverage metrics
-- Baseline/candidate comparison
-- Per-query regression detection
-- Chunk-to-source mapping with policy handling
-- CLI workflows
-- Markdown and JSON reporting
-
-## Non-Goals
-
-SPANCHOR is NOT:
-
-- A RAG framework or orchestrator
-- A vector database or retriever implementation
-- An embedding service or model
-- A document parser or OCR tool
-- An LLM provider or answer-generation system
-- An answer-quality evaluator (rates generated answers)
-- An observability or dashboarding platform
-- An agent framework
-
-SPANCHOR focuses exclusively on **retrieval evaluation** and **regression testing** of the retrieval stage.
-
-## License
-
-SPANCHOR is licensed under the Apache License 2.0. See [LICENSE](LICENSE) for details.
-
-## Repository
-
-- **GitHub**: https://github.com/Mukeshram-07/spanchor
-- **PyPI**: https://pypi.org/project/spanchor/
+## Testing
+
+754 tests covering:
+- Core evaluation logic
+- Metric computation
+- Regression detection
+- Framework integrations
+- CLI commands
+- Edge cases and error handling
+
+Run: `pytest -v`
+
+## Roadmap
+
+**v0.2.x (Current)**
+- ✅ Generic, LangChain, LlamaIndex adapters
+- ✅ Per-query regression detection
+- ✅ Full type safety (mypy --strict)
+- ✅ Adoption example and guides
+
+**v0.3+**
+- Schema versioning improvements
+- Advanced policy configurations
+- Performance optimizations
+- Additional framework adapters
 
 ## Contributing
 
-Contributions are welcome. Please open an issue or pull request on GitHub.
+Contributions welcome. Please:
+1. Fork the repository
+2. Create a feature branch
+3. Add tests for new functionality
+4. Ensure `pytest`, `mypy --strict`, and `ruff` pass
+5. Submit a pull request
+
+## License
+
+Apache License 2.0. See [LICENSE](LICENSE) for details.
 
 ---
 
-For more details, see the [examples/real_world_validation/](examples/real_world_validation/) directory for a complete working example.
+**SPANCHOR**: Regression-test your RAG retrieval quality with confidence.
+
+Created by [Mukeshram-07](https://github.com/Mukeshram-07)
+

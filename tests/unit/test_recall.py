@@ -186,7 +186,6 @@ class TestRecallEdgeCases:
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-
 # ---------------------------------------------------------------------------
 # Helpers / strategies
 # ---------------------------------------------------------------------------

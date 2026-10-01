@@ -5,13 +5,13 @@ across all possible inputs to recall and precision metric calculations.
 """
 
 import pytest
-from hypothesis import given, settings, HealthCheck
+from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
+from spanchor.errors import EvaluationError
 from spanchor.evaluation.intervals import Interval
 from spanchor.evaluation.precision import precision_at_k
 from spanchor.evaluation.recall import recall_at_k
-from spanchor.errors import EvaluationError
 
 
 # Strategy for generating valid intervals

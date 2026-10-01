@@ -11,7 +11,6 @@ from spanchor.models.query import Query
 from spanchor.models.run import Run
 from spanchor.testing import assert_no_regression
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------

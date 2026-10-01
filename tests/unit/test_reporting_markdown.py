@@ -6,17 +6,14 @@ covering all acceptance criteria for Requirement 21.
 Validates: Requirements 21.1, 21.2, 21.3, 21.4, 21.5, 21.6, 21.7
 """
 
-import pytest
 
 from spanchor.comparison.compare import ComparisonResult
-from spanchor.models.anchor import Anchor
 from spanchor.models.query import Query
 from spanchor.models.run import Run
 from spanchor.reporting.markdown import (
     generate_comparison_report,
     generate_evaluation_report,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers

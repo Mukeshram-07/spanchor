@@ -8,17 +8,13 @@ Validates: Requirements 22.1, 22.2, 22.3, 22.4, 22.5, 22.6
 
 import json
 
-import pytest
-
 from spanchor.comparison.compare import ComparisonResult
-from spanchor.models.anchor import Anchor
 from spanchor.models.query import Query
 from spanchor.models.run import Run
 from spanchor.reporting.json_report import (
     generate_comparison_json,
     generate_evaluation_json,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers

@@ -1,6 +1,5 @@
 """Unit tests for IoU (Intersection-over-Union) diagnostic metric."""
 
-import pytest
 
 from spanchor.evaluation.iou import iou
 
