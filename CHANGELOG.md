@@ -2,6 +2,26 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.2.1] - 2026-10-01
+
+### Changed
+
+#### Documentation
+- Completely rewrote README.md with improved clarity and structure
+- Enhanced problem statement with real regression example (0.405 → 0.249 recall)
+- Better organization of framework integration examples
+- Clearer installation instructions with optional extras highlighted
+- Improved PyPI package description for better discoverability
+
+### Compatibility
+
+#### Backward Compatible
+- ✓ All v0.2.0 APIs unchanged
+- ✓ All CLI commands work identically
+- ✓ No code changes in release
+
+---
+
 ## [0.2.0] - 2026-10-01
 
 ### Added
