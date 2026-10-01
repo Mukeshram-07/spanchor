@@ -56,10 +56,16 @@ def nodes_to_retrieval_results(
         >>> results[0].score
         0.95
     """
+    # Support both old (llama_index.schema) and new (llama_index.core.schema) import paths
     try:
-        from llama_index.schema import (
-            NodeWithScore,  # type: ignore[import-not-found,import-untyped]  # noqa: F811
-        )
+        try:
+            from llama_index.schema import (
+                NodeWithScore,  # type: ignore[import-not-found,import-untyped]  # noqa: F811
+            )
+        except ImportError:
+            from llama_index.core.schema import (
+                NodeWithScore,  # type: ignore[import-not-found,import-untyped]  # noqa: F811
+            )
     except ImportError as e:
         raise ImportError(
             "llama-index is required for LlamaIndex adapter. "
