@@ -8,6 +8,7 @@
 [![Python](https://img.shields.io/pypi/pyversions/spanchor)](https://pypi.org/project/spanchor/)
 [![License](https://img.shields.io/pypi/l/spanchor)](LICENSE)
 [![CI](https://github.com/Mukeshram-07/spanchor/actions/workflows/ci.yml/badge.svg)](https://github.com/Mukeshram-07/spanchor/actions/workflows/ci.yml)
+[![Release](https://github.com/Mukeshram-07/spanchor/actions/workflows/release.yml/badge.svg)](https://github.com/Mukeshram-07/spanchor/actions/workflows/release.yml)
 
 **Regression-test your RAG retrieval pipeline against stable source-document anchors, not fragile chunk IDs.**
 
