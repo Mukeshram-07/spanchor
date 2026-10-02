@@ -1,0 +1,114 @@
+- generic [ref=f8e3]:
+  - banner [ref=f8e4]:
+    - generic [ref=f8e6]:
+      - generic [ref=f8e7]:
+        - link "SPANCHOR v0.3.0" [ref=f8e8] [cursor=pointer]:
+          - /url: /
+          - generic [ref=f8e13]:
+            - generic [ref=f8e14]: SPANCHOR
+            - generic [ref=f8e15]: v0.3.0
+        - navigation [ref=f8e16]:
+          - link "Docs" [ref=f8e17] [cursor=pointer]:
+            - /url: /docs
+          - link "Playground" [ref=f8e18] [cursor=pointer]:
+            - /url: /playground
+          - link "Examples" [ref=f8e19] [cursor=pointer]:
+            - /url: /examples
+          - link "API" [ref=f8e20] [cursor=pointer]:
+            - /url: /api
+          - link "Architecture" [ref=f8e21] [cursor=pointer]:
+            - /url: /architecture
+      - generic [ref=f8e22]:
+        - generic [ref=f8e23]: K
+        - link "pip install spanchor" [ref=f8e27] [cursor=pointer]:
+          - /url: https://pypi.org/project/spanchor/
+        - link "GitHub" [ref=f8e33] [cursor=pointer]:
+          - /url: https://github.com/Mukeshram-07/spanchor
+  - main [ref=f8e39]:
+    - generic [ref=f8e40]:
+      - generic [ref=f8e41]: PIPELINE ARCHITECTURE
+      - heading "SPANCHOR Architecture Visualizer" [level=1] [ref=f8e42]
+      - paragraph [ref=f8e43]: Interactive diagram mapping the canonical 8-step RAG retrieval evaluation workflow from raw document source to automated CI test results.
+    - generic [ref=f8e44]:
+      - generic [ref=f8e45]:
+        - button [ref=f8e47]:
+          - generic [ref=f8e53]:
+            - heading "1. Source Documents" [level=3] [ref=f8e54]
+            - paragraph [ref=f8e55]: Raw un-chunked document repository
+        - button [ref=f8e59]:
+          - generic [ref=f8e65]:
+            - heading "2. Canonicalization" [level=3] [ref=f8e66]
+            - paragraph [ref=f8e67]: Whitespace & Unicode normalization
+        - button [ref=f8e71]:
+          - generic [ref=f8e78]:
+            - heading "3. Chunking Engine" [level=3] [ref=f8e79]
+            - paragraph [ref=f8e80]: Variable length document chunker
+        - button [ref=f8e84]:
+          - generic [ref=f8e90]:
+            - heading "4. Retrieval Pipeline" [level=3] [ref=f8e91]
+            - paragraph [ref=f8e92]: Vector search, BM25, or hybrid search
+        - generic [ref=f8e95]:
+          - button [ref=f8e96]:
+            - generic [ref=f8e102]:
+              - heading "5. SPANCHOR Engine" [level=3] [ref=f8e103]
+              - paragraph [ref=f8e104]: Source span matching & hash verification
+          - generic [ref=f8e107]:
+            - paragraph [ref=f8e108]: Core evaluation engine. Matches candidate retrieved chunk spans against gold set character offsets and SHA-256 hashes.
+            - generic [ref=f8e109]:
+              - generic [ref=f8e110]: Source Anchors
+              - generic [ref=f8e111]: Span Intersection (IoU)
+              - generic [ref=f8e112]: Metric Calculation
+              - generic [ref=f8e113]: Regression Delta
+        - button [ref=f8e115]:
+          - generic [ref=f8e119]:
+            - heading "6. Metrics & Comparison" [level=3] [ref=f8e120]
+            - paragraph [ref=f8e121]: Recall@K, Hit@K, IoU calculation
+        - button [ref=f8e125]:
+          - generic [ref=f8e131]:
+            - heading "7. CI / CD Integration" [level=3] [ref=f8e132]
+            - paragraph [ref=f8e133]: Pytest & GitHub Actions test runner
+        - button [ref=f8e137]:
+          - generic [ref=f8e143]:
+            - heading "8. Test Results" [level=3] [ref=f8e144]
+            - paragraph [ref=f8e145]: JSON reports & stdout summary
+      - generic [ref=f8e148]:
+        - generic [ref=f8e149]:
+          - generic [ref=f8e155]:
+            - generic [ref=f8e156]: Node Inspector
+            - heading "5. SPANCHOR Engine" [level=2] [ref=f8e157]
+          - paragraph [ref=f8e158]: Core evaluation engine. Matches candidate retrieved chunk spans against gold set character offsets and SHA-256 hashes.
+          - generic [ref=f8e159]:
+            - generic [ref=f8e160]: Selected Node
+            - generic [ref=f8e161]: "id: \"spanchor\""
+            - generic [ref=f8e162]: "description: \"Source span matching & hash verification\""
+        - generic [ref=f8e163]:
+          - generic [ref=f8e164]: Canonical Architecture Flow
+          - generic [ref=f8e165]: Source Docs ──► Canonicalization ──► Chunking ──► Retrieval │ CI Results ◄── Test Reports ◄── Metrics ◄── SPANCHOR ◄──┘
+  - contentinfo [ref=f8e166]:
+    - generic [ref=f8e167]:
+      - generic [ref=f8e168]:
+        - generic [ref=f8e169]:
+          - heading "SPANCHOR" [level=2] [ref=f8e170]
+          - paragraph [ref=f8e171]: Source-anchored regression testing for RAG retrieval pipelines.
+        - generic [ref=f8e172]:
+          - heading "Resources" [level=3] [ref=f8e173]
+          - navigation "Footer resources" [ref=f8e174]:
+            - link "Documentation" [ref=f8e175] [cursor=pointer]:
+              - /url: /docs
+            - link "GitHub (opens in new tab)" [ref=f8e176] [cursor=pointer]:
+              - /url: https://github.com/Mukeshram-07/spanchor
+              - text: GitHub
+            - link "PyPI (opens in new tab)" [ref=f8e177] [cursor=pointer]:
+              - /url: https://pypi.org/project/spanchor/
+              - text: PyPI
+            - link "Examples" [ref=f8e178] [cursor=pointer]:
+              - /url: /examples
+            - link "API" [ref=f8e179] [cursor=pointer]:
+              - /url: /api
+        - generic [ref=f8e180]:
+          - heading "Info" [level=3] [ref=f8e181]
+          - list [ref=f8e182]:
+            - listitem [ref=f8e183]: "License: Apache-2.0"
+            - listitem [ref=f8e184]: "Python: 3.11 – 3.13"
+            - listitem [ref=f8e185]: "Type: Package"
+      - paragraph [ref=f8e187]: © 2026 SPANCHOR. All rights reserved.

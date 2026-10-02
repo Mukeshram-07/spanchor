@@ -1,0 +1,281 @@
+- generic [ref=f7e3]:
+  - banner [ref=f7e4]:
+    - generic [ref=f7e6]:
+      - generic [ref=f7e7]:
+        - link "SPANCHOR v0.3.0" [ref=f7e8] [cursor=pointer]:
+          - /url: /
+          - generic [ref=f7e13]:
+            - generic [ref=f7e14]: SPANCHOR
+            - generic [ref=f7e15]: v0.3.0
+        - navigation [ref=f7e16]:
+          - link "Docs" [ref=f7e17] [cursor=pointer]:
+            - /url: /docs
+          - link "Playground" [ref=f7e18] [cursor=pointer]:
+            - /url: /playground
+          - link "Examples" [ref=f7e19] [cursor=pointer]:
+            - /url: /examples
+          - link "API" [ref=f7e20] [cursor=pointer]:
+            - /url: /api
+          - link "Architecture" [ref=f7e21] [cursor=pointer]:
+            - /url: /architecture
+      - generic [ref=f7e22]:
+        - generic [ref=f7e23]: K
+        - link "pip install spanchor" [ref=f7e27] [cursor=pointer]:
+          - /url: https://pypi.org/project/spanchor/
+        - link "GitHub" [ref=f7e33] [cursor=pointer]:
+          - /url: https://github.com/Mukeshram-07/spanchor
+  - main [ref=f7e39]:
+    - generic [ref=f7e40]:
+      - generic [ref=f7e41]: PYTHON API SPECIFICATION
+      - heading "SPANCHOR API Reference" [level=1] [ref=f7e42]
+      - paragraph [ref=f7e43]: Formal type signatures and parameter specifications for SPANCHOR core Python classes and evaluation functions.
+    - generic [ref=f7e44]:
+      - generic [ref=f7e45]:
+        - generic [ref=f7e46]:
+          - generic [ref=f7e52]:
+            - heading "Document" [level=2] [ref=f7e53]
+            - paragraph [ref=f7e54]: spanchor.models
+          - generic [ref=f7e55]: CLASS
+        - generic [ref=f7e56]:
+          - code [ref=f7e58]: class Document(BaseModel)
+          - paragraph [ref=f7e59]: Represents a canonicalized source document in the evaluation corpus.
+        - generic [ref=f7e60]:
+          - heading "Class Attributes & Fields" [level=3] [ref=f7e61]
+          - table [ref=f7e63]:
+            - rowgroup [ref=f7e64]:
+              - row [ref=f7e65]:
+                - columnheader "Parameter" [ref=f7e66]
+                - columnheader "Type" [ref=f7e67]
+                - columnheader "Description" [ref=f7e68]
+            - rowgroup [ref=f7e69]:
+              - row [ref=f7e70]:
+                - cell "doc_id" [ref=f7e71]
+                - cell "str" [ref=f7e72]
+                - cell "Unique identifier for the document (e.g. docs/deployment.md)" [ref=f7e73]
+              - row [ref=f7e74]:
+                - cell "content" [ref=f7e75]
+                - cell "str" [ref=f7e76]
+                - cell "Full text content of the source document" [ref=f7e77]
+              - row [ref=f7e78]:
+                - cell "metadata" [ref=f7e79]
+                - cell "Dict[str, Any]" [ref=f7e80]
+                - cell "Optional key-value metadata dictionary" [ref=f7e81]
+        - generic [ref=f7e82]:
+          - heading "Python Usage Example" [level=3] [ref=f7e83]
+          - generic [ref=f7e89]:
+            - generic [ref=f7e90]:
+              - generic [ref=f7e91]: spanchor_example.py
+              - generic [ref=f7e92]:
+                - button "Reset code" [ref=f7e93]
+                - button "Copy code" [ref=f7e97]
+            - region "Code editor" [ref=f7e101]:
+              - code [ref=f7e102]:
+                - generic [ref=f7e103]: "from spanchor import Document doc = Document( doc_id=\"docs/cloudsync/deployment.md\", content=\"To configure production deployment, open SSL port 8443...\", metadata={\"author\": \"DevOps\", \"version\": \"1.2\"} )"
+            - generic [ref=f7e104]: "Language: PYTHON"
+      - generic [ref=f7e106]:
+        - generic [ref=f7e107]:
+          - generic [ref=f7e113]:
+            - heading "DocumentSpan" [level=2] [ref=f7e114]
+            - paragraph [ref=f7e115]: spanchor.models
+          - generic [ref=f7e116]: CLASS
+        - generic [ref=f7e117]:
+          - code [ref=f7e119]: class DocumentSpan(BaseModel)
+          - paragraph [ref=f7e120]: Defines an exact character offset range and canonical SHA-256 hash within a source document.
+        - generic [ref=f7e121]:
+          - heading "Class Attributes & Fields" [level=3] [ref=f7e122]
+          - table [ref=f7e124]:
+            - rowgroup [ref=f7e125]:
+              - row [ref=f7e126]:
+                - columnheader "Parameter" [ref=f7e127]
+                - columnheader "Type" [ref=f7e128]
+                - columnheader "Description" [ref=f7e129]
+            - rowgroup [ref=f7e130]:
+              - row [ref=f7e131]:
+                - cell "doc_id" [ref=f7e132]
+                - cell "str" [ref=f7e133]
+                - cell "Parent document ID" [ref=f7e134]
+              - row [ref=f7e135]:
+                - cell "start_offset" [ref=f7e136]
+                - cell "int" [ref=f7e137]
+                - cell "0-indexed starting character offset" [ref=f7e138]
+              - row [ref=f7e139]:
+                - cell "end_offset" [ref=f7e140]
+                - cell "int" [ref=f7e141]
+                - cell "Ending character offset (exclusive)" [ref=f7e142]
+              - row [ref=f7e143]:
+                - cell "canonical_text" [ref=f7e144]
+                - cell "str" [ref=f7e145]
+                - cell "Ground truth text snippet string" [ref=f7e146]
+              - row [ref=f7e147]:
+                - cell "text_hash" [ref=f7e148]
+                - cell "Optional[str]" [ref=f7e149]
+                - cell "Calculated SHA-256 hash of canonical_text" [ref=f7e150]
+        - generic [ref=f7e151]:
+          - heading "Python Usage Example" [level=3] [ref=f7e152]
+          - generic [ref=f7e158]:
+            - generic [ref=f7e159]:
+              - generic [ref=f7e160]: spanchor_example.py
+              - generic [ref=f7e161]:
+                - button "Reset code" [ref=f7e162]
+                - button "Copy code" [ref=f7e166]
+            - region "Code editor" [ref=f7e170]:
+              - code [ref=f7e171]:
+                - generic [ref=f7e172]: from spanchor import DocumentSpan span = DocumentSpan( doc_id="docs/cloudsync/deployment.md", start_offset=142, end_offset=288, canonical_text="Database connection strings must use sslmode=verify-full..." )
+            - generic [ref=f7e173]: "Language: PYTHON"
+      - generic [ref=f7e175]:
+        - generic [ref=f7e176]:
+          - generic [ref=f7e182]:
+            - heading "Anchor" [level=2] [ref=f7e183]
+            - paragraph [ref=f7e184]: spanchor.models
+          - generic [ref=f7e185]: CLASS
+        - generic [ref=f7e186]:
+          - code [ref=f7e188]: class Anchor(BaseModel)
+          - paragraph [ref=f7e189]: Binds one or more document spans together as a verified ground-truth evidence anchor.
+        - generic [ref=f7e190]:
+          - heading "Class Attributes & Fields" [level=3] [ref=f7e191]
+          - table [ref=f7e193]:
+            - rowgroup [ref=f7e194]:
+              - row [ref=f7e195]:
+                - columnheader "Parameter" [ref=f7e196]
+                - columnheader "Type" [ref=f7e197]
+                - columnheader "Description" [ref=f7e198]
+            - rowgroup [ref=f7e199]:
+              - row [ref=f7e200]:
+                - cell "anchor_id" [ref=f7e201]
+                - cell "str" [ref=f7e202]
+                - cell "Unique anchor ID (e.g. CS-A-101)" [ref=f7e203]
+              - row [ref=f7e204]:
+                - cell "spans" [ref=f7e205]
+                - cell "List[DocumentSpan]" [ref=f7e206]
+                - cell "List of evidence spans composing this anchor" [ref=f7e207]
+              - row [ref=f7e208]:
+                - cell "canonical_text" [ref=f7e209]
+                - cell "str" [ref=f7e210]
+                - cell "Combined canonical text representation" [ref=f7e211]
+        - generic [ref=f7e212]:
+          - heading "Python Usage Example" [level=3] [ref=f7e213]
+          - generic [ref=f7e219]:
+            - generic [ref=f7e220]:
+              - generic [ref=f7e221]: spanchor_example.py
+              - generic [ref=f7e222]:
+                - button "Reset code" [ref=f7e223]
+                - button "Copy code" [ref=f7e227]
+            - region "Code editor" [ref=f7e231]:
+              - code [ref=f7e232]:
+                - generic [ref=f7e233]: from spanchor import Anchor anchor = Anchor( anchor_id="CS-A-101", spans=[span], canonical_text="Database connection strings must use sslmode=verify-full..." )
+            - generic [ref=f7e234]: "Language: PYTHON"
+      - generic [ref=f7e236]:
+        - generic [ref=f7e237]:
+          - generic [ref=f7e243]:
+            - heading "evaluate()" [level=2] [ref=f7e244]
+            - paragraph [ref=f7e245]: spanchor.core
+          - generic [ref=f7e246]: FUNCTION
+        - generic [ref=f7e247]:
+          - code [ref=f7e249]: def evaluate(gold_set, retrieved_results, top_k=[1,3,5], metric_threshold=0.5) -> EvaluationResult
+          - paragraph [ref=f7e250]: Evaluates candidate retrieval outputs against ground-truth source anchor gold sets.
+        - generic [ref=f7e251]:
+          - heading "Function Arguments" [level=3] [ref=f7e252]
+          - table [ref=f7e254]:
+            - rowgroup [ref=f7e255]:
+              - row [ref=f7e256]:
+                - columnheader "Parameter" [ref=f7e257]
+                - columnheader "Type" [ref=f7e258]
+                - columnheader "Description" [ref=f7e259]
+            - rowgroup [ref=f7e260]:
+              - row [ref=f7e261]:
+                - cell "gold_set" [ref=f7e262]
+                - cell "Union[GoldSet, str]" [ref=f7e263]
+                - cell "GoldSet object or path to gold set JSON file" [ref=f7e264]
+              - row [ref=f7e265]:
+                - cell "retrieved_results" [ref=f7e266]
+                - cell "Union[List[RetrievalResult], str]" [ref=f7e267]
+                - cell "Candidate retrieval outputs or file path" [ref=f7e268]
+              - row [ref=f7e269]:
+                - cell "top_k" [ref=f7e270]
+                - cell "List[int]" [ref=f7e271]
+                - 'cell "K cutoffs to calculate Recall@K and Hit@K (default: [1, 3, 5])" [ref=f7e272]'
+              - row [ref=f7e273]:
+                - cell "metric_threshold" [ref=f7e274]
+                - cell "float" [ref=f7e275]
+                - 'cell "IoU threshold for span match (default: 0.5)" [ref=f7e276]'
+        - generic [ref=f7e277]:
+          - heading "Python Usage Example" [level=3] [ref=f7e278]
+          - generic [ref=f7e284]:
+            - generic [ref=f7e285]:
+              - generic [ref=f7e286]: spanchor_example.py
+              - generic [ref=f7e287]:
+                - button "Reset code" [ref=f7e288]
+                - button "Copy code" [ref=f7e292]
+            - region "Code editor" [ref=f7e296]:
+              - code [ref=f7e297]:
+                - generic [ref=f7e298]: from spanchor import evaluate result = evaluate( gold_set="cloudsync_gold.json", retrieved_results="candidate_retrieved.json", top_k=[1, 3, 5] ) print(result.summary())
+            - generic [ref=f7e299]: "Language: PYTHON"
+      - generic [ref=f7e301]:
+        - generic [ref=f7e302]:
+          - generic [ref=f7e308]:
+            - heading "compare()" [level=2] [ref=f7e309]
+            - paragraph [ref=f7e310]: spanchor.core
+          - generic [ref=f7e311]: FUNCTION
+        - generic [ref=f7e312]:
+          - code [ref=f7e314]: def compare(baseline_result, candidate_result) -> ComparisonResult
+          - paragraph [ref=f7e315]: Compares two evaluation runs to calculate metric deltas and detect query-level regressions.
+        - generic [ref=f7e316]:
+          - heading "Function Arguments" [level=3] [ref=f7e317]
+          - table [ref=f7e319]:
+            - rowgroup [ref=f7e320]:
+              - row [ref=f7e321]:
+                - columnheader "Parameter" [ref=f7e322]
+                - columnheader "Type" [ref=f7e323]
+                - columnheader "Description" [ref=f7e324]
+            - rowgroup [ref=f7e325]:
+              - row [ref=f7e326]:
+                - cell "baseline_result" [ref=f7e327]
+                - cell "EvaluationResult" [ref=f7e328]
+                - cell "Baseline evaluation run output" [ref=f7e329]
+              - row [ref=f7e330]:
+                - cell "candidate_result" [ref=f7e331]
+                - cell "EvaluationResult" [ref=f7e332]
+                - cell "Candidate evaluation run output" [ref=f7e333]
+        - generic [ref=f7e334]:
+          - heading "Python Usage Example" [level=3] [ref=f7e335]
+          - generic [ref=f7e341]:
+            - generic [ref=f7e342]:
+              - generic [ref=f7e343]: spanchor_example.py
+              - generic [ref=f7e344]:
+                - button "Reset code" [ref=f7e345]
+                - button "Copy code" [ref=f7e349]
+            - region "Code editor" [ref=f7e353]:
+              - code [ref=f7e354]:
+                - generic [ref=f7e355]:
+                  - text: from spanchor import compare, evaluate baseline_res = evaluate(gold_set, "baseline.json") candidate_res = evaluate(gold_set, "candidate.json") diff = compare(baseline_res, candidate_res) print(
+                  - generic [ref=f7e356]: "f\"Regressions: {diff.regression_count}\""
+                  - text: )
+            - generic [ref=f7e357]: "Language: PYTHON"
+  - contentinfo [ref=f7e359]:
+    - generic [ref=f7e360]:
+      - generic [ref=f7e361]:
+        - generic [ref=f7e362]:
+          - heading "SPANCHOR" [level=2] [ref=f7e363]
+          - paragraph [ref=f7e364]: Source-anchored regression testing for RAG retrieval pipelines.
+        - generic [ref=f7e365]:
+          - heading "Resources" [level=3] [ref=f7e366]
+          - navigation "Footer resources" [ref=f7e367]:
+            - link "Documentation" [ref=f7e368] [cursor=pointer]:
+              - /url: /docs
+            - link "GitHub (opens in new tab)" [ref=f7e369] [cursor=pointer]:
+              - /url: https://github.com/Mukeshram-07/spanchor
+              - text: GitHub
+            - link "PyPI (opens in new tab)" [ref=f7e370] [cursor=pointer]:
+              - /url: https://pypi.org/project/spanchor/
+              - text: PyPI
+            - link "Examples" [ref=f7e371] [cursor=pointer]:
+              - /url: /examples
+            - link "API" [ref=f7e372] [cursor=pointer]:
+              - /url: /api
+        - generic [ref=f7e373]:
+          - heading "Info" [level=3] [ref=f7e374]
+          - list [ref=f7e375]:
+            - listitem [ref=f7e376]: "License: Apache-2.0"
+            - listitem [ref=f7e377]: "Python: 3.11 – 3.13"
+            - listitem [ref=f7e378]: "Type: Package"
+      - paragraph [ref=f7e380]: © 2026 SPANCHOR. All rights reserved.

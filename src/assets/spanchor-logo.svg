@@ -1,0 +1,30 @@
+<svg viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
+  <!-- Define gradients -->
+  <defs>
+    <linearGradient id="logoGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00D9FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0066FF;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="logoGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0066FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#001A66;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Top right sphere -->
+  <circle cx="150" cy="45" r="35" fill="#0033CC"/>
+  
+  <!-- Top curved section (light blue) -->
+  <path d="M 70 40 Q 100 20 150 45 Q 160 55 155 80 Q 140 90 100 100 Q 60 110 50 80 Z" 
+        fill="url(#logoGradient1)"/>
+  
+  <!-- Middle curved section (darker blue) -->
+  <path d="M 50 80 Q 40 120 80 140 Q 120 160 140 135 Q 155 120 150 90 Q 100 100 60 110 Z" 
+        fill="url(#logoGradient2)"/>
+  
+  <!-- Bottom left sphere -->
+  <circle cx="60" cy="160" r="30" fill="#0066FF"/>
+  
+  <!-- Shadow/depth -->
+  <ellipse cx="100" cy="180" rx="80" ry="15" fill="#000000" opacity="0.08"/>
+</svg>

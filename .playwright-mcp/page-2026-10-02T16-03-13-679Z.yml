@@ -1,0 +1,245 @@
+- generic [ref=f1e3]:
+  - banner [ref=f1e4]:
+    - generic [ref=f1e6]:
+      - generic [ref=f1e7]:
+        - link "SPANCHOR SPANCHOR v0.3.0" [ref=f1e8] [cursor=pointer]:
+          - /url: /
+          - img "SPANCHOR" [ref=f1e10]
+          - generic [ref=f1e11]:
+            - generic [ref=f1e12]: SPANCHOR
+            - generic [ref=f1e13]: v0.3.0
+        - navigation [ref=f1e14]:
+          - link "Docs" [ref=f1e15] [cursor=pointer]:
+            - /url: /docs
+          - link "Examples" [ref=f1e16] [cursor=pointer]:
+            - /url: /examples
+          - link "API" [ref=f1e17] [cursor=pointer]:
+            - /url: /api
+          - link "Architecture" [ref=f1e18] [cursor=pointer]:
+            - /url: /architecture
+      - generic [ref=f1e19]:
+        - generic [ref=f1e20]: K
+        - link "pip install spanchor" [ref=f1e24] [cursor=pointer]:
+          - /url: https://pypi.org/project/spanchor/
+        - link "GitHub" [ref=f1e30] [cursor=pointer]:
+          - /url: https://github.com/Mukeshram-07/spanchor
+  - generic [ref=f1e36]:
+    - complementary [ref=f1e37]:
+      - navigation "Documentation navigation" [ref=f1e38]:
+        - generic [ref=f1e39]:
+          - button "Introduction" [ref=f1e40]
+          - link "Overview" [ref=f1e45] [cursor=pointer]:
+            - /url: /docs
+        - button "Getting Started" [ref=f1e47]
+        - button "Core Concepts" [ref=f1e52]
+        - button "Evaluation" [ref=f1e57]
+        - button "Advanced" [ref=f1e62]
+        - button "Examples" [ref=f1e67]
+        - button "Reference" [ref=f1e72]
+    - main [ref=f1e76]:
+      - generic [ref=f1e77]:
+        - generic [ref=f1e78]:
+          - heading "SPANCHOR Documentation" [level=1] [ref=f1e79]
+          - paragraph [ref=f1e80]: Source-anchored regression testing for RAG retrieval pipelines. v0.3.0
+        - article [ref=f1e81]:
+          - generic [ref=f1e82]:
+            - generic [ref=f1e83]:
+              - generic [ref=f1e84]: SOURCE-ANCHORED
+              - generic [ref=f1e85]: DETERMINISTIC
+              - generic [ref=f1e86]: LOCAL-FIRST
+              - generic [ref=f1e87]: CI-READY
+            - generic [ref=f1e88]:
+              - heading "What SPANCHOR does" [level=2] [ref=f1e89]
+              - paragraph [ref=f1e90]:
+                - text: SPANCHOR evaluates whether retrieved evidence still matches
+                - strong [ref=f1e91]: source-anchored ground truth
+                - text: after a retrieval pipeline changes.
+              - generic [ref=f1e94]:
+                - generic [ref=f1e95]: Question
+                - generic [ref=f1e98]: Retriever
+                - generic [ref=f1e101]: Retrieved Chunks
+                - generic [ref=f1e104]: ★ SPANCHOR ★
+                - generic [ref=f1e107]: Evidence Match
+                - generic [ref=f1e110]: Metrics
+                - generic [ref=f1e113]: Regression Detection
+            - generic [ref=f1e114]:
+              - heading "The problem it solves" [level=2] [ref=f1e115]
+              - generic [ref=f1e116]:
+                - generic [ref=f1e117]:
+                  - heading "✗ Without SPANCHOR" [level=3] [ref=f1e118]:
+                    - generic [ref=f1e119]: ✗
+                    - text: Without SPANCHOR
+                  - list [ref=f1e120]:
+                    - listitem [ref=f1e121]: Retriever changes
+                    - listitem [ref=f1e122]: ↓
+                    - listitem [ref=f1e123]: Retrieval results change
+                    - listitem [ref=f1e124]: ↓
+                    - listitem [ref=f1e125]: No reliable signal
+                    - listitem [ref=f1e126]: ↓
+                    - listitem [ref=f1e127]: Potential degradation
+                - generic [ref=f1e128]:
+                  - heading "✓ With SPANCHOR" [level=3] [ref=f1e129]:
+                    - generic [ref=f1e130]: ✓
+                    - text: With SPANCHOR
+                  - list [ref=f1e131]:
+                    - listitem [ref=f1e132]: Retriever changes
+                    - listitem [ref=f1e133]: ↓
+                    - listitem [ref=f1e134]: Baseline vs Candidate
+                    - listitem [ref=f1e135]: ↓
+                    - listitem [ref=f1e136]: Source-anchored evaluation
+                    - listitem [ref=f1e137]: ↓
+                    - listitem [ref=f1e138]: Per-query regressions
+            - generic [ref=f1e139]:
+              - heading "Where SPANCHOR sits in RAG" [level=2] [ref=f1e140]
+              - paragraph [ref=f1e141]: SPANCHOR evaluates at the retrieval boundary — after you get results, before you hit the CI gate.
+              - generic [ref=f1e142]: SOURCE DOCUMENTS ↓ CANONICALIZATION ↓ CHUNKING / INDEXING ↓ RETRIEVAL ↓ RETRIEVED RESULTS ↓ ★ ★ ★ SPANCHOR ★ ★ ★ ← Evaluation happens here ↓ METRICS ↓ REGRESSION DETECTION ↓ CI / TEST RESULTS
+            - generic [ref=f1e144]:
+              - heading "How it works" [level=2] [ref=f1e145]
+              - generic [ref=f1e147]:
+                - generic [ref=f1e148]:
+                  - generic [ref=f1e149]: "01"
+                  - heading "Source Documents" [level=4] [ref=f1e150]
+                  - paragraph [ref=f1e151]: Your raw document corpus
+                - generic [ref=f1e152]:
+                  - generic [ref=f1e153]: "02"
+                  - heading "Source Anchors" [level=4] [ref=f1e154]
+                  - paragraph [ref=f1e155]: Character spans + SHA-256 hashes
+                - generic [ref=f1e156]:
+                  - generic [ref=f1e157]: "03"
+                  - heading "Gold Set" [level=4] [ref=f1e158]
+                  - paragraph [ref=f1e159]: Q→A mappings to ground truth
+                - generic [ref=f1e160]:
+                  - generic [ref=f1e161]: "04"
+                  - heading "Run Retrieval" [level=4] [ref=f1e162]
+                  - paragraph [ref=f1e163]: Execute your candidate retriever
+                - generic [ref=f1e164]:
+                  - generic [ref=f1e165]: "05"
+                  - heading "Evaluate Spans" [level=4] [ref=f1e166]
+                  - paragraph [ref=f1e167]: Match retrieved to ground truth
+                - generic [ref=f1e168]:
+                  - generic [ref=f1e169]: "06"
+                  - heading "Calculate Metrics" [level=4] [ref=f1e170]
+                  - paragraph [ref=f1e171]: Recall@K, Precision@K, IoU
+                - generic [ref=f1e172]:
+                  - generic [ref=f1e173]: "07"
+                  - heading "Compare Baseline" [level=4] [ref=f1e174]
+                  - paragraph [ref=f1e175]: Candidate vs baseline perf
+                - generic [ref=f1e176]:
+                  - generic [ref=f1e177]: "08"
+                  - heading "Detect Regressions" [level=4] [ref=f1e178]
+                  - paragraph [ref=f1e179]: Per-query delta ranking
+            - generic [ref=f1e180]:
+              - heading "Installation" [level=2] [ref=f1e181]
+              - code [ref=f1e183]: pip install spanchor
+              - paragraph [ref=f1e184]:
+                - text: Requires Python 3.11+. See the
+                - link "Installation guide" [ref=f1e185] [cursor=pointer]:
+                  - /url: /docs/installation
+                - text: for details.
+            - generic [ref=f1e186]:
+              - heading "Quick example" [level=2] [ref=f1e187]
+              - code [ref=f1e189]: "from spanchor import evaluate, GoldSet # Load source-anchored ground truth gold_set = GoldSet.from_json(\"gold_set.json\") # Evaluate candidate retrieval results result = evaluate( gold_set=gold_set, retrieved_results=\"candidate_output.json\", top_k=[1, 3, 5] ) # Print regression summary result.print_summary()"
+              - paragraph [ref=f1e190]:
+                - text: See the
+                - link "Quickstart" [ref=f1e191] [cursor=pointer]:
+                  - /url: /docs/quickstart
+                - text: for a complete walkthrough.
+            - generic [ref=f1e192]:
+              - heading "What it evaluates" [level=2] [ref=f1e193]
+              - generic [ref=f1e194]:
+                - generic [ref=f1e195]:
+                  - heading "Per-Query Metrics" [level=3] [ref=f1e196]
+                  - list [ref=f1e197]:
+                    - listitem [ref=f1e198]:
+                      - code [ref=f1e199]: Recall@K
+                      - text: — Gold text found in top K
+                    - listitem [ref=f1e200]:
+                      - code [ref=f1e201]: Hit@K
+                      - text: — Binary match in top K
+                    - listitem [ref=f1e202]:
+                      - code [ref=f1e203]: Precision@K
+                      - text: — Relevant results ratio
+                    - listitem [ref=f1e204]:
+                      - code [ref=f1e205]: IoU
+                      - text: — Span overlap match
+                    - listitem [ref=f1e206]:
+                      - code [ref=f1e207]: Delta
+                      - text: — vs baseline change
+                - generic [ref=f1e208]:
+                  - heading "Aggregate Output" [level=3] [ref=f1e209]
+                  - list [ref=f1e210]:
+                    - listitem [ref=f1e211]: Improved — queries better than baseline
+                    - listitem [ref=f1e212]: Unchanged — no performance delta
+                    - listitem [ref=f1e213]: Regressed — worse than baseline
+                    - listitem [ref=f1e214]: Per-query ranking — delta sorted
+                    - listitem [ref=f1e215]: CI exit codes — regression thresholds
+            - generic [ref=f1e216]:
+              - heading "SPANCHOR does & does not" [level=2] [ref=f1e217]
+              - generic [ref=f1e218]:
+                - generic [ref=f1e219]:
+                  - heading "SPANCHOR Does" [level=3] [ref=f1e224]
+                  - list [ref=f1e225]:
+                    - listitem [ref=f1e226]: ✓ Evaluate retrieval accuracy
+                    - listitem [ref=f1e227]: ✓ Compare baseline vs candidate
+                    - listitem [ref=f1e228]: ✓ Detect query-level regressions
+                    - listitem [ref=f1e229]: ✓ Run in CI/CD pipelines
+                    - listitem [ref=f1e230]: ✓ Work with any retriever
+                    - listitem [ref=f1e231]: ✓ Stay stable across chunking changes
+                - generic [ref=f1e232]:
+                  - heading "SPANCHOR Does NOT" [level=3] [ref=f1e238]
+                  - list [ref=f1e239]:
+                    - listitem [ref=f1e240]: ✗ Run retrievers (you provide results)
+                    - listitem [ref=f1e241]: ✗ Generate embeddings or vectors
+                    - listitem [ref=f1e242]: ✗ Judge LLM answer correctness
+                    - listitem [ref=f1e243]: ✗ Use cloud/hosted services
+                    - listitem [ref=f1e244]: ✗ Use LLM judges or semantic sim
+                    - listitem [ref=f1e245]: ✗ Automate gold set creation
+            - generic [ref=f1e246]:
+              - heading "Next steps" [level=2] [ref=f1e247]
+              - generic [ref=f1e248]:
+                - link "→ Quickstart Step-by-step tutorial to get running in 5 minutes." [ref=f1e249] [cursor=pointer]:
+                  - /url: /docs/quickstart
+                  - generic [ref=f1e250]: → Quickstart
+                  - paragraph [ref=f1e251]: Step-by-step tutorial to get running in 5 minutes.
+                - link "→ Examples Real-world workflows with complete code." [ref=f1e252] [cursor=pointer]:
+                  - /url: /examples
+                  - generic [ref=f1e253]: → Examples
+                  - paragraph [ref=f1e254]: Real-world workflows with complete code.
+                - link "→ GitHub Issues, discussions, and community." [ref=f1e255] [cursor=pointer]:
+                  - /url: https://github.com/Mukeshram-07/spanchor
+                  - generic [ref=f1e256]: → GitHub
+                  - paragraph [ref=f1e257]: Issues, discussions, and community.
+        - navigation [ref=f1e258]
+    - complementary [ref=f1e259]:
+      - generic [ref=f1e260]:
+        - heading "On this page" [level=3] [ref=f1e261]
+        - navigation [ref=f1e262]:
+          - paragraph [ref=f1e263]: No items
+  - contentinfo [ref=f1e264]:
+    - generic [ref=f1e265]:
+      - generic [ref=f1e266]:
+        - generic [ref=f1e267]:
+          - heading "SPANCHOR" [level=2] [ref=f1e268]
+          - paragraph [ref=f1e269]: Source-anchored regression testing for RAG retrieval pipelines.
+        - generic [ref=f1e270]:
+          - heading "Resources" [level=3] [ref=f1e271]
+          - navigation "Footer resources" [ref=f1e272]:
+            - link "Documentation" [ref=f1e273] [cursor=pointer]:
+              - /url: /docs
+            - link "GitHub (opens in new tab)" [ref=f1e274] [cursor=pointer]:
+              - /url: https://github.com/Mukeshram-07/spanchor
+              - text: GitHub
+            - link "PyPI (opens in new tab)" [ref=f1e275] [cursor=pointer]:
+              - /url: https://pypi.org/project/spanchor/
+              - text: PyPI
+            - link "Examples" [ref=f1e276] [cursor=pointer]:
+              - /url: /examples
+            - link "API" [ref=f1e277] [cursor=pointer]:
+              - /url: /api
+        - generic [ref=f1e278]:
+          - heading "Info" [level=3] [ref=f1e279]
+          - list [ref=f1e280]:
+            - listitem [ref=f1e281]: "License: Apache-2.0"
+            - listitem [ref=f1e282]: "Python: 3.11 – 3.13"
+            - listitem [ref=f1e283]: "Type: Package"
+      - paragraph [ref=f1e285]: © 2026 SPANCHOR. All rights reserved.

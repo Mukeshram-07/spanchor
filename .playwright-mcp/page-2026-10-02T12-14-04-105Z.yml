@@ -1,0 +1,452 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - link "SPANCHOR v0.1.0" [ref=e8] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e13]:
+            - generic [ref=e14]: SPANCHOR
+            - generic [ref=e15]: v0.1.0
+        - navigation [ref=e16]:
+          - link "Docs" [ref=e17] [cursor=pointer]:
+            - /url: /docs
+          - link "Playground" [ref=e18] [cursor=pointer]:
+            - /url: /playground
+          - link "Examples" [ref=e19] [cursor=pointer]:
+            - /url: /examples
+          - link "API" [ref=e20] [cursor=pointer]:
+            - /url: /api
+          - link "Architecture" [ref=e21] [cursor=pointer]:
+            - /url: /architecture
+      - generic [ref=e22]:
+        - generic [ref=e23]: K
+        - link "pip install spanchor" [ref=e27] [cursor=pointer]:
+          - /url: https://pypi.org/project/spanchor/
+        - link "GitHub" [ref=e33] [cursor=pointer]:
+          - /url: https://github.com/Mukeshram-07/spanchor
+  - main [ref=e39]:
+    - generic [ref=e42]:
+      - generic [ref=e43]:
+        - generic [ref=e44]: SOURCE-ANCHORED RAG REGRESSION TESTING
+        - heading "Regression testing for RAG retrieval." [level=1] [ref=e47]
+        - paragraph [ref=e48]: Validate whether your retrieval pipeline still finds the evidence it needs — using stable source anchors instead of fragile chunk IDs.
+        - generic [ref=e49]:
+          - button "Try Interactive Demo" [ref=e50]
+          - button "Read Documentation" [ref=e53]
+        - generic [ref=e55]:
+          - generic [ref=e56]:
+            - generic [ref=e59]: $
+            - generic [ref=e60]: pip install spanchor
+          - button "Copy command" [ref=e61]
+      - generic [ref=e66]:
+        - generic [ref=e67]:
+          - generic [ref=e68]: Live Evaluation Flow Engine
+          - generic [ref=e71]: Step 1 of 5
+        - generic [ref=e72]:
+          - button "QUESTION Input Query \"What caused the deployment failure?\"" [ref=e74]:
+            - generic [ref=e75]:
+              - generic [ref=e76]: QUESTION
+              - generic [ref=e82]: Input Query
+            - paragraph [ref=e83]: "\"What caused the deployment failure?\""
+          - button "RETRIEVER Top-K=3 Hybrid Vector + BM25 (3 candidate chunks retrieved)" [ref=e87]:
+            - generic [ref=e88]:
+              - generic [ref=e89]: RETRIEVER
+              - generic [ref=e95]: Top-K=3
+            - paragraph [ref=e96]: Hybrid Vector + BM25 (3 candidate chunks retrieved)
+          - 'button "SOURCE ANCHOR SHA-256 Validated cloudsync-deployment-guide.md (Span: 589 → 721)" [ref=e100]':
+            - generic [ref=e101]:
+              - generic [ref=e102]: SOURCE ANCHOR
+              - generic [ref=e108]: SHA-256 Validated
+            - paragraph [ref=e109]: "cloudsync-deployment-guide.md (Span: 589 → 721)"
+          - 'button "EVALUATION Metrics Computed Recall@5: 0.405 | IoU: 0.782 | Precision@5: 0.020" [ref=e113]':
+            - generic [ref=e114]:
+              - generic [ref=e115]: EVALUATION
+              - generic [ref=e119]: Metrics Computed
+            - paragraph [ref=e120]: "Recall@5: 0.405 | IoU: 0.782 | Precision@5: 0.020"
+          - button "REGRESSION 19 Regressed ⚠ 19 regressions detected compared to baseline v1" [ref=e124]:
+            - generic [ref=e125]:
+              - generic [ref=e126]: REGRESSION
+              - generic [ref=e131]: 19 Regressed ⚠
+            - paragraph [ref=e132]: 19 regressions detected compared to baseline v1
+        - generic [ref=e133]:
+          - generic [ref=e134]: Deterministic Local Evaluation
+          - generic [ref=e135]: Ready for CI
+    - generic [ref=e140]:
+      - generic [ref=e141]:
+        - generic [ref=e142]: SIGNATURE INTERACTIVE EXPERIENCE
+        - heading "See SPANCHOR in action" [level=2] [ref=e143]
+        - paragraph [ref=e144]: Watch a retrieval evaluation move from code execution to deterministic regression results.
+      - generic [ref=e145]:
+        - generic [ref=e146]:
+          - generic [ref=e147]: eval_workspace.py — SPANCHOR Runner
+          - generic [ref=e152]:
+            - generic [ref=e153]: "Status:"
+            - generic [ref=e154]: READY
+        - generic [ref=e155]:
+          - generic [ref=e156]:
+            - generic [ref=e157]:
+              - generic [ref=e158]:
+                - generic [ref=e159]: PYTHON EVALUATION SCRIPT
+                - button "Copy" [ref=e160]
+              - code [ref=e167]: "from spanchor import evaluate # Run evaluation on candidate retriever result = evaluate( queries=queries, retrieved=retrieved, gold=gold, ) print(result)"
+            - generic [ref=e168]:
+              - button "Run Evaluation" [ref=e169]
+              - button "Reset" [ref=e173]
+          - generic [ref=e178]:
+            - generic [ref=e179]:
+              - generic [ref=e180]:
+                - generic [ref=e181]: SPANCHOR EXECUTION STREAM
+                - generic [ref=e185]: 100 Benchmark Queries
+              - generic [ref=e186]: Click "Run Evaluation" to execute simulation...
+              - generic [ref=e191]:
+                - generic [ref=e192]:
+                  - generic [ref=e193]: Recall@5
+                  - text: —
+                - generic [ref=e194]:
+                  - generic [ref=e195]: Precision@5
+                  - text: —
+                - generic [ref=e196]:
+                  - generic [ref=e197]: Hit@5
+                  - text: —
+                - generic [ref=e198]:
+                  - generic [ref=e199]: Regressions
+                  - text: —
+            - generic [ref=e200]:
+              - generic [ref=e201]:
+                - generic [ref=e202]: STDOUT STREAM
+                - generic [ref=e203]: spanchor evaluate CLI
+              - code [ref=e204]: $ spanchor evaluate --gold-set cloudsync.json --candidate hybrid_v2.json
+    - generic [ref=e206]:
+      - generic [ref=e207]:
+        - generic [ref=e208]: CORE INNOVATION
+        - heading "Why Source Anchors?" [level=2] [ref=e209]
+        - paragraph [ref=e210]: Traditional RAG testing uses fragile generated chunk IDs that break when chunk size or embedding models change. SPANCHOR anchors ground truth directly to source document text spans.
+      - generic [ref=e211]:
+        - generic [ref=e212]:
+          - generic [ref=e213]:
+            - heading "Fragile Chunk IDs" [level=3] [ref=e217]
+            - generic [ref=e218]: Breaks on re-chunking
+          - paragraph [ref=e219]: When chunk size (e.g. 512 → 256 tokens) or overlap changes, chunk hashes change completely. All historical evaluation benchmarks are rendered invalid.
+          - generic [ref=e220]:
+            - generic [ref=e221]: "# Chunk Index ID"
+            - generic [ref=e222]: "chunk_id: \"vec_idx_589201\" [MISSING]"
+            - generic [ref=e223]: "embedding_model: \"text-embedding-ada-002\""
+            - generic [ref=e224]: ❌ Fails regression testing when index is rebuilt
+        - generic [ref=e225]:
+          - generic [ref=e226]:
+            - heading "Stable Source Anchors" [level=3] [ref=e231]
+            - generic [ref=e232]: 100% Deterministic
+          - paragraph [ref=e233]: Anchors ground truth evidence directly to document text character ranges and canonical SHA-256 hashes. Immune to chunking strategy changes.
+          - generic [ref=e234]:
+            - generic [ref=e235]: "doc_id: \"cloudsync-deployment-guide.md\""
+            - generic [ref=e236]: "span_range: [589, 721]"
+            - generic [ref=e237]: "sha256: \"4a9c2b1f8e9102c...\""
+            - generic [ref=e238]: ✓ Remains valid across any chunking or model change
+      - generic [ref=e239]:
+        - generic [ref=e240]:
+          - generic [ref=e247]:
+            - generic [ref=e248]: Interactive Document Inspector
+            - heading "cloudsync-deployment-guide.md" [level=3] [ref=e249]
+          - generic [ref=e250]: ANCHOR VALID
+        - generic [ref=e254]:
+          - generic [ref=e255]:
+            - paragraph [ref=e256]: "[Offset 0 - 588] CloudSync is an enterprise file synchronization architecture supporting multi-cloud destinations..."
+            - generic [ref=e257] [cursor=pointer]:
+              - generic [ref=e258]:
+                - generic [ref=e259]: "EVIDENCE SPAN #001 (CHAR 589 → 721)"
+                - generic [ref=e260]: Hover to inspect anchor
+              - paragraph [ref=e261]: "\"CloudSync retries failed uploads three times before marking the operation as failed.\""
+            - paragraph [ref=e262]: "[Offset 722 - 1200] Each retry incorporates exponential backoff to minimize server payload overhead..."
+          - generic [ref=e263]:
+            - generic [ref=e264]: Source Anchor Metadata
+            - generic [ref=e269]:
+              - generic [ref=e270]:
+                - generic [ref=e271]: "Document:"
+                - generic [ref=e272]: cloudsync-deployment-guide.md
+              - generic [ref=e273]:
+                - generic [ref=e274]: "Start Offset:"
+                - generic [ref=e275]: "589"
+              - generic [ref=e276]:
+                - generic [ref=e277]: "End Offset:"
+                - generic [ref=e278]: "721"
+              - generic [ref=e279]:
+                - generic [ref=e280]: "Canonical Length:"
+                - generic [ref=e281]: 132 characters
+              - generic [ref=e282]:
+                - generic [ref=e283]: "Content Hash:"
+                - generic [ref=e284]: sha256:4a9c2b1f8e...
+              - generic [ref=e285]:
+                - generic [ref=e286]: "Status:"
+                - generic [ref=e287]: VALID
+    - generic [ref=e292]:
+      - generic [ref=e293]:
+        - generic [ref=e294]: REGRESSION ANALYSIS
+        - heading "Baseline vs Candidate Comparison" [level=2] [ref=e295]
+        - paragraph [ref=e296]: Compare retriever iterations objectively. Detect metric regressions before deploying retriever or embedding model updates to production.
+      - generic [ref=e297]:
+        - generic [ref=e298]:
+          - generic [ref=e299]:
+            - generic [ref=e300]:
+              - generic [ref=e301]: Retriever Version 1
+              - heading "BASELINE (BM25)" [level=3] [ref=e302]
+            - generic [ref=e303]: Control Group
+          - generic [ref=e304]:
+            - generic [ref=e306]:
+              - generic [ref=e307]: Recall@5
+              - generic [ref=e308]: "0.405"
+            - generic [ref=e312]:
+              - generic [ref=e313]: Precision@5
+              - generic [ref=e314]: "0.020"
+            - generic [ref=e318]:
+              - generic [ref=e319]: Hit@5
+              - generic [ref=e320]: "0.410"
+        - generic [ref=e323]:
+          - generic [ref=e324]:
+            - generic [ref=e325]:
+              - generic [ref=e326]: Retriever Version 2
+              - heading "CANDIDATE (Hybrid)" [level=3] [ref=e327]
+            - generic [ref=e328]: Under Test
+          - generic [ref=e329]:
+            - generic [ref=e331]:
+              - generic [ref=e332]: Recall@5
+              - generic [ref=e333]:
+                - text: "0.249"
+                - generic [ref=e334]: (-0.156)
+            - generic [ref=e338]:
+              - generic [ref=e339]: Precision@5
+              - generic [ref=e340]:
+                - text: "0.017"
+                - generic [ref=e341]: (-0.003)
+            - generic [ref=e345]:
+              - generic [ref=e346]: Hit@5
+              - generic [ref=e347]:
+                - text: "0.260"
+                - generic [ref=e348]: (-0.150)
+      - generic [ref=e351]:
+        - generic [ref=e352]:
+          - heading "Query Regression Breakdown (100 Queries)" [level=4] [ref=e353]
+          - paragraph [ref=e354]: Factual breakdown of query retrieval performance transitions.
+        - generic [ref=e355]:
+          - generic [ref=e356]: 6 Improved
+          - generic [ref=e361]: 75 Unchanged
+          - generic [ref=e364]: 19 Regressed
+    - generic [ref=e369]:
+      - generic [ref=e370]:
+        - generic [ref=e371]: EVALUATION METRICS
+        - heading "Deterministic Retrieval Metrics" [level=2] [ref=e372]
+        - paragraph [ref=e373]: SPANCHOR evaluates retrieval pipelines using exact character span formulas rather than subjective LLM judge scores.
+      - generic [ref=e374]:
+        - generic [ref=e375]:
+          - generic [ref=e376]:
+            - status "Binary Success" [ref=e383]
+            - heading "Hit@K" [level=3] [ref=e384]
+            - paragraph [ref=e385]: Binary indicator showing whether at least one ground-truth source anchor span is retrieved in top K results.
+          - generic [ref=e386]:
+            - generic [ref=e387]: Hit@K = 1 if Σ Match(retrieved_i, gold) > 0 else 0
+            - generic [ref=e388]:
+              - generic [ref=e389]: "Example output:"
+              - generic [ref=e390]: Hit@5 = 1 (Anchor found in top 5 chunks)
+        - generic [ref=e391]:
+          - generic [ref=e392]:
+            - status "Coverage Ratio" [ref=e399]
+            - heading "Recall@K" [level=3] [ref=e400]
+            - paragraph [ref=e401]: Fraction of ground-truth evidence character length successfully captured by top K retrieved chunks.
+          - generic [ref=e402]:
+            - generic [ref=e403]: Recall@K = |Retrieved Spans ∩ Gold Spans| / |Gold Spans|
+            - generic [ref=e404]:
+              - generic [ref=e405]: "Example output:"
+              - generic [ref=e406]: Recall@5 = 0.405 (40.5% of evidence captured)
+        - generic [ref=e407]:
+          - generic [ref=e408]:
+            - status "Density Ratio" [ref=e414]
+            - heading "Precision@K" [level=3] [ref=e415]
+            - paragraph [ref=e416]: Proportion of retrieved context window length that overlaps with verified source anchor spans.
+          - generic [ref=e417]:
+            - generic [ref=e418]: Precision@K = |Retrieved Spans ∩ Gold Spans| / Total Retrieved Length
+            - generic [ref=e419]:
+              - generic [ref=e420]: "Example output:"
+              - generic [ref=e421]: Precision@5 = 0.020 (Signal-to-noise density)
+        - generic [ref=e422]:
+          - generic [ref=e423]:
+            - status "Boundary Alignment" [ref=e430]
+            - heading "IoU (Intersection over Union)" [level=3] [ref=e431]
+            - paragraph [ref=e432]: Ratio of overlapping character area to the combined union area of retrieved chunk and ground truth span.
+          - generic [ref=e433]:
+            - generic [ref=e434]: IoU = Length(Retrieved ∩ Gold) / Length(Retrieved ∪ Gold)
+            - generic [ref=e435]:
+              - generic [ref=e436]: "Example output:"
+              - generic [ref=e437]: IoU = 0.782 (78.2% exact overlap)
+        - generic [ref=e438]:
+          - generic [ref=e439]:
+            - status "Multi-Span Complete" [ref=e445]
+            - heading "Full Evidence@K" [level=3] [ref=e446]
+            - paragraph [ref=e447]: Binary check verifying whether ALL required source anchor spans for multi-span queries are retrieved.
+          - generic [ref=e448]:
+            - generic [ref=e449]: Full Evidence@K = ∏ I(Retrieved in Top K(span_i))
+            - generic [ref=e450]:
+              - generic [ref=e451]: "Example output:"
+              - generic [ref=e452]: Full Evidence@5 = 1 (All 3 anchors found)
+        - generic [ref=e453]:
+          - generic [ref=e454]:
+            - status "Context Size" [ref=e460]
+            - heading "Retrieved Characters" [level=3] [ref=e461]
+            - paragraph [ref=e462]: Total raw character count returned to downstream LLM prompt context window.
+          - generic [ref=e463]:
+            - generic [ref=e464]: Chars = Σ Length(retrieved_chunk_i)
+            - generic [ref=e465]:
+              - generic [ref=e466]: "Example output:"
+              - generic [ref=e467]: Chars = 4,120 chars (~1,030 tokens)
+    - generic [ref=e469]:
+      - generic [ref=e470]:
+        - generic [ref=e471]: CANONICAL PROCESS
+        - heading "How SPANCHOR Works" [level=2] [ref=e472]
+        - paragraph [ref=e473]: A 4-step canonical workflow for reliable, reproducible retrieval testing.
+      - generic [ref=e474]:
+        - generic [ref=e475]:
+          - generic [ref=e476]:
+            - generic [ref=e477]: "01"
+            - heading "Canonicalize Documents" [level=3] [ref=e483]
+            - paragraph [ref=e484]: Raw source documents are loaded and canonicalized with standardized whitespace and character indexing.
+          - list [ref=e486]:
+            - listitem [ref=e487]:
+              - generic [ref=e489]: Unicode normalization
+            - listitem [ref=e490]:
+              - generic [ref=e492]: Stable character offset indexing
+            - listitem [ref=e493]:
+              - generic [ref=e495]: Zero chunk-strategy dependency
+        - generic [ref=e499]:
+          - generic [ref=e500]:
+            - generic [ref=e501]: "02"
+            - heading "Define Source Anchors" [level=3] [ref=e507]
+            - paragraph [ref=e508]: Ground-truth evidence spans are anchored directly to source text character offsets and SHA-256 hashes.
+          - list [ref=e510]:
+            - listitem [ref=e511]:
+              - generic [ref=e513]: Exact text span bounds
+            - listitem [ref=e514]:
+              - generic [ref=e516]: SHA-256 canonical text hashing
+            - listitem [ref=e517]:
+              - generic [ref=e519]: Resistant to chunking changes
+        - generic [ref=e523]:
+          - generic [ref=e524]:
+            - generic [ref=e525]: "03"
+            - heading "Evaluate Retrieval Chunks" [level=3] [ref=e531]
+            - paragraph [ref=e532]: Candidate retrieval chunks are evaluated against ground truth anchors using character overlap math.
+          - list [ref=e534]:
+            - listitem [ref=e535]:
+              - generic [ref=e537]: Intersection over Union (IoU)
+            - listitem [ref=e538]:
+              - generic [ref=e540]: Character span matching
+            - listitem [ref=e541]:
+              - generic [ref=e543]: Multi-span query support
+        - generic [ref=e547]:
+          - generic [ref=e548]:
+            - generic [ref=e549]: "04"
+            - heading "Detect Regressions" [level=3] [ref=e554]
+            - paragraph [ref=e555]: Metrics are calculated and compared against baseline runs to flag regressions before production deployment.
+          - list [ref=e557]:
+            - listitem [ref=e558]:
+              - generic [ref=e560]: Recall@K & Precision@K deltas
+            - listitem [ref=e561]:
+              - generic [ref=e563]: Query-level regression tagging
+            - listitem [ref=e564]:
+              - generic [ref=e566]: Automated CI/CD exit codes
+    - generic [ref=e568]:
+      - generic [ref=e569]:
+        - generic [ref=e570]: SCOPE BOUNDARIES
+        - heading "What SPANCHOR Is (And Is Not)" [level=2] [ref=e571]
+        - paragraph [ref=e572]: SPANCHOR is strictly focused on retrieval regression testing. We keep boundaries clear so you can integrate it seamlessly into your existing tech stack.
+      - table [ref=e575]:
+        - rowgroup [ref=e576]:
+          - row [ref=e577]:
+            - columnheader "Capability / System" [ref=e578]
+            - columnheader "Status" [ref=e579]
+            - columnheader "Technical Scope Boundary" [ref=e580]
+        - rowgroup [ref=e581]:
+          - row [ref=e582]:
+            - cell "Source-Anchored Retrieval Regression Testing" [ref=e583]
+            - cell "YES" [ref=e584]
+            - cell "Evaluates whether candidate retrievers consistently retrieve verified ground-truth text evidence." [ref=e588]
+          - row [ref=e589]:
+            - cell "Deterministic Math-Based Metric Calculations" [ref=e590]
+            - cell "YES" [ref=e591]
+            - cell "Uses exact character overlap (IoU, Recall@K) instead of expensive, non-reproducible LLM calls." [ref=e595]
+          - row [ref=e596]:
+            - cell "Pytest & GitHub Actions CI Integration" [ref=e597]
+            - cell "YES" [ref=e598]
+            - cell "Provides automated exit codes and summary reports to block retrieval regression PRs." [ref=e602]
+          - row [ref=e603]:
+            - cell "Vector Database / Index Store" [ref=e604]
+            - cell "NO" [ref=e605]
+            - cell "SPANCHOR does not store embeddings or build vector index structures (e.g. Pinecone, Milvus, Qdrant)." [ref=e610]
+          - row [ref=e611]:
+            - cell "Embedding Model Generator" [ref=e612]
+            - cell "NO" [ref=e613]
+            - cell "SPANCHOR does not generate text embeddings or fine-tune embedding models." [ref=e618]
+          - row [ref=e619]:
+            - cell "LLM Response Judge / Chatbot Framework" [ref=e620]
+            - cell "NO" [ref=e621]
+            - cell "SPANCHOR evaluates retrieval output, not downstream LLM generation or chat outputs." [ref=e626]
+          - row [ref=e627]:
+            - cell "PDF / OCR Document Converter" [ref=e628]
+            - cell "NO" [ref=e629]
+            - cell "Document parsing and OCR processing must happen prior to SPANCHOR evaluation." [ref=e634]
+          - row [ref=e635]:
+            - cell "Hosted SaaS Platform / Cloud Tracking" [ref=e636]
+            - cell "NO" [ref=e637]
+            - cell "SPANCHOR is a 100% open-source, local-first Python library and CLI." [ref=e642]
+    - generic [ref=e645]:
+      - generic [ref=e646]:
+        - generic [ref=e647]: 5-MINUTE INTEGRATION
+        - heading "Get Started with SPANCHOR" [level=2] [ref=e648]
+        - paragraph [ref=e649]: Install the open-source Python package and start detecting RAG retrieval regressions in your CI pipeline today.
+        - generic [ref=e650]:
+          - paragraph [ref=e651]: Installation
+          - generic [ref=e652]:
+            - generic [ref=e653]: pip install spanchor
+            - button "Copy install command" [ref=e657]
+        - button "Read Quickstart" [ref=e662]
+      - generic [ref=e665]:
+        - generic [ref=e666]:
+          - generic [ref=e667]: eval_pipeline.py
+          - button "Copy snippet" [ref=e672]:
+            - generic [ref=e676]: Copy
+        - code [ref=e678]: "from spanchor import evaluate, GoldSet # Load source anchor ground truth set gold_set = GoldSet.from_json(\"gold_set.json\") # Evaluate candidate retrieval outputs result = evaluate( gold_set=gold_set, retrieved_results=\"candidate_output.json\", top_k=[1, 3, 5] ) # Print regression report result.print_summary()"
+    - generic [ref=e681]:
+      - generic [ref=e682]:
+        - heading "Open Source & Community Driven" [level=3] [ref=e683]
+        - paragraph [ref=e684]: Inspect source code, file issue reports, or contribute to SPANCHOR on GitHub and PyPI.
+      - generic [ref=e685]:
+        - link "GitHub Repository Star" [ref=e686] [cursor=pointer]:
+          - /url: https://github.com/Mukeshram-07/spanchor
+          - generic [ref=e691]: GitHub Repository
+          - generic [ref=e692]: Star
+        - link "PyPI Package" [ref=e695] [cursor=pointer]:
+          - /url: https://pypi.org/project/spanchor/
+  - contentinfo [ref=e705]:
+    - generic [ref=e706]:
+      - generic [ref=e707]:
+        - generic [ref=e708]:
+          - heading "SPANCHOR" [level=2] [ref=e709]
+          - paragraph [ref=e710]: Source-anchored regression testing for RAG retrieval pipelines.
+        - generic [ref=e711]:
+          - heading "Resources" [level=3] [ref=e712]
+          - navigation "Footer resources" [ref=e713]:
+            - link "Documentation" [ref=e714] [cursor=pointer]:
+              - /url: /docs
+            - link "GitHub (opens in new tab)" [ref=e715] [cursor=pointer]:
+              - /url: https://github.com/Mukeshram-07/spanchor
+              - text: GitHub
+            - link "PyPI (opens in new tab)" [ref=e716] [cursor=pointer]:
+              - /url: https://pypi.org/project/spanchor/
+              - text: PyPI
+            - link "Examples" [ref=e717] [cursor=pointer]:
+              - /url: /examples
+            - link "API" [ref=e718] [cursor=pointer]:
+              - /url: /api
+        - generic [ref=e719]:
+          - heading "Info" [level=3] [ref=e720]
+          - list [ref=e721]:
+            - listitem [ref=e722]: "License: Apache-2.0"
+            - listitem [ref=e723]: "Python: 3.11 – 3.13"
+            - listitem [ref=e724]: "Type: Package"
+      - paragraph [ref=e726]: © 2026 SPANCHOR. All rights reserved.

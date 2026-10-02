@@ -1,0 +1,210 @@
+- generic [ref=f9e3]:
+  - banner [ref=f9e4]:
+    - generic [ref=f9e6]:
+      - generic [ref=f9e7]:
+        - link "SPANCHOR v0.3.0" [ref=f9e8] [cursor=pointer]:
+          - /url: /
+          - generic [ref=f9e13]:
+            - generic [ref=f9e14]: SPANCHOR
+            - generic [ref=f9e15]: v0.3.0
+        - navigation [ref=f9e16]:
+          - link "Docs" [ref=f9e17] [cursor=pointer]:
+            - /url: /docs
+          - link "Playground" [ref=f9e18] [cursor=pointer]:
+            - /url: /playground
+          - link "Examples" [ref=f9e19] [cursor=pointer]:
+            - /url: /examples
+          - link "API" [ref=f9e20] [cursor=pointer]:
+            - /url: /api
+          - link "Architecture" [ref=f9e21] [cursor=pointer]:
+            - /url: /architecture
+      - generic [ref=f9e22]:
+        - generic [ref=f9e23]: K
+        - link "pip install spanchor" [ref=f9e27] [cursor=pointer]:
+          - /url: https://pypi.org/project/spanchor/
+        - link "GitHub" [ref=f9e33] [cursor=pointer]:
+          - /url: https://github.com/Mukeshram-07/spanchor
+  - generic [ref=f9e39]:
+    - complementary [ref=f9e40]:
+      - navigation "Documentation navigation" [ref=f9e41]:
+        - generic [ref=f9e42]:
+          - button "Introduction" [ref=f9e43]
+          - link "Overview" [ref=f9e48] [cursor=pointer]:
+            - /url: /docs
+        - generic [ref=f9e49]:
+          - button "Getting Started" [ref=f9e50]
+          - generic [ref=f9e54]:
+            - link "Installation" [ref=f9e55] [cursor=pointer]:
+              - /url: /docs/installation
+            - link "Quickstart" [ref=f9e56] [cursor=pointer]:
+              - /url: /docs/quickstart
+        - button "Core Concepts" [ref=f9e58]
+        - button "Evaluation" [ref=f9e63]
+        - button "Advanced" [ref=f9e68]
+        - button "Examples" [ref=f9e73]
+        - button "Reference" [ref=f9e78]
+    - main [ref=f9e82]:
+      - generic [ref=f9e83]:
+        - generic [ref=f9e84]:
+          - heading "Quickstart" [level=1] [ref=f9e85]
+          - paragraph [ref=f9e86]: Run your first SPANCHOR test in 5 minutes
+        - article [ref=f9e87]:
+          - generic [ref=f9e88]:
+            - generic [ref=f9e89]:
+              - heading "Overview" [level=2] [ref=f9e90]
+              - paragraph [ref=f9e91]: This guide walks you through creating and running your first SPANCHOR test. You'll create a gold set, configure a ranking test, and evaluate results.
+            - generic [ref=f9e92]:
+              - 'heading "Step 1: Create a Gold Set" [level=2] [ref=f9e93]'
+              - paragraph [ref=f9e94]:
+                - text: A gold set defines what good search results look like. Create a file called
+                - code [ref=f9e95]: gold_set.json
+                - text: ":"
+              - generic [ref=f9e97]:
+                - generic [ref=f9e98]:
+                  - generic [ref=f9e99]: spanchor_example.py
+                  - button "Copy code" [ref=f9e101]
+                - region "Code editor" [ref=f9e105]:
+                  - code [ref=f9e106]:
+                    - generic [ref=f9e107]:
+                      - generic [ref=f9e108]:
+                        - generic [ref=f9e109]: "1"
+                        - generic [ref=f9e110]: "2"
+                        - generic [ref=f9e111]: "3"
+                        - generic [ref=f9e112]: "4"
+                        - generic [ref=f9e113]: "5"
+                        - generic [ref=f9e114]: "6"
+                        - generic [ref=f9e115]: "7"
+                        - generic [ref=f9e116]: "8"
+                        - generic [ref=f9e117]: "9"
+                        - generic [ref=f9e118]: "10"
+                        - generic [ref=f9e119]: "11"
+                        - generic [ref=f9e120]: "12"
+                      - generic [ref=f9e121]: "{ \"queries\": [ { \"query\": \"machine learning\", \"relevant_documents\": [\"doc_001\", \"doc_042\", \"doc_156\"] }, { \"query\": \"neural networks\", \"relevant_documents\": [\"doc_042\", \"doc_089\", \"doc_234\"] } ] }"
+                - generic [ref=f9e123]: "Language: JSON"
+            - generic [ref=f9e125]:
+              - 'heading "Step 2: Configure Your Adapter" [level=2] [ref=f9e126]'
+              - paragraph [ref=f9e127]:
+                - text: SPANCHOR uses adapters to connect to your search backend. Create
+                - code [ref=f9e128]: config.py
+                - text: ":"
+              - generic [ref=f9e130]:
+                - generic [ref=f9e131]:
+                  - generic [ref=f9e132]: spanchor_example.py
+                  - button "Copy code" [ref=f9e134]
+                - region "Code editor" [ref=f9e138]:
+                  - code [ref=f9e139]:
+                    - generic [ref=f9e140]:
+                      - generic [ref=f9e141]:
+                        - generic [ref=f9e142]: "1"
+                        - generic [ref=f9e143]: "2"
+                        - generic [ref=f9e144]: "3"
+                        - generic [ref=f9e145]: "4"
+                        - generic [ref=f9e146]: "5"
+                        - generic [ref=f9e147]: "6"
+                        - generic [ref=f9e148]: "7"
+                      - generic [ref=f9e149]: "from spanchor import SpanchorClient, Adapter client = SpanchorClient( adapter=Adapter.elasticsearch, # or your adapter host=\"localhost\", port=9200 )"
+                - generic [ref=f9e151]: "Language: PYTHON"
+            - generic [ref=f9e153]:
+              - 'heading "Step 3: Run Your Test" [level=2] [ref=f9e154]'
+              - paragraph [ref=f9e155]:
+                - text: Create a test file called
+                - code [ref=f9e156]: test.py
+                - text: ":"
+              - generic [ref=f9e158]:
+                - generic [ref=f9e159]:
+                  - generic [ref=f9e160]: spanchor_example.py
+                  - button "Copy code" [ref=f9e162]
+                - region "Code editor" [ref=f9e166]:
+                  - code [ref=f9e167]:
+                    - generic [ref=f9e168]:
+                      - generic [ref=f9e169]:
+                        - generic [ref=f9e170]: "1"
+                        - generic [ref=f9e171]: "2"
+                        - generic [ref=f9e172]: "3"
+                        - generic [ref=f9e173]: "4"
+                        - generic [ref=f9e174]: "5"
+                        - generic [ref=f9e175]: "6"
+                        - generic [ref=f9e176]: "7"
+                        - generic [ref=f9e177]: "8"
+                        - generic [ref=f9e178]: "9"
+                        - generic [ref=f9e179]: "10"
+                        - generic [ref=f9e180]: "11"
+                        - generic [ref=f9e181]: "12"
+                        - generic [ref=f9e182]: "13"
+                        - generic [ref=f9e183]: "14"
+                        - generic [ref=f9e184]: "15"
+                        - generic [ref=f9e185]: "16"
+                        - generic [ref=f9e186]: "17"
+                        - generic [ref=f9e187]: "18"
+                        - generic [ref=f9e188]: "19"
+                        - generic [ref=f9e189]: "20"
+                      - generic [ref=f9e191]:
+                        - text: "from spanchor import SpanchorClient import json # Load gold set with open('gold_set.json') as f: gold_set = json.load(f) # Initialize client client = SpanchorClient() # Run test results = client.evaluate_gold_set( gold_set=gold_set, top_k=10 ) # Print results print(results.metrics) print("
+                        - generic [ref=f9e192]: "f\"Recall@10: {results.metrics.recall}\""
+                        - text: ) print(
+                        - generic [ref=f9e193]: "f\"Precision@10: {results.metrics.precision}\""
+                        - text: )
+                - generic [ref=f9e194]: "Language: PYTHON"
+            - generic [ref=f9e196]:
+              - 'heading "Step 4: Interpret Results" [level=2] [ref=f9e197]'
+              - paragraph [ref=f9e198]: "SPANCHOR returns metrics including:"
+              - list [ref=f9e199]:
+                - listitem [ref=f9e200]:
+                  - strong [ref=f9e201]: Recall@K
+                  - text: "- Percentage of relevant docs in top K results"
+                - listitem [ref=f9e202]:
+                  - strong [ref=f9e203]: Precision@K
+                  - text: "- Percentage of returned docs that are relevant"
+                - listitem [ref=f9e204]:
+                  - strong [ref=f9e205]: Hit Rate
+                  - text: "- Percentage of queries with at least one relevant result"
+            - generic [ref=f9e206]:
+              - heading "What's Next?" [level=2] [ref=f9e207]
+              - paragraph [ref=f9e208]: "Now that you've run your first test, explore:"
+              - list [ref=f9e209]:
+                - listitem [ref=f9e210]:
+                  - link "Core Concepts" [ref=f9e211] [cursor=pointer]:
+                    - /url: /docs/concepts
+                  - text: "- Deep dive into SPANCHOR architecture"
+                - listitem [ref=f9e212]:
+                  - link "Metrics" [ref=f9e213] [cursor=pointer]:
+                    - /url: /docs/metrics
+                  - text: "- Understand all evaluation metrics"
+                - listitem [ref=f9e214]:
+                  - link "Adapters" [ref=f9e215] [cursor=pointer]:
+                    - /url: /docs/adapters
+                  - text: "- Connect to different search backends"
+        - navigation [ref=f9e216]
+    - complementary [ref=f9e217]:
+      - generic [ref=f9e218]:
+        - heading "On this page" [level=3] [ref=f9e219]
+        - navigation [ref=f9e220]:
+          - paragraph [ref=f9e221]: No items
+  - contentinfo [ref=f9e222]:
+    - generic [ref=f9e223]:
+      - generic [ref=f9e224]:
+        - generic [ref=f9e225]:
+          - heading "SPANCHOR" [level=2] [ref=f9e226]
+          - paragraph [ref=f9e227]: Source-anchored regression testing for RAG retrieval pipelines.
+        - generic [ref=f9e228]:
+          - heading "Resources" [level=3] [ref=f9e229]
+          - navigation "Footer resources" [ref=f9e230]:
+            - link "Documentation" [ref=f9e231] [cursor=pointer]:
+              - /url: /docs
+            - link "GitHub (opens in new tab)" [ref=f9e232] [cursor=pointer]:
+              - /url: https://github.com/Mukeshram-07/spanchor
+              - text: GitHub
+            - link "PyPI (opens in new tab)" [ref=f9e233] [cursor=pointer]:
+              - /url: https://pypi.org/project/spanchor/
+              - text: PyPI
+            - link "Examples" [ref=f9e234] [cursor=pointer]:
+              - /url: /examples
+            - link "API" [ref=f9e235] [cursor=pointer]:
+              - /url: /api
+        - generic [ref=f9e236]:
+          - heading "Info" [level=3] [ref=f9e237]
+          - list [ref=f9e238]:
+            - listitem [ref=f9e239]: "License: Apache-2.0"
+            - listitem [ref=f9e240]: "Python: 3.11 – 3.13"
+            - listitem [ref=f9e241]: "Type: Package"
+      - paragraph [ref=f9e243]: © 2026 SPANCHOR. All rights reserved.

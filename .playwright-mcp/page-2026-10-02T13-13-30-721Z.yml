@@ -1,0 +1,173 @@
+- generic [ref=f3e3]:
+  - banner [ref=f3e4]:
+    - generic [ref=f3e6]:
+      - generic [ref=f3e7]:
+        - link "SPANCHOR v0.3.0" [ref=f3e8] [cursor=pointer]:
+          - /url: /
+          - generic [ref=f3e13]:
+            - generic [ref=f3e14]: SPANCHOR
+            - generic [ref=f3e15]: v0.3.0
+        - navigation [ref=f3e16]:
+          - link "Docs" [ref=f3e17] [cursor=pointer]:
+            - /url: /docs
+          - link "Playground" [ref=f3e18] [cursor=pointer]:
+            - /url: /playground
+          - link "Examples" [ref=f3e19] [cursor=pointer]:
+            - /url: /examples
+          - link "API" [ref=f3e20] [cursor=pointer]:
+            - /url: /api
+          - link "Architecture" [ref=f3e21] [cursor=pointer]:
+            - /url: /architecture
+      - generic [ref=f3e22]:
+        - generic [ref=f3e23]: K
+        - link "pip install spanchor" [ref=f3e27] [cursor=pointer]:
+          - /url: https://pypi.org/project/spanchor/
+        - link "GitHub" [ref=f3e33] [cursor=pointer]:
+          - /url: https://github.com/Mukeshram-07/spanchor
+  - main [ref=f3e39]:
+    - generic [ref=f3e40]:
+      - heading "Playground" [level=1] [ref=f3e41]
+      - paragraph [ref=f3e42]: Interactive SPANCHOR terminal demonstration. Select a benchmark preset, run the evaluation, and inspect the simulated results. All data is deterministic benchmark examples — not live package execution.
+    - generic [ref=f3e43]:
+      - generic [ref=f3e44]: "Dataset preset:"
+      - generic [ref=f3e45]:
+        - button "CloudSync Deployment Docs (100q)" [ref=f3e46]:
+          - text: CloudSync Deployment Docs
+          - generic [ref=f3e47]: (100q)
+        - button "Support Bot Knowledgebase (50q)" [ref=f3e48]:
+          - text: Support Bot Knowledgebase
+          - generic [ref=f3e49]: (50q)
+        - button "Medical QA Corpus (200q)" [ref=f3e50]:
+          - text: Medical QA Corpus
+          - generic [ref=f3e51]: (200q)
+    - generic [ref=f3e52]: "Description: Deployment documentation corpus, 100 queries, BM25 baseline vs Hybrid v2 candidate."
+    - generic [ref=f3e54]:
+      - generic [ref=f3e55]:
+        - generic [ref=f3e56]: spanchor terminal — CloudSync Deployment Docs
+        - generic [ref=f3e61]: READY
+      - generic [ref=f3e62]: Select a dataset and click Run Evaluation to start.
+    - generic [ref=f3e65]:
+      - button "Run Evaluation" [ref=f3e66]
+      - button "Reset" [ref=f3e69]
+      - generic [ref=f3e73]: Select a preset above, then click Run Evaluation.
+    - generic [ref=f3e74]:
+      - heading "Evaluation Metrics" [level=2] [ref=f3e75]
+      - generic [ref=f3e76]:
+        - generic [ref=f3e77]:
+          - generic [ref=f3e78]: Recall@5
+          - generic [ref=f3e79]: —
+        - generic [ref=f3e80]:
+          - generic [ref=f3e81]: Precision@5
+          - generic [ref=f3e82]: —
+        - generic [ref=f3e83]:
+          - generic [ref=f3e84]: Hit@5
+          - generic [ref=f3e85]: —
+        - generic [ref=f3e86]:
+          - generic [ref=f3e87]: Regressions
+          - generic [ref=f3e88]: —
+        - generic [ref=f3e89]:
+          - generic [ref=f3e90]: Improved
+          - generic [ref=f3e91]: —
+        - generic [ref=f3e92]:
+          - generic [ref=f3e93]: Unchanged
+          - generic [ref=f3e94]: —
+    - generic [ref=f3e95]:
+      - heading "Query Regression Audit Table" [level=2] [ref=f3e96]
+      - generic [ref=f3e97]:
+        - generic [ref=f3e98]:
+          - heading "Query Regression Audit" [level=3] [ref=f3e99]
+          - generic [ref=f3e100]: Demo dataset — 8 sample queries shown
+        - table [ref=f3e102]:
+          - rowgroup [ref=f3e103]:
+            - row [ref=f3e104]:
+              - columnheader "Query ID" [ref=f3e105]
+              - columnheader "Query" [ref=f3e106]
+              - columnheader "Baseline" [ref=f3e107]
+              - columnheader "Candidate" [ref=f3e108]
+              - columnheader "Delta" [ref=f3e109]
+              - columnheader "Status" [ref=f3e110]
+          - rowgroup [ref=f3e111]:
+            - row [ref=f3e112]:
+              - cell "CS-Q-001" [ref=f3e113]
+              - cell "SSL port 8443 configuration" [ref=f3e114]
+              - cell "—" [ref=f3e115]
+              - cell "—" [ref=f3e116]
+              - cell "—" [ref=f3e117]
+              - cell "—" [ref=f3e118]
+            - row [ref=f3e119]:
+              - cell "CS-Q-002" [ref=f3e120]
+              - cell "Database verify-full connection" [ref=f3e121]
+              - cell "—" [ref=f3e122]
+              - cell "—" [ref=f3e123]
+              - cell "—" [ref=f3e124]
+              - cell "—" [ref=f3e125]
+            - row [ref=f3e126]:
+              - cell "CS-Q-003" [ref=f3e127]
+              - cell "Upload timeout retry count" [ref=f3e128]
+              - cell "—" [ref=f3e129]
+              - cell "—" [ref=f3e130]
+              - cell "—" [ref=f3e131]
+              - cell "—" [ref=f3e132]
+            - row [ref=f3e133]:
+              - cell "CS-Q-004" [ref=f3e134]
+              - cell "Memory limit fallback policy" [ref=f3e135]
+              - cell "—" [ref=f3e136]
+              - cell "—" [ref=f3e137]
+              - cell "—" [ref=f3e138]
+              - cell "—" [ref=f3e139]
+            - row [ref=f3e140]:
+              - cell "CS-Q-005" [ref=f3e141]
+              - cell "Cluster migration node sequence" [ref=f3e142]
+              - cell "—" [ref=f3e143]
+              - cell "—" [ref=f3e144]
+              - cell "—" [ref=f3e145]
+              - cell "—" [ref=f3e146]
+            - row [ref=f3e147]:
+              - cell "CS-Q-006" [ref=f3e148]
+              - cell "Container registry auth token" [ref=f3e149]
+              - cell "—" [ref=f3e150]
+              - cell "—" [ref=f3e151]
+              - cell "—" [ref=f3e152]
+              - cell "—" [ref=f3e153]
+            - row [ref=f3e154]:
+              - cell "CS-Q-007" [ref=f3e155]
+              - cell "TLS certificate renewal steps" [ref=f3e156]
+              - cell "—" [ref=f3e157]
+              - cell "—" [ref=f3e158]
+              - cell "—" [ref=f3e159]
+              - cell "—" [ref=f3e160]
+            - row [ref=f3e161]:
+              - cell "CS-Q-008" [ref=f3e162]
+              - cell "Load balancer health check path" [ref=f3e163]
+              - cell "—" [ref=f3e164]
+              - cell "—" [ref=f3e165]
+              - cell "—" [ref=f3e166]
+              - cell "—" [ref=f3e167]
+  - contentinfo [ref=f3e168]:
+    - generic [ref=f3e169]:
+      - generic [ref=f3e170]:
+        - generic [ref=f3e171]:
+          - heading "SPANCHOR" [level=2] [ref=f3e172]
+          - paragraph [ref=f3e173]: Source-anchored regression testing for RAG retrieval pipelines.
+        - generic [ref=f3e174]:
+          - heading "Resources" [level=3] [ref=f3e175]
+          - navigation "Footer resources" [ref=f3e176]:
+            - link "Documentation" [ref=f3e177] [cursor=pointer]:
+              - /url: /docs
+            - link "GitHub (opens in new tab)" [ref=f3e178] [cursor=pointer]:
+              - /url: https://github.com/Mukeshram-07/spanchor
+              - text: GitHub
+            - link "PyPI (opens in new tab)" [ref=f3e179] [cursor=pointer]:
+              - /url: https://pypi.org/project/spanchor/
+              - text: PyPI
+            - link "Examples" [ref=f3e180] [cursor=pointer]:
+              - /url: /examples
+            - link "API" [ref=f3e181] [cursor=pointer]:
+              - /url: /api
+        - generic [ref=f3e182]:
+          - heading "Info" [level=3] [ref=f3e183]
+          - list [ref=f3e184]:
+            - listitem [ref=f3e185]: "License: Apache-2.0"
+            - listitem [ref=f3e186]: "Python: 3.11 – 3.13"
+            - listitem [ref=f3e187]: "Type: Package"
+      - paragraph [ref=f3e189]: © 2026 SPANCHOR. All rights reserved.

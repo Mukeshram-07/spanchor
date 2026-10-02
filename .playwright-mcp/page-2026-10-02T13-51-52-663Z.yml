@@ -1,0 +1,304 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - link "SPANCHOR v0.3.0" [ref=e8] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e13]:
+            - generic [ref=e14]: SPANCHOR
+            - generic [ref=e15]: v0.3.0
+        - navigation [ref=e16]:
+          - link "Docs" [ref=e17] [cursor=pointer]:
+            - /url: /docs
+          - link "Playground" [ref=e18] [cursor=pointer]:
+            - /url: /playground
+          - link "Examples" [ref=e19] [cursor=pointer]:
+            - /url: /examples
+          - link "API" [ref=e20] [cursor=pointer]:
+            - /url: /api
+          - link "Architecture" [ref=e21] [cursor=pointer]:
+            - /url: /architecture
+      - generic [ref=e22]:
+        - generic [ref=e23]: K
+        - link "pip install spanchor" [ref=e27] [cursor=pointer]:
+          - /url: https://pypi.org/project/spanchor/
+        - link "GitHub" [ref=e33] [cursor=pointer]:
+          - /url: https://github.com/Mukeshram-07/spanchor
+  - generic [ref=e39]:
+    - complementary [ref=e40]:
+      - navigation "Documentation navigation" [ref=e41]:
+        - generic [ref=e42]:
+          - button "Introduction" [ref=e43]
+          - link "Overview" [ref=e48] [cursor=pointer]:
+            - /url: /docs
+        - generic [ref=e49]:
+          - button "Getting Started" [ref=e50]
+          - generic [ref=e54]:
+            - link "Installation" [ref=e55] [cursor=pointer]:
+              - /url: /docs/installation
+            - link "Quickstart" [ref=e56] [cursor=pointer]:
+              - /url: /docs/quickstart
+        - button "Core Concepts" [ref=e58]
+        - button "Evaluation" [ref=e63]
+        - button "Advanced" [ref=e68]
+        - button "Examples" [ref=e73]
+        - button "Reference" [ref=e78]
+    - main [ref=e82]:
+      - generic [ref=e83]:
+        - generic [ref=e84]:
+          - heading "Quickstart" [level=1] [ref=e85]
+          - paragraph [ref=e86]: Run your first SPANCHOR test in 5 minutes
+        - article [ref=e87]:
+          - generic [ref=e88]:
+            - generic [ref=e89]:
+              - heading "Overview" [level=2] [ref=e90]
+              - paragraph [ref=e91]: This guide walks you through creating and running your first SPANCHOR test. You'll create a gold set, configure evaluation, and inspect results.
+            - generic [ref=e92]:
+              - heading "Installation" [level=2] [ref=e93]
+              - paragraph [ref=e94]: "Install SPANCHOR with pip:"
+              - generic [ref=e95]:
+                - generic [ref=e96]:
+                  - generic [ref=e97]: Shell
+                  - button "Copy code to clipboard" [active] [ref=e341]:
+                    - generic [ref=e103]: Copy
+                - region "Code example in shell" [ref=e104]:
+                  - code [ref=e105]:
+                    - generic [ref=e106]: pip install spanchor
+              - paragraph [ref=e107]:
+                - text: Requires Python 3.11 or later. For more details, see the
+                - link "Installation guide" [ref=e108] [cursor=pointer]:
+                  - /url: /docs/installation
+                - text: .
+            - generic [ref=e109]:
+              - 'heading "Step 1: Create a Gold Set" [level=2] [ref=e110]'
+              - paragraph [ref=e111]:
+                - text: A gold set defines queries and their relevant documents. Create a file called
+                - code [ref=e112]: gold_set.json
+                - text: ":"
+              - generic [ref=e113]:
+                - generic [ref=e114]:
+                  - generic [ref=e115]: gold_set.json
+                  - button "Copy code to clipboard" [ref=e117]:
+                    - generic [ref=e121]: Copy
+                - region "Code example in json" [ref=e122]:
+                  - code [ref=e123]:
+                    - generic [ref=e124]:
+                      - generic [ref=e125]:
+                        - generic [ref=e126]: "1"
+                        - generic [ref=e127]: "2"
+                        - generic [ref=e128]: "3"
+                        - generic [ref=e129]: "4"
+                        - generic [ref=e130]: "5"
+                        - generic [ref=e131]: "6"
+                        - generic [ref=e132]: "7"
+                        - generic [ref=e133]: "8"
+                        - generic [ref=e134]: "9"
+                        - generic [ref=e135]: "10"
+                        - generic [ref=e136]: "11"
+                        - generic [ref=e137]: "12"
+                        - generic [ref=e138]: "13"
+                        - generic [ref=e139]: "14"
+                        - generic [ref=e140]: "15"
+                        - generic [ref=e141]: "16"
+                      - generic [ref=e142]: "{ \"queries\": [ { \"query\": \"machine learning fundamentals\", \"relevant_documents\": [\"doc_001\", \"doc_042\", \"doc_156\"] }, { \"query\": \"neural networks architecture\", \"relevant_documents\": [\"doc_042\", \"doc_089\", \"doc_234\"] }, { \"query\": \"deep learning optimization\", \"relevant_documents\": [\"doc_089\", \"doc_156\", \"doc_345\"] } ] }"
+            - generic [ref=e144]:
+              - 'heading "Step 2: Prepare Retrieval Results" [level=2] [ref=e145]'
+              - paragraph [ref=e146]:
+                - text: Run your retriever against the queries and save the results. Create
+                - code [ref=e147]: retrieval_results.json
+                - text: ":"
+              - generic [ref=e148]:
+                - generic [ref=e149]:
+                  - generic [ref=e150]: retrieval_results.json
+                  - button "Copy code to clipboard" [ref=e152]:
+                    - generic [ref=e156]: Copy
+                - region "Code example in json" [ref=e157]:
+                  - code [ref=e158]:
+                    - generic [ref=e159]:
+                      - generic [ref=e160]:
+                        - generic [ref=e161]: "1"
+                        - generic [ref=e162]: "2"
+                        - generic [ref=e163]: "3"
+                        - generic [ref=e164]: "4"
+                        - generic [ref=e165]: "5"
+                        - generic [ref=e166]: "6"
+                        - generic [ref=e167]: "7"
+                        - generic [ref=e168]: "8"
+                        - generic [ref=e169]: "9"
+                        - generic [ref=e170]: "10"
+                        - generic [ref=e171]: "11"
+                        - generic [ref=e172]: "12"
+                        - generic [ref=e173]: "13"
+                        - generic [ref=e174]: "14"
+                        - generic [ref=e175]: "15"
+                        - generic [ref=e176]: "16"
+                      - generic [ref=e177]: "{ \"results\": [ { \"query\": \"machine learning fundamentals\", \"retrieved_documents\": [\"doc_001\", \"doc_042\", \"doc_200\", \"doc_300\"] }, { \"query\": \"neural networks architecture\", \"retrieved_documents\": [\"doc_089\", \"doc_042\", \"doc_156\", \"doc_400\"] }, { \"query\": \"deep learning optimization\", \"retrieved_documents\": [\"doc_156\", \"doc_089\", \"doc_345\", \"doc_500\"] } ] }"
+            - generic [ref=e179]:
+              - 'heading "Step 3: Run Evaluation" [level=2] [ref=e180]'
+              - paragraph [ref=e181]:
+                - text: Create a Python script to evaluate your retriever. Create
+                - code [ref=e182]: evaluate.py
+                - text: ":"
+              - generic [ref=e183]:
+                - generic [ref=e184]:
+                  - generic [ref=e185]: evaluate.py
+                  - button "Copy code to clipboard" [ref=e187]:
+                    - generic [ref=e191]: Copy
+                - region "Code example in python" [ref=e192]:
+                  - code [ref=e193]:
+                    - generic [ref=e194]:
+                      - generic [ref=e195]:
+                        - generic [ref=e196]: "1"
+                        - generic [ref=e197]: "2"
+                        - generic [ref=e198]: "3"
+                        - generic [ref=e199]: "4"
+                        - generic [ref=e200]: "5"
+                        - generic [ref=e201]: "6"
+                        - generic [ref=e202]: "7"
+                        - generic [ref=e203]: "8"
+                        - generic [ref=e204]: "9"
+                        - generic [ref=e205]: "10"
+                        - generic [ref=e206]: "11"
+                        - generic [ref=e207]: "12"
+                        - generic [ref=e208]: "13"
+                        - generic [ref=e209]: "14"
+                        - generic [ref=e210]: "15"
+                        - generic [ref=e211]: "16"
+                        - generic [ref=e212]: "17"
+                        - generic [ref=e213]: "18"
+                        - generic [ref=e214]: "19"
+                      - generic [ref=e215]: "from spanchor import evaluate, GoldSet import json # Load gold set gold_set = GoldSet.from_json(\"gold_set.json\") # Load retrieval results with open(\"retrieval_results.json\") as f: retrieval_results = json.load(f) # Run evaluation result = evaluate( gold_set=gold_set, retrieved_results=retrieval_results, top_k=[1, 5, 10] ) # Print results result.print_summary()"
+              - paragraph [ref=e217]: "Run the evaluation:"
+              - generic [ref=e218]:
+                - generic [ref=e219]:
+                  - generic [ref=e220]: Shell
+                  - button "Copy code to clipboard" [ref=e222]:
+                    - generic [ref=e226]: Copy
+                - region "Code example in shell" [ref=e227]:
+                  - code [ref=e228]:
+                    - generic [ref=e229]: python evaluate.py
+            - generic [ref=e230]:
+              - 'heading "Step 4: Inspect Results" [level=2] [ref=e231]'
+              - paragraph [ref=e232]: "SPANCHOR outputs metrics including:"
+              - list [ref=e233]:
+                - listitem [ref=e234]:
+                  - strong [ref=e235]: Recall@K
+                  - text: — fraction of relevant documents found in top K results
+                - listitem [ref=e236]:
+                  - strong [ref=e237]: Precision@K
+                  - text: — fraction of top K results that are relevant
+                - listitem [ref=e238]:
+                  - strong [ref=e239]: Hit@K
+                  - text: — percentage of queries with at least one relevant result in top K
+              - paragraph [ref=e240]: "Example output:"
+              - generic [ref=e241]:
+                - generic [ref=e242]:
+                  - generic [ref=e243]: Output
+                  - button "Copy code to clipboard" [ref=e245]:
+                    - generic [ref=e249]: Copy
+                - region "Code example in plaintext" [ref=e250]:
+                  - code [ref=e251]:
+                    - generic [ref=e252]: "Recall@1: 0.667 Recall@5: 0.900 Recall@10: 1.000 Precision@1: 0.667 Precision@5: 0.800 Precision@10:0.750 Hit@1: 0.667 Hit@5: 1.000 Hit@10: 1.000"
+            - generic [ref=e253]:
+              - 'heading "Step 5: Compare Baseline vs Candidate" [level=2] [ref=e254]'
+              - paragraph [ref=e255]:
+                - text: To detect regressions, compare your candidate retriever against a baseline. Create
+                - code [ref=e256]: compare.py
+                - text: ":"
+              - generic [ref=e257]:
+                - generic [ref=e258]:
+                  - generic [ref=e259]: compare.py
+                  - button "Copy code to clipboard" [ref=e261]:
+                    - generic [ref=e265]: Copy
+                - region "Code example in python" [ref=e266]:
+                  - code [ref=e267]:
+                    - generic [ref=e268]:
+                      - generic [ref=e269]:
+                        - generic [ref=e270]: "1"
+                        - generic [ref=e271]: "2"
+                        - generic [ref=e272]: "3"
+                        - generic [ref=e273]: "4"
+                        - generic [ref=e274]: "5"
+                        - generic [ref=e275]: "6"
+                        - generic [ref=e276]: "7"
+                        - generic [ref=e277]: "8"
+                        - generic [ref=e278]: "9"
+                        - generic [ref=e279]: "10"
+                        - generic [ref=e280]: "11"
+                        - generic [ref=e281]: "12"
+                        - generic [ref=e282]: "13"
+                        - generic [ref=e283]: "14"
+                        - generic [ref=e284]: "15"
+                        - generic [ref=e285]: "16"
+                        - generic [ref=e286]: "17"
+                        - generic [ref=e287]: "18"
+                      - generic [ref=e288]: "from spanchor import evaluate, GoldSet import json gold_set = GoldSet.from_json(\"gold_set.json\") # Evaluate baseline with open(\"baseline_results.json\") as f: baseline_results = json.load(f) baseline = evaluate(gold_set, baseline_results, top_k=[5]) # Evaluate candidate with open(\"candidate_results.json\") as f: candidate_results = json.load(f) candidate = evaluate(gold_set, candidate_results, top_k=[5]) # Compare comparison = baseline.compare(candidate) comparison.print_summary()"
+            - generic [ref=e290]:
+              - heading "What's Next?" [level=2] [ref=e291]
+              - paragraph [ref=e292]: "Now that you've run your first evaluation, explore:"
+              - list [ref=e293]:
+                - listitem [ref=e294]:
+                  - link "→ Core Concepts" [ref=e295] [cursor=pointer]:
+                    - /url: /docs/concepts
+                  - text: — Deep dive into SPANCHOR architecture and design
+                - listitem [ref=e296]:
+                  - link "→ Examples" [ref=e297] [cursor=pointer]:
+                    - /url: /examples
+                  - text: — Real-world workflows and use cases
+                - listitem [ref=e298]:
+                  - link "→ API Reference" [ref=e299] [cursor=pointer]:
+                    - /url: /api
+                  - text: — Complete API documentation
+                - listitem [ref=e300]:
+                  - link "→ Playground" [ref=e301] [cursor=pointer]:
+                    - /url: /playground
+                  - text: — Interactive demo with sample data
+        - navigation [ref=e302]
+    - complementary [ref=e303]:
+      - generic [ref=e304]:
+        - heading "On this page" [level=3] [ref=e305]
+        - navigation [ref=e306]:
+          - link "Overview" [ref=e330] [cursor=pointer]:
+            - /url: "#overview"
+          - link "Installation" [ref=e331] [cursor=pointer]:
+            - /url: "#installation"
+          - 'link "Step 1: Create a Gold Set" [ref=e332] [cursor=pointer]':
+            - /url: "#step-1"
+          - 'link "Step 2: Prepare Retrieval Results" [ref=e333] [cursor=pointer]':
+            - /url: "#step-2"
+          - 'link "Step 3: Run Evaluation" [ref=e334] [cursor=pointer]':
+            - /url: "#step-3"
+          - 'link "Step 4: Inspect Results" [ref=e335] [cursor=pointer]':
+            - /url: "#step-4"
+          - 'link "Step 5: Compare Baseline vs Candidate" [ref=e336] [cursor=pointer]':
+            - /url: "#step-5"
+          - link "What's Next?" [ref=e337] [cursor=pointer]:
+            - /url: "#next-steps"
+  - contentinfo [ref=e308]:
+    - generic [ref=e309]:
+      - generic [ref=e310]:
+        - generic [ref=e311]:
+          - heading "SPANCHOR" [level=2] [ref=e312]
+          - paragraph [ref=e313]: Source-anchored regression testing for RAG retrieval pipelines.
+        - generic [ref=e314]:
+          - heading "Resources" [level=3] [ref=e315]
+          - navigation "Footer resources" [ref=e316]:
+            - link "Documentation" [ref=e317] [cursor=pointer]:
+              - /url: /docs
+            - link "GitHub (opens in new tab)" [ref=e318] [cursor=pointer]:
+              - /url: https://github.com/Mukeshram-07/spanchor
+              - text: GitHub
+            - link "PyPI (opens in new tab)" [ref=e319] [cursor=pointer]:
+              - /url: https://pypi.org/project/spanchor/
+              - text: PyPI
+            - link "Examples" [ref=e320] [cursor=pointer]:
+              - /url: /examples
+            - link "API" [ref=e321] [cursor=pointer]:
+              - /url: /api
+        - generic [ref=e322]:
+          - heading "Info" [level=3] [ref=e323]
+          - list [ref=e324]:
+            - listitem [ref=e325]: "License: Apache-2.0"
+            - listitem [ref=e326]: "Python: 3.11 – 3.13"
+            - listitem [ref=e327]: "Type: Package"
+      - paragraph [ref=e329]: © 2026 SPANCHOR. All rights reserved.

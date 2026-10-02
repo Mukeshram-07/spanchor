@@ -1,0 +1,175 @@
+- generic [ref=f2e3]:
+  - banner [ref=f2e4]:
+    - generic [ref=f2e6]:
+      - generic [ref=f2e7]:
+        - link "SPANCHOR v0.3.0" [ref=f2e8] [cursor=pointer]:
+          - /url: /
+          - generic [ref=f2e13]:
+            - generic [ref=f2e14]: SPANCHOR
+            - generic [ref=f2e15]: v0.3.0
+        - navigation [ref=f2e16]:
+          - link "Docs" [ref=f2e17] [cursor=pointer]:
+            - /url: /docs
+          - link "Playground" [ref=f2e18] [cursor=pointer]:
+            - /url: /playground
+          - link "Examples" [ref=f2e19] [cursor=pointer]:
+            - /url: /examples
+          - link "API" [ref=f2e20] [cursor=pointer]:
+            - /url: /api
+          - link "Architecture" [ref=f2e21] [cursor=pointer]:
+            - /url: /architecture
+      - generic [ref=f2e22]:
+        - generic [ref=f2e23]: K
+        - link "pip install spanchor" [ref=f2e27] [cursor=pointer]:
+          - /url: https://pypi.org/project/spanchor/
+        - link "GitHub" [ref=f2e33] [cursor=pointer]:
+          - /url: https://github.com/Mukeshram-07/spanchor
+  - main [ref=f2e39]:
+    - generic [ref=f2e40]:
+      - heading "Playground" [level=1] [ref=f2e41]
+      - paragraph [ref=f2e42]: Interactive SPANCHOR terminal demonstration. Select a benchmark preset, run the evaluation, and inspect the simulated results. All data is deterministic benchmark examples — not live package execution.
+    - generic [ref=f2e43]:
+      - generic [ref=f2e44]: "Dataset preset:"
+      - generic [ref=f2e45]:
+        - button "CloudSync Deployment Docs (100q)" [ref=f2e46]:
+          - text: CloudSync Deployment Docs
+          - generic [ref=f2e47]: (100q)
+        - button "Support Bot Knowledgebase (50q)" [ref=f2e48]:
+          - text: Support Bot Knowledgebase
+          - generic [ref=f2e49]: (50q)
+        - button "Medical QA Corpus (200q)" [ref=f2e50]:
+          - text: Medical QA Corpus
+          - generic [ref=f2e51]: (200q)
+    - generic [ref=f2e52]: "Description: Medical question answering corpus, 200 queries, sparse BM25 v2 baseline vs BM25 v3 candidate."
+    - generic [ref=f2e54]:
+      - generic [ref=f2e55]:
+        - generic [ref=f2e56]: spanchor terminal — Medical QA Corpus
+        - generic [ref=f2e61]: RUNNING
+      - generic [ref=f2e63]:
+        - generic [ref=f2e439]: $ spanchor validate medical_qa.json
+        - generic [ref=f2e440]: ✓ Loading gold set from medical_qa.json
+        - generic [ref=f2e441]: ✓ 200 queries with source anchors loaded
+    - generic [ref=f2e65]:
+      - button "Running Evaluation..." [disabled] [ref=f2e443]
+      - button "Reset" [ref=f2e69]
+    - generic [ref=f2e74]:
+      - heading "Evaluation Metrics" [level=2] [ref=f2e341]
+      - generic [ref=f2e76]:
+        - generic [ref=f2e77]:
+          - generic [ref=f2e78]: Recall@5
+          - generic [ref=f2e79]: —
+        - generic [ref=f2e80]:
+          - generic [ref=f2e81]: Precision@5
+          - generic [ref=f2e82]: —
+        - generic [ref=f2e83]:
+          - generic [ref=f2e84]: Hit@5
+          - generic [ref=f2e85]: —
+        - generic [ref=f2e86]:
+          - generic [ref=f2e87]: Regressions
+          - generic [ref=f2e88]: —
+        - generic [ref=f2e89]:
+          - generic [ref=f2e90]: Improved
+          - generic [ref=f2e91]: —
+        - generic [ref=f2e92]:
+          - generic [ref=f2e93]: Unchanged
+          - generic [ref=f2e94]: —
+    - generic [ref=f2e95]:
+      - heading "Query Regression Audit Table" [level=2] [ref=f2e342]
+      - generic [ref=f2e97]:
+        - generic [ref=f2e98]:
+          - heading "Query Regression Audit" [level=3] [ref=f2e99]
+          - generic [ref=f2e100]: Demo dataset — 8 sample queries shown
+        - table [ref=f2e102]:
+          - rowgroup [ref=f2e103]:
+            - row [ref=f2e104]:
+              - columnheader "Query ID" [ref=f2e105]
+              - columnheader "Query" [ref=f2e106]
+              - columnheader "Baseline" [ref=f2e107]
+              - columnheader "Candidate" [ref=f2e108]
+              - columnheader "Delta" [ref=f2e109]
+              - columnheader "Status" [ref=f2e110]
+          - rowgroup [ref=f2e111]:
+            - row [ref=f2e383]:
+              - cell "MQ-Q-001" [ref=f2e384]
+              - cell "Metformin dosage type 2 diabetes" [ref=f2e385]
+              - cell "—" [ref=f2e386]
+              - cell "—" [ref=f2e387]
+              - cell "—" [ref=f2e388]
+              - cell "—" [ref=f2e389]
+            - row [ref=f2e390]:
+              - cell "MQ-Q-002" [ref=f2e391]
+              - cell "ACE inhibitor contraindications" [ref=f2e392]
+              - cell "—" [ref=f2e393]
+              - cell "—" [ref=f2e394]
+              - cell "—" [ref=f2e395]
+              - cell "—" [ref=f2e396]
+            - row [ref=f2e397]:
+              - cell "MQ-Q-003" [ref=f2e398]
+              - cell "Warfarin INR monitoring frequency" [ref=f2e399]
+              - cell "—" [ref=f2e400]
+              - cell "—" [ref=f2e401]
+              - cell "—" [ref=f2e402]
+              - cell "—" [ref=f2e403]
+            - row [ref=f2e404]:
+              - cell "MQ-Q-004" [ref=f2e405]
+              - cell "Sepsis diagnostic criteria qSOFA" [ref=f2e406]
+              - cell "—" [ref=f2e407]
+              - cell "—" [ref=f2e408]
+              - cell "—" [ref=f2e409]
+              - cell "—" [ref=f2e410]
+            - row [ref=f2e411]:
+              - cell "MQ-Q-005" [ref=f2e412]
+              - cell "COPD inhaler step therapy protocol" [ref=f2e413]
+              - cell "—" [ref=f2e414]
+              - cell "—" [ref=f2e415]
+              - cell "—" [ref=f2e416]
+              - cell "—" [ref=f2e417]
+            - row [ref=f2e418]:
+              - cell "MQ-Q-006" [ref=f2e419]
+              - cell "DVT anticoagulation duration unprovoked" [ref=f2e420]
+              - cell "—" [ref=f2e421]
+              - cell "—" [ref=f2e422]
+              - cell "—" [ref=f2e423]
+              - cell "—" [ref=f2e424]
+            - row [ref=f2e425]:
+              - cell "MQ-Q-007" [ref=f2e426]
+              - cell "Hypertension first-line therapy JNC8" [ref=f2e427]
+              - cell "—" [ref=f2e428]
+              - cell "—" [ref=f2e429]
+              - cell "—" [ref=f2e430]
+              - cell "—" [ref=f2e431]
+            - row [ref=f2e432]:
+              - cell "MQ-Q-008" [ref=f2e433]
+              - cell "Asthma exacerbation SABA frequency" [ref=f2e434]
+              - cell "—" [ref=f2e435]
+              - cell "—" [ref=f2e436]
+              - cell "—" [ref=f2e437]
+              - cell "—" [ref=f2e438]
+  - contentinfo [ref=f2e168]:
+    - generic [ref=f2e169]:
+      - generic [ref=f2e170]:
+        - generic [ref=f2e171]:
+          - heading "SPANCHOR" [level=2] [ref=f2e172]
+          - paragraph [ref=f2e173]: Source-anchored regression testing for RAG retrieval pipelines.
+        - generic [ref=f2e174]:
+          - heading "Resources" [level=3] [ref=f2e175]
+          - navigation "Footer resources" [ref=f2e176]:
+            - link "Documentation" [ref=f2e177] [cursor=pointer]:
+              - /url: /docs
+            - link "GitHub (opens in new tab)" [ref=f2e178] [cursor=pointer]:
+              - /url: https://github.com/Mukeshram-07/spanchor
+              - text: GitHub
+            - link "PyPI (opens in new tab)" [ref=f2e179] [cursor=pointer]:
+              - /url: https://pypi.org/project/spanchor/
+              - text: PyPI
+            - link "Examples" [ref=f2e180] [cursor=pointer]:
+              - /url: /examples
+            - link "API" [ref=f2e181] [cursor=pointer]:
+              - /url: /api
+        - generic [ref=f2e182]:
+          - heading "Info" [level=3] [ref=f2e183]
+          - list [ref=f2e184]:
+            - listitem [ref=f2e185]: "License: Apache-2.0"
+            - listitem [ref=f2e186]: "Python: 3.11 – 3.13"
+            - listitem [ref=f2e187]: "Type: Package"
+      - paragraph [ref=f2e189]: © 2026 SPANCHOR. All rights reserved.

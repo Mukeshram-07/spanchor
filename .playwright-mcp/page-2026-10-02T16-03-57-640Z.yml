@@ -1,0 +1,6 @@
+- generic [ref=f5e3]:
+  - heading "404" [level=1] [ref=f5e4]
+  - paragraph [ref=f5e5]: Page Not Found
+  - paragraph [ref=f5e6]: The page you're looking for doesn't exist or has been moved.
+  - link "Go Home" [ref=f5e7] [cursor=pointer]:
+    - /url: /

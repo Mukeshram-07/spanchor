@@ -1,0 +1,335 @@
+- generic [ref=f10e3]:
+  - banner [ref=f10e4]:
+    - generic [ref=f10e6]:
+      - generic [ref=f10e7]:
+        - link "SPANCHOR v0.3.0" [ref=f10e8] [cursor=pointer]:
+          - /url: /
+          - generic [ref=f10e13]:
+            - generic [ref=f10e14]: SPANCHOR
+            - generic [ref=f10e15]: v0.3.0
+        - navigation [ref=f10e16]:
+          - link "Docs" [ref=f10e17] [cursor=pointer]:
+            - /url: /docs
+          - link "Examples" [ref=f10e18] [cursor=pointer]:
+            - /url: /examples
+          - link "API" [ref=f10e19] [cursor=pointer]:
+            - /url: /api
+          - link "Architecture" [ref=f10e20] [cursor=pointer]:
+            - /url: /architecture
+      - generic [ref=f10e21]:
+        - generic [ref=f10e22]: K
+        - link "pip install spanchor" [ref=f10e26] [cursor=pointer]:
+          - /url: https://pypi.org/project/spanchor/
+        - link "GitHub" [ref=f10e32] [cursor=pointer]:
+          - /url: https://github.com/Mukeshram-07/spanchor
+  - main [ref=f10e38]:
+    - generic [ref=f10e39]:
+      - heading "SPANCHOR Architecture" [level=1] [ref=f10e40]
+      - paragraph [ref=f10e41]: Where source-anchored retrieval evaluation fits inside a RAG pipeline.
+      - paragraph [ref=f10e42]: SPANCHOR sits between retrieval output and evaluation decisions. It maps retrieved evidence back to canonical source spans, measures retrieval quality, and compares baseline and candidate runs for regression detection.
+    - generic [ref=f10e45]:
+      - generic [ref=f10e46]: SOURCE DOCUMENTS
+      - generic [ref=f10e48]: ↓
+      - generic [ref=f10e50]: CANONICALIZATION
+      - generic [ref=f10e52]: normalize • hash • deterministic
+      - generic [ref=f10e54]: ↓
+      - generic [ref=f10e56]: SOURCE ANCHORS / GOLD SET
+      - generic [ref=f10e58]: document_id + [start, end) + hash
+      - generic [ref=f10e60]: ↓
+      - generic [ref=f10e62]: RAG RETRIEVAL SYSTEM
+      - generic [ref=f10e64]:
+        - generic [ref=f10e65]: Retriever
+        - generic [ref=f10e66]: •
+        - generic [ref=f10e67]: Vector Store
+        - generic [ref=f10e68]: •
+        - generic [ref=f10e69]: Embeddings
+      - generic [ref=f10e70]: ↓
+      - generic [ref=f10e72]: RETRIEVED RESULTS
+      - generic [ref=f10e74]: query / document / span / text
+      - generic [ref=f10e76]: ↓
+      - generic [ref=f10e78]: ╔════════════════════════════════════════════╗║ SPANCHOR ENGINE ║║ • Anchor Resolution ║║ • Evidence Matching (IoU) ║║ • Retrieval Evaluation ║║ • Metrics (Recall, Precision, Hit, IoU) ║║ • Baseline vs Candidate Comparison ║║ • Regression Detection ║╚════════════════════════════════════════════╝
+      - generic [ref=f10e80]: ↓
+      - generic [ref=f10e82]: CI / DECISION
+      - generic [ref=f10e84]: pass • investigate • fail
+    - generic [ref=f10e86]:
+      - heading "Where SPANCHOR Sits" [level=2] [ref=f10e87]
+      - paragraph [ref=f10e88]: The application and retriever remain responsible for retrieving evidence. SPANCHOR evaluates whether that evidence still corresponds to the source-anchored expectations.
+      - generic [ref=f10e89]:
+        - generic [ref=f10e90]: USER QUERY
+        - generic [ref=f10e91]: ↓
+        - generic [ref=f10e92]: RAG RETRIEVER
+        - generic [ref=f10e93]: ↓
+        - generic [ref=f10e94]: RETRIEVED EVIDENCE
+        - generic [ref=f10e95]: ━━━━━━━━━━━━━ SPANCHOR ━━━━━━━━━━━━━
+        - generic [ref=f10e96]: ↓
+        - generic [ref=f10e97]: METRICS
+        - generic [ref=f10e98]: ↓
+        - generic [ref=f10e99]: REGRESSION DECISION
+    - generic [ref=f10e100]:
+      - heading "Source-Anchored Evidence Model" [level=2] [ref=f10e101]
+      - paragraph [ref=f10e102]: "An anchor identifies expected evidence using the source document identity plus a span. The relationship between document, canonical text, source span, and anchor:"
+      - generic [ref=f10e103]:
+        - generic [ref=f10e104]:
+          - generic [ref=f10e105]: Document Structure
+          - generic [ref=f10e106]:
+            - generic [ref=f10e107]: Document
+            - generic [ref=f10e108]: "├── document_id: str"
+            - generic [ref=f10e109]: "├── canonical_text: str"
+            - generic [ref=f10e110]: "├── sha256: str"
+            - generic [ref=f10e111]: └── Anchor
+            - generic [ref=f10e112]: "├── document_id: str"
+            - generic [ref=f10e113]: "├── start: int"
+            - generic [ref=f10e114]: "├── end: int"
+            - generic [ref=f10e115]: "└── expected_text_hash: str"
+        - generic [ref=f10e117]:
+          - generic [ref=f10e118]:
+            - heading "document_id" [level=4] [ref=f10e119]
+            - paragraph [ref=f10e120]: Unique identifier for the source document (e.g., "docs/deployment.md")
+          - generic [ref=f10e121]:
+            - heading "[start, end)" [level=4] [ref=f10e122]
+            - paragraph [ref=f10e123]: Half-open character interval in the canonical text. Stable even if chunking changes.
+          - generic [ref=f10e124]:
+            - heading "expected_text_hash" [level=4] [ref=f10e125]
+            - paragraph [ref=f10e126]: SHA-256 hash of the expected text span. Verification mechanism.
+      - generic [ref=f10e127]:
+        - strong [ref=f10e128]: "Important:"
+        - text: An offset alone is not a stable identity. SPANCHOR anchors combine document_id + [start, end) + hash for deterministic identity.
+    - generic [ref=f10e129]:
+      - heading "Canonicalization" [level=2] [ref=f10e130]
+      - paragraph [ref=f10e131]: The same source must produce a deterministic representation before span offsets and hashes are used for evaluation. Canonicalization is the foundation for reproducible anchors.
+      - generic [ref=f10e132]:
+        - generic [ref=f10e133]: Raw Source
+        - generic [ref=f10e134]: ↓
+        - generic [ref=f10e135]: Unicode Normalization (NFC)
+        - generic [ref=f10e136]: ↓
+        - generic [ref=f10e137]: Line-Ending Normalization (CRLF → LF)
+        - generic [ref=f10e138]: ↓
+        - generic [ref=f10e139]: Canonical Text
+        - generic [ref=f10e140]: ↓
+        - generic [ref=f10e141]: SHA-256 Identity
+      - paragraph [ref=f10e142]:
+        - strong [ref=f10e143]: "Why it matters:"
+        - text: Different systems may represent the same text differently (Unicode normalization forms, line endings, whitespace). Canonicalization ensures that SPANCHOR always measures offsets against the same normalized representation.
+    - generic [ref=f10e144]:
+      - heading "Evaluation Flow" [level=2] [ref=f10e145]
+      - paragraph [ref=f10e146]: From gold queries to aggregate metrics, SPANCHOR computes per-query evidence overlap and then aggregates to system-level metrics.
+      - generic [ref=f10e147]:
+        - generic [ref=f10e148]:
+          - generic [ref=f10e149]: Gold Queries
+          - generic [ref=f10e150]: ↓
+          - generic [ref=f10e151]: Expected Anchors
+          - generic [ref=f10e152]: ↓
+          - generic [ref=f10e153]: Retrieval Results
+          - generic [ref=f10e154]: ↓
+          - generic [ref=f10e155]: Anchor Resolution
+          - generic [ref=f10e156]: ↓
+          - generic [ref=f10e157]: Evidence Overlap (IoU)
+          - generic [ref=f10e158]: ↓
+          - generic [ref=f10e159]: Per-Query Metrics
+          - generic [ref=f10e160]: ↓
+          - generic [ref=f10e161]: Aggregate Metrics
+        - generic [ref=f10e163]:
+          - heading "Verified SPANCHOR Metrics" [level=4] [ref=f10e164]
+          - generic [ref=f10e165]:
+            - generic [ref=f10e166]:
+              - generic [ref=f10e167]: Recall@K
+              - generic [ref=f10e168]: Fraction of gold anchors retrieved in top K
+            - generic [ref=f10e169]:
+              - generic [ref=f10e170]: Precision@K
+              - generic [ref=f10e171]: Fraction of retrieved results matching gold
+            - generic [ref=f10e172]:
+              - generic [ref=f10e173]: Hit@K
+              - generic [ref=f10e174]: "Binary: at least one gold anchor in top K"
+            - generic [ref=f10e175]:
+              - generic [ref=f10e176]: IoU
+              - generic [ref=f10e177]: Character overlap between retrieved and gold spans
+            - generic [ref=f10e178]:
+              - generic [ref=f10e179]: FullEvidence@K
+              - generic [ref=f10e180]: All gold anchors retrieved with 100% IoU in top K
+    - generic [ref=f10e181]:
+      - heading "Baseline → Candidate Comparison" [level=2] [ref=f10e182]
+      - paragraph [ref=f10e183]: SPANCHOR compares two runs and classifies per-query deltas to detect regressions.
+      - generic [ref=f10e184]:
+        - generic [ref=f10e185]:
+          - heading "BASELINE RUN" [level=4] [ref=f10e186]
+          - generic [ref=f10e187]:
+            - generic [ref=f10e188]: "Recall@5: 0.405"
+            - generic [ref=f10e189]: "Precision@5: 0.020"
+            - generic [ref=f10e190]: "Hit@5: 0.410"
+          - generic [ref=f10e191]: ↓
+        - generic [ref=f10e192]:
+          - heading "compare()" [level=4] [ref=f10e193]
+          - generic [ref=f10e194]:
+            - generic [ref=f10e195]: per-query deltas
+            - generic [ref=f10e196]: policy thresholds
+            - generic [ref=f10e197]: classification
+        - generic [ref=f10e198]:
+          - heading "CANDIDATE RUN" [level=4] [ref=f10e199]
+          - generic [ref=f10e200]:
+            - generic [ref=f10e201]: "Recall@5: 0.249"
+            - generic [ref=f10e202]: "Precision@5: 0.017"
+            - generic [ref=f10e203]: "Hit@5: 0.260"
+          - generic [ref=f10e204]: ↑
+      - generic [ref=f10e205]:
+        - 'heading "Result: Per-Query Classification" [level=4] [ref=f10e206]'
+        - generic [ref=f10e207]:
+          - generic [ref=f10e208]:
+            - generic [ref=f10e209]: IMPROVED
+            - generic [ref=f10e210]: Candidate better than baseline
+            - generic [ref=f10e211]: "6"
+          - generic [ref=f10e212]:
+            - generic [ref=f10e213]: UNCHANGED
+            - generic [ref=f10e214]: Within policy threshold
+            - generic [ref=f10e215]: "75"
+          - generic [ref=f10e216]:
+            - generic [ref=f10e217]: REGRESSED
+            - generic [ref=f10e218]: Candidate worse than baseline
+            - generic [ref=f10e219]: "19"
+    - generic [ref=f10e220]:
+      - heading "Regression Gate" [level=2] [ref=f10e221]
+      - paragraph [ref=f10e222]: SPANCHOR provides comparison results and the surrounding CI workflow uses those results. The regression gate is a policy threshold applied during compare().
+      - code [ref=f10e224]: "compare(baseline, candidate, policy={\"recall@5\": 0.05})"
+      - generic [ref=f10e225]:
+        - generic [ref=f10e226]: Candidate Retrieval Changes
+        - generic [ref=f10e227]: ↓
+        - generic [ref=f10e228]: Metric Delta Calculation
+        - generic [ref=f10e229]: ↓
+        - generic [ref=f10e230]: Policy Threshold Check
+        - generic [ref=f10e231]: ↓
+        - generic [ref=f10e232]: Regression Classification
+        - generic [ref=f10e233]: ↓
+        - generic [ref=f10e234]: CI / Engineering Decision
+      - paragraph [ref=f10e235]:
+        - strong [ref=f10e236]: "Key distinction:"
+        - text: SPANCHOR computes the comparison result. Your CI workflow decides how to act on that result (pass, investigate, fail).
+    - generic [ref=f10e237]:
+      - heading "Data Flow & Object Model" [level=2] [ref=f10e238]
+      - paragraph [ref=f10e239]: "The relationship between core SPANCHOR objects as they flow through evaluation:"
+      - generic [ref=f10e240]:
+        - generic [ref=f10e241]: Document
+        - generic [ref=f10e242]: ↓
+        - generic [ref=f10e243]: Anchor
+        - generic [ref=f10e244]: ↓
+        - generic [ref=f10e245]: Query
+        - generic [ref=f10e246]: ↓
+        - generic [ref=f10e247]: RetrievalResult
+        - generic [ref=f10e248]: ↓
+        - generic [ref=f10e249]: evaluate()
+        - generic [ref=f10e250]: ↓
+        - generic [ref=f10e251]: Run
+        - generic [ref=f10e252]: ↓
+        - generic [ref=f10e253]: compare()
+        - generic [ref=f10e254]: ↓
+        - generic [ref=f10e255]: ComparisonResult
+      - paragraph [ref=f10e256]:
+        - strong [ref=f10e257]: "Terminology:"
+        - text: These are the actual SPANCHOR public classes. Do not confuse with conceptual terms like "gold set" (which refers to expected anchors) or "retrieval result" (concept; the type is RetrievalResult).
+    - generic [ref=f10e258]:
+      - heading "Capabilities & Boundaries" [level=2] [ref=f10e259]
+      - generic [ref=f10e260]:
+        - generic [ref=f10e261]:
+          - heading "SPANCHOR Does" [level=3] [ref=f10e262]
+          - list [ref=f10e263]:
+            - listitem [ref=f10e264]:
+              - generic [ref=f10e265]: ✓
+              - generic [ref=f10e266]: Source-anchored retrieval evaluation
+            - listitem [ref=f10e267]:
+              - generic [ref=f10e268]: ✓
+              - generic [ref=f10e269]: Anchor resolution & verification
+            - listitem [ref=f10e270]:
+              - generic [ref=f10e271]: ✓
+              - generic [ref=f10e272]: Retrieval metrics (Recall, Precision, Hit, IoU)
+            - listitem [ref=f10e273]:
+              - generic [ref=f10e274]: ✓
+              - generic [ref=f10e275]: Baseline/candidate comparison
+            - listitem [ref=f10e276]:
+              - generic [ref=f10e277]: ✓
+              - generic [ref=f10e278]: Regression classification
+            - listitem [ref=f10e279]:
+              - generic [ref=f10e280]: ✓
+              - generic [ref=f10e281]: Deterministic local evaluation
+        - generic [ref=f10e282]:
+          - heading "SPANCHOR Does NOT" [level=3] [ref=f10e283]
+          - list [ref=f10e284]:
+            - listitem [ref=f10e285]:
+              - generic [ref=f10e286]: ✗
+              - generic [ref=f10e287]: Generate embeddings
+            - listitem [ref=f10e288]:
+              - generic [ref=f10e289]: ✗
+              - generic [ref=f10e290]: Provide vector databases
+            - listitem [ref=f10e291]:
+              - generic [ref=f10e292]: ✗
+              - generic [ref=f10e293]: Parse documents or PDFs
+            - listitem [ref=f10e294]:
+              - generic [ref=f10e295]: ✗
+              - generic [ref=f10e296]: Generate LLM answers
+            - listitem [ref=f10e297]:
+              - generic [ref=f10e298]: ✗
+              - generic [ref=f10e299]: Host RAG applications
+            - listitem [ref=f10e300]:
+              - generic [ref=f10e301]: ✗
+              - generic [ref=f10e302]: Replace retrievers or provide a REST backend
+    - generic [ref=f10e303]:
+      - heading "Architecture Principles" [level=2] [ref=f10e304]
+      - generic [ref=f10e305]:
+        - generic [ref=f10e306]:
+          - heading "Deterministic" [level=4] [ref=f10e307]
+          - paragraph [ref=f10e308]: Same input always produces same output
+        - generic [ref=f10e309]:
+          - heading "Local-First" [level=4] [ref=f10e310]
+          - paragraph [ref=f10e311]: Runs locally without external dependencies
+        - generic [ref=f10e312]:
+          - heading "Source-Anchored" [level=4] [ref=f10e313]
+          - paragraph [ref=f10e314]: Evidence identity tied to source documents
+        - generic [ref=f10e315]:
+          - heading "Reproducible" [level=4] [ref=f10e316]
+          - paragraph [ref=f10e317]: Results are verifiable and repeatable
+        - generic [ref=f10e318]:
+          - heading "Schema-Aware" [level=4] [ref=f10e319]
+          - paragraph [ref=f10e320]: Explicit data contracts and types
+        - generic [ref=f10e321]:
+          - heading "Explicit Limits" [level=4] [ref=f10e322]
+          - paragraph [ref=f10e323]: Clear about what it can and cannot do
+    - generic [ref=f10e324]:
+      - heading "Next Steps" [level=2] [ref=f10e325]
+      - generic [ref=f10e326]:
+        - link [ref=f10e327] [cursor=pointer]:
+          - /url: /docs/quickstart
+          - heading "→ Quickstart" [level=3] [ref=f10e328]
+          - paragraph [ref=f10e329]: Get up and running with SPANCHOR in minutes.
+        - link [ref=f10e330] [cursor=pointer]:
+          - /url: /examples
+          - heading "→ Examples" [level=3] [ref=f10e331]
+          - paragraph [ref=f10e332]: Learn from real-world use cases and workflows.
+        - link [ref=f10e333] [cursor=pointer]:
+          - /url: /api
+          - heading "→ API Reference" [level=3] [ref=f10e334]
+          - paragraph [ref=f10e335]: Complete documentation of classes and functions.
+  - contentinfo [ref=f10e336]:
+    - generic [ref=f10e337]:
+      - generic [ref=f10e338]:
+        - generic [ref=f10e339]:
+          - heading "SPANCHOR" [level=2] [ref=f10e340]
+          - paragraph [ref=f10e341]: Source-anchored regression testing for RAG retrieval pipelines.
+        - generic [ref=f10e342]:
+          - heading "Resources" [level=3] [ref=f10e343]
+          - navigation "Footer resources" [ref=f10e344]:
+            - link "Documentation" [ref=f10e345] [cursor=pointer]:
+              - /url: /docs
+            - link "GitHub (opens in new tab)" [ref=f10e346] [cursor=pointer]:
+              - /url: https://github.com/Mukeshram-07/spanchor
+              - text: GitHub
+            - link "PyPI (opens in new tab)" [ref=f10e347] [cursor=pointer]:
+              - /url: https://pypi.org/project/spanchor/
+              - text: PyPI
+            - link "Examples" [ref=f10e348] [cursor=pointer]:
+              - /url: /examples
+            - link "API" [ref=f10e349] [cursor=pointer]:
+              - /url: /api
+        - generic [ref=f10e350]:
+          - heading "Info" [level=3] [ref=f10e351]
+          - list [ref=f10e352]:
+            - listitem [ref=f10e353]: "License: Apache-2.0"
+            - listitem [ref=f10e354]: "Python: 3.11 – 3.13"
+            - listitem [ref=f10e355]: "Type: Package"
+      - paragraph [ref=f10e357]: © 2026 SPANCHOR. All rights reserved.

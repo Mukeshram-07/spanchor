@@ -1,0 +1,381 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - link "SPANCHOR v0.3.0" [ref=e8] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e13]:
+            - generic [ref=e14]: SPANCHOR
+            - generic [ref=e15]: v0.3.0
+        - navigation [ref=e16]:
+          - link "Docs" [ref=e17] [cursor=pointer]:
+            - /url: /docs
+          - link "Examples" [ref=e18] [cursor=pointer]:
+            - /url: /examples
+          - link "API" [ref=e19] [cursor=pointer]:
+            - /url: /api
+          - link "Architecture" [ref=e20] [cursor=pointer]:
+            - /url: /architecture
+      - generic [ref=e21]:
+        - generic [ref=e22]: K
+        - link "pip install spanchor" [ref=e26] [cursor=pointer]:
+          - /url: https://pypi.org/project/spanchor/
+        - link "GitHub" [ref=e32] [cursor=pointer]:
+          - /url: https://github.com/Mukeshram-07/spanchor
+  - main [ref=e38]:
+    - generic [ref=e39]:
+      - heading "API Reference" [level=1] [ref=e40]
+      - paragraph [ref=e41]: Core interfaces for defining source-anchored evaluations, measuring retrieval quality, and detecting regressions.
+      - generic [ref=e42]:
+        - generic [ref=e43]:
+          - generic [ref=e44]: Documents
+          - generic [ref=e47]: Anchors
+          - generic [ref=e50]: Gold Set
+        - generic [ref=e51]:
+          - generic [ref=e54]: Retrieval Results
+          - generic [ref=e57]: Evaluation
+          - generic [ref=e60]: Metrics
+          - generic [ref=e63]: Comparison
+    - generic [ref=e64]:
+      - heading "On This Page" [level=2] [ref=e65]
+      - generic [ref=e66]:
+        - link "› Core Concepts" [ref=e67] [cursor=pointer]:
+          - /url: "#core-concepts"
+          - generic [ref=e68]: ›
+          - generic [ref=e69]: Core Concepts
+        - link "› Gold Set" [ref=e70] [cursor=pointer]:
+          - /url: "#gold-set"
+          - generic [ref=e71]: ›
+          - generic [ref=e72]: Gold Set
+        - link "› Evaluation" [ref=e73] [cursor=pointer]:
+          - /url: "#evaluation"
+          - generic [ref=e74]: ›
+          - generic [ref=e75]: Evaluation
+        - link "› Metrics" [ref=e76] [cursor=pointer]:
+          - /url: "#metrics"
+          - generic [ref=e77]: ›
+          - generic [ref=e78]: Metrics
+        - link "› Comparison" [ref=e79] [cursor=pointer]:
+          - /url: "#comparison"
+          - generic [ref=e80]: ›
+          - generic [ref=e81]: Comparison
+    - generic [ref=e82]:
+      - generic [ref=e83]:
+        - heading "Core Concepts" [level=2] [ref=e84]
+        - paragraph [ref=e85]: Fundamental types and interfaces for SPANCHOR evaluations.
+      - generic [ref=e86]:
+        - generic [ref=e87]:
+          - heading "Document" [level=3] [ref=e88]
+          - generic [ref=e89]: class
+        - paragraph [ref=e90]: Represents a canonicalized source document in the evaluation corpus.
+        - generic [ref=e91]:
+          - heading "Signature" [level=4] [ref=e92]
+          - generic [ref=e93]: class Document(BaseModel)
+        - generic [ref=e94]:
+          - heading "Fields" [level=4] [ref=e95]
+          - generic [ref=e96]:
+            - generic [ref=e97]:
+              - generic [ref=e98]: doc_id
+              - generic [ref=e99]:
+                - generic [ref=e100]: str
+                - generic [ref=e101]: Unique identifier (e.g., docs/deployment.md)
+            - generic [ref=e102]:
+              - generic [ref=e103]: content
+              - generic [ref=e104]:
+                - generic [ref=e105]: str
+                - generic [ref=e106]: Full text content
+            - generic [ref=e107]:
+              - generic [ref=e108]: metadata
+              - generic [ref=e109]:
+                - generic [ref=e110]: Dict[str, Any]
+                - generic [ref=e111]: Optional metadata (author, version, etc.)
+        - generic [ref=e112]:
+          - heading "Example" [level=4] [ref=e113]
+          - generic [ref=e114]:
+            - generic [ref=e115]:
+              - generic [ref=e116]: document.py
+              - button "Copy code to clipboard" [ref=e118]:
+                - generic [ref=e122]: Copy
+            - region "Code example in python" [ref=e123]:
+              - code [ref=e124]:
+                - generic [ref=e125]: "from spanchor import Document doc = Document( doc_id=\"docs/cloudsync/deployment.md\", content=\"To configure production deployment, open SSL port 8443...\", metadata={\"author\": \"DevOps\", \"version\": \"1.2\"} )"
+      - generic [ref=e126]:
+        - generic [ref=e127]:
+          - heading "DocumentSpan" [level=3] [ref=e128]
+          - generic [ref=e129]: class
+        - paragraph [ref=e130]: Defines an exact character offset range within a source document, bound to canonical ground truth.
+        - generic [ref=e131]:
+          - heading "Signature" [level=4] [ref=e132]
+          - generic [ref=e133]: class DocumentSpan(BaseModel)
+        - generic [ref=e134]:
+          - heading "Fields" [level=4] [ref=e135]
+          - generic [ref=e136]:
+            - generic [ref=e137]:
+              - generic [ref=e138]: doc_id
+              - generic [ref=e139]:
+                - generic [ref=e140]: str
+                - generic [ref=e141]: Parent document ID
+            - generic [ref=e142]:
+              - generic [ref=e143]: start_offset
+              - generic [ref=e144]:
+                - generic [ref=e145]: int
+                - generic [ref=e146]: Starting character offset (0-indexed)
+            - generic [ref=e147]:
+              - generic [ref=e148]: end_offset
+              - generic [ref=e149]:
+                - generic [ref=e150]: int
+                - generic [ref=e151]: Ending character offset (exclusive)
+            - generic [ref=e152]:
+              - generic [ref=e153]: canonical_text
+              - generic [ref=e154]:
+                - generic [ref=e155]: str
+                - generic [ref=e156]: Ground truth text snippet
+            - generic [ref=e157]:
+              - generic [ref=e158]: text_hash
+              - generic [ref=e159]:
+                - generic [ref=e160]: Optional[str]
+                - generic [ref=e161]: SHA-256 hash of canonical text
+        - generic [ref=e162]:
+          - heading "Example" [level=4] [ref=e163]
+          - generic [ref=e164]:
+            - generic [ref=e165]:
+              - generic [ref=e166]: span.py
+              - button "Copy code to clipboard" [ref=e168]:
+                - generic [ref=e172]: Copy
+            - region "Code example in python" [ref=e173]:
+              - code [ref=e174]:
+                - generic [ref=e175]: from spanchor import DocumentSpan span = DocumentSpan( doc_id="docs/cloudsync/deployment.md", start_offset=142, end_offset=288, canonical_text="Database connection strings must use sslmode=verify-full..." )
+      - generic [ref=e176]:
+        - generic [ref=e177]:
+          - heading "Anchor" [level=3] [ref=e178]
+          - generic [ref=e179]: class
+        - paragraph [ref=e180]: Groups one or more document spans together as verified ground-truth evidence.
+        - generic [ref=e181]:
+          - heading "Signature" [level=4] [ref=e182]
+          - generic [ref=e183]: class Anchor(BaseModel)
+        - generic [ref=e184]:
+          - heading "Fields" [level=4] [ref=e185]
+          - generic [ref=e186]:
+            - generic [ref=e187]:
+              - generic [ref=e188]: anchor_id
+              - generic [ref=e189]:
+                - generic [ref=e190]: str
+                - generic [ref=e191]: Unique anchor identifier (e.g., CS-A-101)
+            - generic [ref=e192]:
+              - generic [ref=e193]: spans
+              - generic [ref=e194]:
+                - generic [ref=e195]: List[DocumentSpan]
+                - generic [ref=e196]: One or more evidence spans
+            - generic [ref=e197]:
+              - generic [ref=e198]: canonical_text
+              - generic [ref=e199]:
+                - generic [ref=e200]: str
+                - generic [ref=e201]: Combined ground truth text
+        - generic [ref=e202]:
+          - heading "Example" [level=4] [ref=e203]
+          - generic [ref=e204]:
+            - generic [ref=e205]:
+              - generic [ref=e206]: anchor.py
+              - button "Copy code to clipboard" [ref=e208]:
+                - generic [ref=e212]: Copy
+            - region "Code example in python" [ref=e213]:
+              - code [ref=e214]:
+                - generic [ref=e215]: from spanchor import Anchor anchor = Anchor( anchor_id="CS-A-101", spans=[span], canonical_text="Database connection strings must use sslmode=verify-full..." )
+    - generic [ref=e216]:
+      - generic [ref=e217]:
+        - heading "Gold Set" [level=2] [ref=e218]
+        - paragraph [ref=e219]: Define queries and their source-anchored ground truth evidence.
+      - generic [ref=e220]:
+        - heading "Importing & Loading" [level=3] [ref=e221]
+        - generic [ref=e222]:
+          - generic [ref=e223]:
+            - generic [ref=e224]: gold_set_load.py
+            - button "Copy code to clipboard" [ref=e226]:
+              - generic [ref=e230]: Copy
+          - region "Code example in python" [ref=e231]:
+            - code [ref=e232]:
+              - generic [ref=e233]:
+                - text: "from spanchor import GoldSet # Load from JSON file gold_set = GoldSet.from_json(\"gold_set.json\") # Access queries and anchors for query in gold_set.queries: print("
+                - generic [ref=e234]: "f\"Query: {query.text}\""
+                - text: ") for anchor in query.anchors: print("
+                - generic [ref=e235]: "f\" Anchor: {anchor.anchor_id}\""
+                - text: )
+      - paragraph [ref=e237]: "Note: Gold sets are typically created and stored in JSON format. SPANCHOR provides utilities to import and validate gold set structures before running evaluations."
+    - generic [ref=e238]:
+      - generic [ref=e239]:
+        - heading "Evaluation" [level=2] [ref=e240]
+        - paragraph [ref=e241]: Evaluate candidate retrieval results against source-anchored ground truth.
+      - generic [ref=e242]:
+        - heading "Function Signature" [level=3] [ref=e243]
+        - generic [ref=e244]: def evaluate(gold_set, retrieved_results, top_k=[1,3,5]) → EvaluationResult
+      - generic [ref=e245]:
+        - heading "Parameters" [level=3] [ref=e246]
+        - generic [ref=e247]:
+          - generic [ref=e248]:
+            - generic [ref=e249]: gold_set
+            - generic [ref=e250]:
+              - generic [ref=e251]: Union[GoldSet, str]
+              - generic [ref=e252]: GoldSet object or path to JSON file
+          - generic [ref=e253]:
+            - generic [ref=e254]: retrieved_results
+            - generic [ref=e255]:
+              - generic [ref=e256]: Union[List, str]
+              - generic [ref=e257]: List of retrieval results or path to JSON file
+          - generic [ref=e258]:
+            - generic [ref=e259]: top_k
+            - generic [ref=e260]:
+              - generic [ref=e261]: List[int]
+              - generic [ref=e262]: "K cutoffs for evaluation (default: [1, 3, 5])"
+      - generic [ref=e263]:
+        - heading "Returns" [level=3] [ref=e264]
+        - generic [ref=e265]:
+          - text: EvaluationResult
+          - generic [ref=e266]: Object containing per-query metrics (Recall@K, Hit@K, IoU, etc.) and aggregate statistics
+      - generic [ref=e267]:
+        - heading "Example" [level=3] [ref=e268]
+        - generic [ref=e269]:
+          - generic [ref=e270]:
+            - generic [ref=e271]: evaluate.py
+            - button "Copy code to clipboard" [ref=e273]:
+              - generic [ref=e277]: Copy
+          - region "Code example in python" [ref=e278]:
+            - code [ref=e279]:
+              - generic [ref=e280]:
+                - text: "from spanchor import evaluate result = evaluate( gold_set=\"cloudsync_gold.json\", retrieved_results=\"candidate_retrieved.json\", top_k=[1, 3, 5] ) # Access results print("
+                - generic [ref=e281]:
+                  - text: "f\"Recall@5:"
+                  - generic [ref=e282]: "{result.metrics['recall@5']}"
+                  - text: "\""
+                - text: ) print(
+                - generic [ref=e283]: "f\"Queries evaluated: {result.total_queries}\""
+                - text: ") for query_result in result.per_query_results: print("
+                - generic [ref=e284]: "f\" Query {query_result.query_id}: Recall={query_result.recall}\""
+                - text: )
+    - generic [ref=e285]:
+      - generic [ref=e286]:
+        - heading "Metrics" [level=2] [ref=e287]
+        - paragraph [ref=e288]: Metrics computed during evaluation of retrieval quality against ground truth.
+      - generic [ref=e289]:
+        - generic [ref=e290]:
+          - heading "Recall@K" [level=3] [ref=e291]
+          - generic [ref=e292]:
+            - paragraph [ref=e293]: "Definition: Fraction of ground-truth evidence found in the top K retrieved results."
+            - paragraph [ref=e294]: "Range: [0.0, 1.0] — higher is better"
+            - paragraph [ref=e295]: "Example: If 2 of 5 ground-truth anchors appear in top 5 results, Recall@5 = 0.4"
+        - generic [ref=e296]:
+          - heading "Precision@K" [level=3] [ref=e297]
+          - generic [ref=e298]:
+            - paragraph [ref=e299]: "Definition: Fraction of top K results that match ground-truth evidence."
+            - paragraph [ref=e300]: "Range: [0.0, 1.0] — higher is better"
+            - paragraph [ref=e301]: "Example: If 3 of 5 top results are relevant, Precision@5 = 0.6"
+        - generic [ref=e302]:
+          - heading "Hit@K" [level=3] [ref=e303]
+          - generic [ref=e304]:
+            - paragraph [ref=e305]: "Definition: Binary indicator: 1 if at least one ground-truth anchor appears in top K results."
+            - paragraph [ref=e306]: "Range: [0, 1] — whether evidence was found"
+            - paragraph [ref=e307]: "Use case: Quick check for presence of relevant evidence at given cutoff."
+        - generic [ref=e308]:
+          - heading "IoU (Intersection over Union)" [level=3] [ref=e309]
+          - generic [ref=e310]:
+            - paragraph [ref=e311]: "Definition: Character-span overlap ratio between retrieved text and ground-truth span."
+            - paragraph [ref=e312]: "Range: [0.0, 1.0] — 1.0 = exact match"
+            - paragraph [ref=e313]: "Example: If retrieved text overlaps 80% of the ground-truth character span, IoU = 0.8"
+    - generic [ref=e314]:
+      - generic [ref=e315]:
+        - heading "Comparison" [level=2] [ref=e316]
+        - paragraph [ref=e317]: Compare baseline vs candidate evaluation runs to detect regressions.
+      - generic [ref=e318]:
+        - heading "Function Signature" [level=3] [ref=e319]
+        - generic [ref=e320]: def compare(baseline_result, candidate_result) → ComparisonResult
+      - generic [ref=e321]:
+        - heading "Parameters" [level=3] [ref=e322]
+        - generic [ref=e323]:
+          - generic [ref=e324]:
+            - generic [ref=e325]: baseline_result
+            - generic [ref=e326]:
+              - generic [ref=e327]: EvaluationResult
+              - generic [ref=e328]: Baseline evaluation (reference / previous version)
+          - generic [ref=e329]:
+            - generic [ref=e330]: candidate_result
+            - generic [ref=e331]:
+              - generic [ref=e332]: EvaluationResult
+              - generic [ref=e333]: Candidate evaluation (new / test version)
+      - generic [ref=e334]:
+        - heading "Returns" [level=3] [ref=e335]
+        - generic [ref=e336]:
+          - text: ComparisonResult
+          - generic [ref=e337]: Per-query deltas, aggregate change statistics, and regression classification
+      - generic [ref=e338]:
+        - heading "Example" [level=3] [ref=e339]
+        - generic [ref=e340]:
+          - generic [ref=e341]:
+            - generic [ref=e342]: compare.py
+            - button "Copy code to clipboard" [ref=e344]:
+              - generic [ref=e348]: Copy
+          - region "Code example in python" [ref=e349]:
+            - code [ref=e350]:
+              - generic [ref=e351]:
+                - text: "from spanchor import compare, evaluate # Evaluate both versions baseline = evaluate(gold_set, \"baseline_retrieved.json\") candidate = evaluate(gold_set, \"candidate_retrieved.json\") # Compare comparison = compare(baseline, candidate) print("
+                - generic [ref=e352]: "f\"Improved queries: {comparison.improved_count}\""
+                - text: ) print(
+                - generic [ref=e353]: "f\"Regressed queries: {comparison.regression_count}\""
+                - text: ) print(
+                - generic [ref=e354]: "f\"Unchanged queries: {comparison.unchanged_count}\""
+                - text: ) print(
+                - generic [ref=e355]: "f\"Overall status: {comparison.status}\""
+                - text: ") # 'improved', 'regressed', 'unchanged'"
+    - generic [ref=e356]:
+      - heading "Related Resources" [level=2] [ref=e357]
+      - generic [ref=e358]:
+        - link "› Quickstart Step-by-step guide to run your first evaluation." [ref=e359] [cursor=pointer]:
+          - /url: /docs/quickstart
+          - generic [ref=e360]:
+            - generic [ref=e361]: ›
+            - generic [ref=e362]: Quickstart
+            - paragraph [ref=e363]: Step-by-step guide to run your first evaluation.
+        - link "› Examples Real-world workflows and practical use cases." [ref=e364] [cursor=pointer]:
+          - /url: /examples
+          - generic [ref=e365]:
+            - generic [ref=e366]: ›
+            - generic [ref=e367]: Examples
+            - paragraph [ref=e368]: Real-world workflows and practical use cases.
+        - link "› Architecture System design, components, and implementation details." [ref=e369] [cursor=pointer]:
+          - /url: /architecture
+          - generic [ref=e370]:
+            - generic [ref=e371]: ›
+            - generic [ref=e372]: Architecture
+            - paragraph [ref=e373]: System design, components, and implementation details.
+        - link "› Documentation Core concepts, guides, and in-depth explanations." [ref=e374] [cursor=pointer]:
+          - /url: /docs
+          - generic [ref=e375]:
+            - generic [ref=e376]: ›
+            - generic [ref=e377]: Documentation
+            - paragraph [ref=e378]: Core concepts, guides, and in-depth explanations.
+  - contentinfo [ref=e379]:
+    - generic [ref=e380]:
+      - generic [ref=e381]:
+        - generic [ref=e382]:
+          - heading "SPANCHOR" [level=2] [ref=e383]
+          - paragraph [ref=e384]: Source-anchored regression testing for RAG retrieval pipelines.
+        - generic [ref=e385]:
+          - heading "Resources" [level=3] [ref=e386]
+          - navigation "Footer resources" [ref=e387]:
+            - link "Documentation" [ref=e388] [cursor=pointer]:
+              - /url: /docs
+            - link "GitHub (opens in new tab)" [ref=e389] [cursor=pointer]:
+              - /url: https://github.com/Mukeshram-07/spanchor
+              - text: GitHub
+            - link "PyPI (opens in new tab)" [ref=e390] [cursor=pointer]:
+              - /url: https://pypi.org/project/spanchor/
+              - text: PyPI
+            - link "Examples" [ref=e391] [cursor=pointer]:
+              - /url: /examples
+            - link "API" [ref=e392] [cursor=pointer]:
+              - /url: /api
+        - generic [ref=e393]:
+          - heading "Info" [level=3] [ref=e394]
+          - list [ref=e395]:
+            - listitem [ref=e396]: "License: Apache-2.0"
+            - listitem [ref=e397]: "Python: 3.11 – 3.13"
+            - listitem [ref=e398]: "Type: Package"
+      - paragraph [ref=e400]: © 2026 SPANCHOR. All rights reserved.

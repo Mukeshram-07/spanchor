@@ -1,0 +1,197 @@
+- generic [ref=f2e3]:
+  - banner [ref=f2e4]:
+    - generic [ref=f2e6]:
+      - generic [ref=f2e7]:
+        - link "SPANCHOR v0.3.0" [ref=f2e8] [cursor=pointer]:
+          - /url: /
+          - generic [ref=f2e13]:
+            - generic [ref=f2e14]: SPANCHOR
+            - generic [ref=f2e15]: v0.3.0
+        - navigation [ref=f2e16]:
+          - link "Docs" [ref=f2e17] [cursor=pointer]:
+            - /url: /docs
+          - link "Playground" [ref=f2e18] [cursor=pointer]:
+            - /url: /playground
+          - link "Examples" [ref=f2e19] [cursor=pointer]:
+            - /url: /examples
+          - link "API" [ref=f2e20] [cursor=pointer]:
+            - /url: /api
+          - link "Architecture" [ref=f2e21] [cursor=pointer]:
+            - /url: /architecture
+      - generic [ref=f2e22]:
+        - generic [ref=f2e23]: K
+        - link "pip install spanchor" [ref=f2e27] [cursor=pointer]:
+          - /url: https://pypi.org/project/spanchor/
+        - link "GitHub" [ref=f2e33] [cursor=pointer]:
+          - /url: https://github.com/Mukeshram-07/spanchor
+  - main [ref=f2e39]:
+    - generic [ref=f2e40]:
+      - heading "Playground" [level=1] [ref=f2e41]
+      - paragraph [ref=f2e42]: Interactive SPANCHOR terminal demonstration. Select a benchmark preset, run the evaluation, and inspect the simulated results. All data is deterministic benchmark examples — not live package execution.
+    - generic [ref=f2e43]:
+      - generic [ref=f2e44]: "Dataset preset:"
+      - generic [ref=f2e45]:
+        - button "CloudSync Deployment Docs (100q)" [ref=f2e46]:
+          - text: CloudSync Deployment Docs
+          - generic [ref=f2e47]: (100q)
+        - button "Support Bot Knowledgebase (50q)" [ref=f2e48]:
+          - text: Support Bot Knowledgebase
+          - generic [ref=f2e49]: (50q)
+        - button "Medical QA Corpus (200q)" [ref=f2e50]:
+          - text: Medical QA Corpus
+          - generic [ref=f2e51]: (200q)
+    - generic [ref=f2e52]: "Description: Customer support knowledge base, 50 queries, keyword baseline vs dense retriever v1."
+    - generic [ref=f2e54]:
+      - generic [ref=f2e55]:
+        - generic [ref=f2e56]: spanchor terminal — Support Bot Knowledgebase
+        - generic [ref=f2e61]: COMPLETE
+      - generic [ref=f2e63]:
+        - generic [ref=f2e246]: $ spanchor validate support_kb.json
+        - generic [ref=f2e247]: ✓ Loading gold set from support_kb.json
+        - generic [ref=f2e248]: ✓ 50 queries with source anchors loaded
+        - generic [ref=f2e251]: ✓ All 50 canonical hashes verified
+        - generic [ref=f2e252]: $ spanchor evaluate candidate.json --top-k 5
+        - generic [ref=f2e253]: → Loading retrieval results from candidate.json...
+        - generic [ref=f2e254]: → Calculating Recall@5...
+        - generic [ref=f2e255]: → Calculating Precision@5...
+        - generic [ref=f2e256]: → Calculating Hit@5...
+        - generic [ref=f2e257]: ✓ Evaluation complete
+        - generic [ref=f2e258]: $ spanchor compare baseline.json candidate.json
+        - generic [ref=f2e259]: → Comparing baseline and candidate...
+        - generic [ref=f2e260]: ✓ Query comparison complete
+        - generic [ref=f2e261]: ─────────────────────────────────────
+        - generic [ref=f2e262]: "Recall@5: 0.612"
+        - generic [ref=f2e263]: "Precision@5: 0.041"
+        - generic [ref=f2e264]: "Hit@5: 0.640"
+        - generic [ref=f2e265]: ─────────────────────────────────────
+        - generic [ref=f2e266]: "Improved: 14 queries"
+        - generic [ref=f2e267]: "Unchanged: 31 queries"
+        - generic [ref=f2e268]: "Regressed: 5 queries"
+        - generic [ref=f2e269]: ─────────────────────────────────────
+        - generic [ref=f2e270]: ✓ 5 regressions detected. Minor impact.
+    - generic [ref=f2e65]:
+      - button "Run Evaluation" [ref=f2e271]
+      - button "Reset" [ref=f2e69]
+    - generic [ref=f2e74]:
+      - heading "Evaluation Metrics— deterministic benchmark example" [level=2] [ref=f2e272]
+      - generic [ref=f2e76]:
+        - generic [ref=f2e77]:
+          - generic [ref=f2e78]: Recall@5
+          - generic [ref=f2e79]: "0.612"
+        - generic [ref=f2e80]:
+          - generic [ref=f2e81]: Precision@5
+          - generic [ref=f2e82]: "0.041"
+        - generic [ref=f2e83]:
+          - generic [ref=f2e84]: Hit@5
+          - generic [ref=f2e85]: "0.640"
+        - generic [ref=f2e86]:
+          - generic [ref=f2e87]: Regressions
+          - generic [ref=f2e88]: "5"
+        - generic [ref=f2e89]:
+          - generic [ref=f2e90]: Improved
+          - generic [ref=f2e91]: "14"
+        - generic [ref=f2e92]:
+          - generic [ref=f2e93]: Unchanged
+          - generic [ref=f2e94]: "31"
+    - generic [ref=f2e95]:
+      - heading "Query Regression Audit Table— sample queries from Support Bot Knowledgebase" [level=2] [ref=f2e273]:
+        - text: Query Regression Audit Table
+        - generic [ref=f2e274]: — sample queries from Support Bot Knowledgebase
+      - generic [ref=f2e97]:
+        - generic [ref=f2e98]:
+          - heading "Query Regression Audit" [level=3] [ref=f2e99]
+          - generic [ref=f2e100]: Demo dataset — 8 sample queries shown
+        - table [ref=f2e102]:
+          - rowgroup [ref=f2e103]:
+            - row [ref=f2e104]:
+              - columnheader "Query ID" [ref=f2e105]
+              - columnheader "Query" [ref=f2e106]
+              - columnheader "Baseline" [ref=f2e107]
+              - columnheader "Candidate" [ref=f2e108]
+              - columnheader "Delta" [ref=f2e109]
+              - columnheader "Status" [ref=f2e110]
+          - rowgroup [ref=f2e111]:
+            - row [ref=f2e275]:
+              - cell "SB-Q-001" [ref=f2e191]
+              - cell "Password reset email not received" [ref=f2e192]
+              - cell "0.70" [ref=f2e276]
+              - cell "0.85" [ref=f2e277]
+              - cell "+0.15" [ref=f2e278]
+              - cell "Improved" [ref=f2e279]
+            - row [ref=f2e284]:
+              - cell "SB-Q-002" [ref=f2e198]
+              - cell "Cancel subscription steps" [ref=f2e199]
+              - cell "0.80" [ref=f2e285]
+              - cell "0.80" [ref=f2e286]
+              - cell "0.00" [ref=f2e287]
+              - cell "Unchanged" [ref=f2e288]
+            - row [ref=f2e291]:
+              - cell "SB-Q-003" [ref=f2e205]
+              - cell "Two-factor auth backup codes" [ref=f2e206]
+              - cell "0.90" [ref=f2e292]
+              - cell "0.55" [ref=f2e293]
+              - cell "-0.35" [ref=f2e294]
+              - cell "Regressed" [ref=f2e295]
+            - row [ref=f2e299]:
+              - cell "SB-Q-004" [ref=f2e212]
+              - cell "Invoice download from billing" [ref=f2e213]
+              - cell "0.75" [ref=f2e300]
+              - cell "0.90" [ref=f2e301]
+              - cell "+0.15" [ref=f2e302]
+              - cell "Improved" [ref=f2e303]
+            - row [ref=f2e308]:
+              - cell "SB-Q-005" [ref=f2e219]
+              - cell "Change primary email address" [ref=f2e220]
+              - cell "0.65" [ref=f2e309]
+              - cell "0.65" [ref=f2e310]
+              - cell "0.00" [ref=f2e311]
+              - cell "Unchanged" [ref=f2e312]
+            - row [ref=f2e315]:
+              - cell "SB-Q-006" [ref=f2e226]
+              - cell "API rate limit per minute" [ref=f2e227]
+              - cell "0.60" [ref=f2e316]
+              - cell "0.75" [ref=f2e317]
+              - cell "+0.15" [ref=f2e318]
+              - cell "Improved" [ref=f2e319]
+            - row [ref=f2e324]:
+              - cell "SB-Q-007" [ref=f2e233]
+              - cell "Export account data GDPR" [ref=f2e234]
+              - cell "0.85" [ref=f2e325]
+              - cell "0.40" [ref=f2e326]
+              - cell "-0.45" [ref=f2e327]
+              - cell "Regressed" [ref=f2e328]
+            - row [ref=f2e332]:
+              - cell "SB-Q-008" [ref=f2e240]
+              - cell "Team member invite workflow" [ref=f2e241]
+              - cell "0.70" [ref=f2e333]
+              - cell "0.70" [ref=f2e334]
+              - cell "0.00" [ref=f2e335]
+              - cell "Unchanged" [ref=f2e336]
+  - contentinfo [ref=f2e168]:
+    - generic [ref=f2e169]:
+      - generic [ref=f2e170]:
+        - generic [ref=f2e171]:
+          - heading "SPANCHOR" [level=2] [ref=f2e172]
+          - paragraph [ref=f2e173]: Source-anchored regression testing for RAG retrieval pipelines.
+        - generic [ref=f2e174]:
+          - heading "Resources" [level=3] [ref=f2e175]
+          - navigation "Footer resources" [ref=f2e176]:
+            - link "Documentation" [ref=f2e177] [cursor=pointer]:
+              - /url: /docs
+            - link "GitHub (opens in new tab)" [ref=f2e178] [cursor=pointer]:
+              - /url: https://github.com/Mukeshram-07/spanchor
+              - text: GitHub
+            - link "PyPI (opens in new tab)" [ref=f2e179] [cursor=pointer]:
+              - /url: https://pypi.org/project/spanchor/
+              - text: PyPI
+            - link "Examples" [ref=f2e180] [cursor=pointer]:
+              - /url: /examples
+            - link "API" [ref=f2e181] [cursor=pointer]:
+              - /url: /api
+        - generic [ref=f2e182]:
+          - heading "Info" [level=3] [ref=f2e183]
+          - list [ref=f2e184]:
+            - listitem [ref=f2e185]: "License: Apache-2.0"
+            - listitem [ref=f2e186]: "Python: 3.11 – 3.13"
+            - listitem [ref=f2e187]: "Type: Package"
+      - paragraph [ref=f2e189]: © 2026 SPANCHOR. All rights reserved.

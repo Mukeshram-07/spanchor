@@ -1,0 +1,312 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - link "SPANCHOR v0.3.0" [ref=e8] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e13]:
+            - generic [ref=e14]: SPANCHOR
+            - generic [ref=e15]: v0.3.0
+        - navigation [ref=e16]:
+          - link "Docs" [ref=e17] [cursor=pointer]:
+            - /url: /docs
+          - link "Playground" [ref=e18] [cursor=pointer]:
+            - /url: /playground
+          - link "Examples" [ref=e19] [cursor=pointer]:
+            - /url: /examples
+          - link "API" [ref=e20] [cursor=pointer]:
+            - /url: /api
+          - link "Architecture" [ref=e21] [cursor=pointer]:
+            - /url: /architecture
+      - generic [ref=e22]:
+        - generic [ref=e23]: K
+        - link "pip install spanchor" [ref=e27] [cursor=pointer]:
+          - /url: https://pypi.org/project/spanchor/
+        - link "GitHub" [ref=e33] [cursor=pointer]:
+          - /url: https://github.com/Mukeshram-07/spanchor
+  - main [ref=e39]:
+    - generic [ref=e40]:
+      - heading "Examples" [level=1] [ref=e41]
+      - paragraph [ref=e42]: See how SPANCHOR fits into real RAG retrieval evaluation workflows.
+      - paragraph [ref=e43]: These examples show how to define source-anchored gold sets, evaluate retrieval results, and detect regressions between baseline and candidate runs.
+    - generic [ref=e44]:
+      - heading "Examples Overview" [level=2] [ref=e45]
+      - generic [ref=e46]:
+        - link "01 Basic Retrieval Evaluation Evaluate whether retrieved chunks contain the source evidence expected for each query." [ref=e47] [cursor=pointer]:
+          - /url: "#example-01"
+          - generic [ref=e49]:
+            - generic [ref=e50]: "01"
+            - heading "Basic Retrieval Evaluation" [level=3] [ref=e51]
+            - paragraph [ref=e52]: Evaluate whether retrieved chunks contain the source evidence expected for each query.
+        - link "02 Regression Comparison Compare two retrieval runs against the same source-anchored evaluation set." [ref=e55] [cursor=pointer]:
+          - /url: "#example-02"
+          - generic [ref=e57]:
+            - generic [ref=e58]: "02"
+            - heading "Regression Comparison" [level=3] [ref=e59]
+            - paragraph [ref=e60]: Compare two retrieval runs against the same source-anchored evaluation set.
+        - link "03 CI Regression Gate Use SPANCHOR in CI to prevent retrieval regressions from silently reaching production." [ref=e63] [cursor=pointer]:
+          - /url: "#example-03"
+          - generic [ref=e65]:
+            - generic [ref=e66]: "03"
+            - heading "CI Regression Gate" [level=3] [ref=e67]
+            - paragraph [ref=e68]: Use SPANCHOR in CI to prevent retrieval regressions from silently reaching production.
+    - generic [ref=e71]:
+      - generic [ref=e72]:
+        - generic [ref=e73]: "01"
+        - heading "Basic Retrieval Evaluation" [level=2] [ref=e74]
+        - paragraph [ref=e75]: Evaluate whether retrieved chunks contain the source evidence expected for each query.
+      - generic [ref=e76]:
+        - heading "Expected Flow" [level=3] [ref=e77]
+        - generic [ref=e78]:
+          - generic [ref=e79]: Source Document
+          - generic [ref=e83]: ↓
+          - generic [ref=e85]: Gold-Set Anchor
+          - generic [ref=e89]: ↓
+          - generic [ref=e91]: Retrieval Results
+          - generic [ref=e95]: ↓
+          - generic [ref=e97]: SPANCHOR Evaluation
+          - generic [ref=e101]: ↓
+          - generic [ref=e103]: Recall / Precision / Hit Metrics
+      - generic [ref=e104]:
+        - heading "Python Example" [level=3] [ref=e105]
+        - generic [ref=e106]:
+          - generic [ref=e107]:
+            - generic [ref=e108]: evaluate.py
+            - button "Copied to clipboard" [active] [ref=e371]:
+              - generic [ref=e114]: Copied
+          - region "Code example in python" [ref=e115]:
+            - code [ref=e116]:
+              - generic [ref=e117]:
+                - generic [ref=e118]:
+                  - generic [ref=e119]: "1"
+                  - generic [ref=e120]: "2"
+                  - generic [ref=e121]: "3"
+                  - generic [ref=e122]: "4"
+                  - generic [ref=e123]: "5"
+                  - generic [ref=e124]: "6"
+                  - generic [ref=e125]: "7"
+                  - generic [ref=e126]: "8"
+                  - generic [ref=e127]: "9"
+                  - generic [ref=e128]: "10"
+                  - generic [ref=e129]: "11"
+                  - generic [ref=e130]: "12"
+                  - generic [ref=e131]: "13"
+                - generic [ref=e132]: "from spanchor import evaluate, GoldSet # Load ground-truth source anchors gold_set = GoldSet.from_json(\"gold_set.json\") # Evaluate candidate retrieval outputs results = evaluate( gold_set=gold_set, retrieved_results=\"candidate_retrieved.json\", top_k=[1, 3, 5] ) results.print_summary()"
+      - generic [ref=e134]:
+        - heading "Example Output" [level=3] [ref=e135]
+        - generic [ref=e136]:
+          - generic [ref=e137]: "Recall@1: 0.667"
+          - generic [ref=e138]: "Recall@3: 0.800"
+          - generic [ref=e139]: "Recall@5: 0.900"
+          - generic [ref=e140]: "Precision@1: 0.667"
+          - generic [ref=e141]: "Precision@3: 0.733"
+          - generic [ref=e142]: "Precision@5: 0.800"
+          - generic [ref=e143]: "Hit@1: 0.667"
+          - generic [ref=e144]: "Hit@3: 0.900"
+          - generic [ref=e145]: "Hit@5: 1.000"
+    - generic [ref=e146]:
+      - generic [ref=e147]:
+        - generic [ref=e148]: "02"
+        - heading "Regression Comparison" [level=2] [ref=e149]
+        - paragraph [ref=e150]: Compare two retrieval runs against the same source-anchored evaluation set.
+      - generic [ref=e151]:
+        - generic [ref=e152]:
+          - heading "Baseline" [level=3] [ref=e153]
+          - paragraph [ref=e154]: Your existing retrieval system (e.g., BM25, previous embedding model).
+          - generic [ref=e155]:
+            - generic [ref=e156]:
+              - generic [ref=e157]: baseline.json
+              - button "Copy code to clipboard" [ref=e159]:
+                - generic [ref=e163]: Copy
+            - region "Code example in json" [ref=e164]:
+              - code [ref=e165]:
+                - generic [ref=e166]: "{ \"results\": [ { \"query\": \"machine learning\", \"retrieved\": [\"doc_001\", \"doc_042\"] } ] }"
+        - generic [ref=e167]:
+          - heading "Candidate" [level=3] [ref=e168]
+          - paragraph [ref=e169]: Your new retrieval system (e.g., Hybrid search, new embedding model).
+          - generic [ref=e170]:
+            - generic [ref=e171]:
+              - generic [ref=e172]: candidate.json
+              - button "Copy code to clipboard" [ref=e174]:
+                - generic [ref=e178]: Copy
+            - region "Code example in json" [ref=e179]:
+              - code [ref=e180]:
+                - generic [ref=e181]: "{ \"results\": [ { \"query\": \"machine learning\", \"retrieved\": [\"doc_001\", \"doc_089\"] } ] }"
+      - generic [ref=e182]:
+        - heading "Comparison Script" [level=3] [ref=e183]
+        - generic [ref=e184]:
+          - generic [ref=e185]:
+            - generic [ref=e186]: compare.py
+            - button "Copy code to clipboard" [ref=e188]:
+              - generic [ref=e192]: Copy
+          - region "Code example in python" [ref=e193]:
+            - code [ref=e194]:
+              - generic [ref=e195]:
+                - generic [ref=e196]:
+                  - generic [ref=e197]: "1"
+                  - generic [ref=e198]: "2"
+                  - generic [ref=e199]: "3"
+                  - generic [ref=e200]: "4"
+                  - generic [ref=e201]: "5"
+                  - generic [ref=e202]: "6"
+                  - generic [ref=e203]: "7"
+                  - generic [ref=e204]: "8"
+                  - generic [ref=e205]: "9"
+                  - generic [ref=e206]: "10"
+                  - generic [ref=e207]: "11"
+                  - generic [ref=e208]: "12"
+                  - generic [ref=e209]: "13"
+                  - generic [ref=e210]: "14"
+                  - generic [ref=e211]: "15"
+                  - generic [ref=e212]: "16"
+                  - generic [ref=e213]: "17"
+                  - generic [ref=e214]: "18"
+                  - generic [ref=e215]: "19"
+                  - generic [ref=e216]: "20"
+                  - generic [ref=e217]: "21"
+                - generic [ref=e218]: "from spanchor import evaluate, GoldSet gold_set = GoldSet.from_json(\"gold_set.json\") # Evaluate baseline baseline = evaluate( gold_set=gold_set, retrieved_results=\"baseline.json\", top_k=[5] ) # Evaluate candidate candidate = evaluate( gold_set=gold_set, retrieved_results=\"candidate.json\", top_k=[5] ) # Compare results comparison = baseline.compare(candidate) comparison.print_summary()"
+      - generic [ref=e220]:
+        - heading "Per-Query Changes" [level=3] [ref=e221]
+        - table [ref=e223]:
+          - rowgroup [ref=e224]:
+            - row [ref=e225]:
+              - columnheader "Query" [ref=e226]
+              - columnheader "Baseline" [ref=e227]
+              - columnheader "Candidate" [ref=e228]
+              - columnheader "Delta" [ref=e229]
+              - columnheader "Status" [ref=e230]
+          - rowgroup [ref=e231]:
+            - row [ref=e232]:
+              - cell "machine learning" [ref=e233]
+              - cell "0.800" [ref=e234]
+              - cell "0.900" [ref=e235]
+              - cell "+0.100" [ref=e236]
+              - cell "Improved" [ref=e237]
+            - row [ref=e243]:
+              - cell "neural networks" [ref=e244]
+              - cell "0.750" [ref=e245]
+              - cell "0.750" [ref=e246]
+              - cell "0.000" [ref=e247]
+              - cell "Unchanged" [ref=e248]
+            - row [ref=e252]:
+              - cell "deep learning optimization" [ref=e253]
+              - cell "0.850" [ref=e254]
+              - cell "0.420" [ref=e255]
+              - cell "-0.430" [ref=e256]
+              - cell "Regressed" [ref=e257]
+    - generic [ref=e262]:
+      - generic [ref=e263]:
+        - generic [ref=e264]: "03"
+        - heading "CI Regression Gate" [level=2] [ref=e265]
+        - paragraph [ref=e266]: Use SPANCHOR in CI to prevent retrieval regressions from silently reaching production.
+      - generic [ref=e267]:
+        - heading "Workflow" [level=3] [ref=e268]
+        - generic [ref=e269]:
+          - generic [ref=e270]:
+            - generic [ref=e271]: Shell
+            - button "Copy code to clipboard" [ref=e273]:
+              - generic [ref=e277]: Copy
+          - region "Code example in shell" [ref=e278]:
+            - code [ref=e279]:
+              - generic [ref=e280]: "$ spanchor evaluate candidate.json --top-k 5 ✓ Loading gold set... ✓ 100 queries evaluated ✓ Evaluation complete $ spanchor compare baseline.json candidate.json → Computing per-query deltas... → Detecting regressions... ✓ Comparison complete Improved: 6 queries Unchanged: 75 queries Regressed: 19 queries ⚠ 19 regressions detected. CI gate FAILED."
+      - generic [ref=e281]:
+        - generic [ref=e282]:
+          - heading "GitHub Actions" [level=3] [ref=e283]
+          - generic [ref=e284]:
+            - generic [ref=e285]:
+              - generic [ref=e286]: .github/workflows/ci.yml
+              - button "Copy code to clipboard" [ref=e288]:
+                - generic [ref=e292]: Copy
+            - region "Code example in yaml" [ref=e293]:
+              - code [ref=e294]:
+                - generic [ref=e295]: "- name: SPANCHOR Regression Gate run: | spanchor evaluate \\ candidate.json \\ --top-k 5 \\ --fail-on-regressions 19"
+        - generic [ref=e296]:
+          - heading "Exit Code" [level=3] [ref=e297]
+          - generic [ref=e298]:
+            - generic [ref=e299]:
+              - generic [ref=e300]: Shell
+              - button "Copy code to clipboard" [ref=e302]:
+                - generic [ref=e306]: Copy
+            - region "Code example in shell" [ref=e307]:
+              - code [ref=e308]:
+                - generic [ref=e309]:
+                  - text: "# Success: no regressions $"
+                  - generic [ref=e310]: echo $?
+                  - text: "0 # Failure: regressions detected $"
+                  - generic [ref=e311]: echo $?
+                  - text: "1"
+      - paragraph [ref=e312]: "Note: This is an illustrative deterministic example. Actual numbers depend on your gold set and retrieval system."
+    - generic [ref=e313]:
+      - heading "When to use which example?" [level=2] [ref=e314]
+      - generic [ref=e315]:
+        - generic [ref=e316]:
+          - generic [ref=e317]: →
+          - generic [ref=e318]:
+            - heading "Need to validate retrieval?" [level=3] [ref=e319]
+            - paragraph [ref=e320]:
+              - text: See
+              - 'link "Example 01: Basic Retrieval Evaluation" [ref=e321] [cursor=pointer]':
+                - /url: "#example-01"
+        - generic [ref=e322]:
+          - generic [ref=e323]: →
+          - generic [ref=e324]:
+            - heading "Need to compare a new retriever against an existing one?" [level=3] [ref=e325]
+            - paragraph [ref=e326]:
+              - text: See
+              - 'link "Example 02: Regression Comparison" [ref=e327] [cursor=pointer]':
+                - /url: "#example-02"
+        - generic [ref=e328]:
+          - generic [ref=e329]: →
+          - generic [ref=e330]:
+            - heading "Need to enforce retrieval quality in CI?" [level=3] [ref=e331]
+            - paragraph [ref=e332]:
+              - text: See
+              - 'link "Example 03: CI Regression Gate" [ref=e333] [cursor=pointer]':
+                - /url: "#example-03"
+    - generic [ref=e334]:
+      - heading "Next Steps" [level=2] [ref=e335]
+      - generic [ref=e336]:
+        - link "→ Quickstart Step-by-step guide to run your first test." [ref=e337] [cursor=pointer]:
+          - /url: /docs/quickstart
+          - generic [ref=e338]: → Quickstart
+          - paragraph [ref=e339]: Step-by-step guide to run your first test.
+        - link "→ Playground Interactive terminal demo with sample data." [ref=e340] [cursor=pointer]:
+          - /url: /playground
+          - generic [ref=e341]: → Playground
+          - paragraph [ref=e342]: Interactive terminal demo with sample data.
+        - link "→ API Reference Complete API documentation." [ref=e343] [cursor=pointer]:
+          - /url: /api
+          - generic [ref=e344]: → API Reference
+          - paragraph [ref=e345]: Complete API documentation.
+        - link "→ Architecture System design and components." [ref=e346] [cursor=pointer]:
+          - /url: /docs/architecture
+          - generic [ref=e347]: → Architecture
+          - paragraph [ref=e348]: System design and components.
+  - contentinfo [ref=e349]:
+    - generic [ref=e350]:
+      - generic [ref=e351]:
+        - generic [ref=e352]:
+          - heading "SPANCHOR" [level=2] [ref=e353]
+          - paragraph [ref=e354]: Source-anchored regression testing for RAG retrieval pipelines.
+        - generic [ref=e355]:
+          - heading "Resources" [level=3] [ref=e356]
+          - navigation "Footer resources" [ref=e357]:
+            - link "Documentation" [ref=e358] [cursor=pointer]:
+              - /url: /docs
+            - link "GitHub (opens in new tab)" [ref=e359] [cursor=pointer]:
+              - /url: https://github.com/Mukeshram-07/spanchor
+              - text: GitHub
+            - link "PyPI (opens in new tab)" [ref=e360] [cursor=pointer]:
+              - /url: https://pypi.org/project/spanchor/
+              - text: PyPI
+            - link "Examples" [ref=e361] [cursor=pointer]:
+              - /url: /examples
+            - link "API" [ref=e362] [cursor=pointer]:
+              - /url: /api
+        - generic [ref=e363]:
+          - heading "Info" [level=3] [ref=e364]
+          - list [ref=e365]:
+            - listitem [ref=e366]: "License: Apache-2.0"
+            - listitem [ref=e367]: "Python: 3.11 – 3.13"
+            - listitem [ref=e368]: "Type: Package"
+      - paragraph [ref=e370]: © 2026 SPANCHOR. All rights reserved.

@@ -1,0 +1,758 @@
+- generic [ref=f1e3]:
+  - banner [ref=f1e4]:
+    - generic [ref=f1e6]:
+      - link "SPANCHOR" [ref=f1e8] [cursor=pointer]:
+        - /url: /
+      - button "Toggle menu" [ref=f1e16]
+  - main [ref=f1e18]:
+    - generic [ref=f1e19]:
+      - heading "API Reference" [level=1] [ref=f1e20]
+      - paragraph [ref=f1e21]: Complete Python interfaces and CLI tools for SPANCHOR. Define source-anchored evaluations, measure retrieval quality with verified metrics, and detect regressions in CI/CD pipelines.
+      - generic [ref=f1e22]:
+        - generic [ref=f1e23]: import spanchor
+        - generic [ref=f1e24]:
+          - generic [ref=f1e25]: Document, Anchor, Query, RetrievalResult, Run, ComparisonResult
+          - generic [ref=f1e26]: evaluate(), compare(), check_corpus()
+          - generic [ref=f1e27]: SpanchorError, AnchorResolutionError, ... (10 exceptions)
+    - generic [ref=f1e28]:
+      - heading "On This Page" [level=2] [ref=f1e29]
+      - generic [ref=f1e30]:
+        - link "› 01 Core Objects" [ref=f1e31] [cursor=pointer]:
+          - /url: "#core-objects"
+          - generic [ref=f1e32]: ›
+          - generic [ref=f1e33]: 01 Core Objects
+        - link "› 02 Evaluation" [ref=f1e34] [cursor=pointer]:
+          - /url: "#evaluation"
+          - generic [ref=f1e35]: ›
+          - generic [ref=f1e36]: 02 Evaluation
+        - link "› 03 Metrics" [ref=f1e37] [cursor=pointer]:
+          - /url: "#metrics"
+          - generic [ref=f1e38]: ›
+          - generic [ref=f1e39]: 03 Metrics
+        - link "› 04 Comparison" [ref=f1e40] [cursor=pointer]:
+          - /url: "#comparison"
+          - generic [ref=f1e41]: ›
+          - generic [ref=f1e42]: 04 Comparison
+        - link "› 05 Regression / CI" [ref=f1e43] [cursor=pointer]:
+          - /url: "#regression"
+          - generic [ref=f1e44]: ›
+          - generic [ref=f1e45]: 05 Regression / CI
+        - link "› 06 CLI Reference" [ref=f1e46] [cursor=pointer]:
+          - /url: "#cli"
+          - generic [ref=f1e47]: ›
+          - generic [ref=f1e48]: 06 CLI Reference
+        - link "› 07 Exceptions" [ref=f1e49] [cursor=pointer]:
+          - /url: "#exceptions"
+          - generic [ref=f1e50]: ›
+          - generic [ref=f1e51]: 07 Exceptions
+        - link "› 08 Type Reference" [ref=f1e52] [cursor=pointer]:
+          - /url: "#types"
+          - generic [ref=f1e53]: ›
+          - generic [ref=f1e54]: 08 Type Reference
+    - generic [ref=f1e55]:
+      - generic [ref=f1e56]:
+        - heading "01 Core Objects" [level=2] [ref=f1e57]
+        - paragraph [ref=f1e58]: Six frozen dataclasses represent the complete SPANCHOR evaluation workflow.
+      - generic [ref=f1e59]:
+        - generic [ref=f1e60]:
+          - heading "Document" [level=3] [ref=f1e61]
+          - generic [ref=f1e62]: class
+        - paragraph [ref=f1e63]: Canonical source document with SHA256 hash. Text is normalized to NFC and line endings standardized for reproducible evaluation.
+        - generic [ref=f1e64]:
+          - heading "Signature" [level=4] [ref=f1e65]
+          - generic [ref=f1e66]: "Document(document_id: str, text: str, sha256: str, schema_version: str = \"0.1.0\")"
+        - generic [ref=f1e67]:
+          - heading "Fields" [level=4] [ref=f1e68]
+          - generic [ref=f1e69]:
+            - generic [ref=f1e70]:
+              - generic [ref=f1e71]: document_id
+              - generic [ref=f1e72]:
+                - generic [ref=f1e73]: str
+                - generic [ref=f1e74]: Unique document identifier (e.g., "docs/deployment.md")
+            - generic [ref=f1e75]:
+              - generic [ref=f1e76]: text
+              - generic [ref=f1e77]:
+                - generic [ref=f1e78]: str
+                - generic [ref=f1e79]: Canonicalized text content (NFC normalized, Unix line endings)
+            - generic [ref=f1e80]:
+              - generic [ref=f1e81]: sha256
+              - generic [ref=f1e82]:
+                - generic [ref=f1e83]: str
+                - generic [ref=f1e84]: SHA256 hash of canonical text (hex string)
+            - generic [ref=f1e85]:
+              - generic [ref=f1e86]: schema_version
+              - generic [ref=f1e87]:
+                - generic [ref=f1e88]: str = "0.1.0"
+                - generic [ref=f1e89]: Schema version (frozen at 0.1.0 for compatibility)
+        - generic [ref=f1e90]:
+          - heading "Class Methods" [level=4] [ref=f1e91]
+          - generic [ref=f1e92]: "@classmethodfrom_text(document_id: str, raw_text: str) → Document"
+          - paragraph [ref=f1e93]: Create Document from raw text with automatic canonicalization and SHA256 hashing.
+        - generic [ref=f1e94]:
+          - heading "Example" [level=4] [ref=f1e95]
+          - generic [ref=f1e96]:
+            - generic [ref=f1e97]:
+              - generic [ref=f1e98]: document.py
+              - button "Copy code to clipboard" [ref=f1e100]:
+                - generic [ref=f1e104]: Copy
+            - region "Code example in python" [ref=f1e105]:
+              - code [ref=f1e106]:
+                - generic [ref=f1e107]: "from spanchor import Document # From raw text (auto-canonicalize & hash) doc = Document.from_text( \"docs/deployment.md\", \"Database connection strings must use sslmode=verify-full...\" ) # Or construct directly doc2 = Document( document_id=\"docs/auth.md\", text=\"OAuth2 implementation requires...\", sha256=\"a1b2c3d4e5f6...\", schema_version=\"0.1.0\" )"
+      - generic [ref=f1e108]:
+        - generic [ref=f1e109]:
+          - heading "Anchor" [level=3] [ref=f1e110]
+          - generic [ref=f1e111]: class
+        - paragraph [ref=f1e112]: Character span [start, end) within a Document defining ground-truth evidence for a Query.
+        - generic [ref=f1e113]:
+          - heading "Signature" [level=4] [ref=f1e114]
+          - generic [ref=f1e115]: "Anchor(document_id: str, start: int, end: int, expected_text_hash: str, schema_version: str = \"0.1.0\")"
+        - generic [ref=f1e116]:
+          - heading "Fields" [level=4] [ref=f1e117]
+          - generic [ref=f1e118]:
+            - generic [ref=f1e119]:
+              - generic [ref=f1e120]: document_id
+              - generic [ref=f1e121]:
+                - generic [ref=f1e122]: str
+                - generic [ref=f1e123]: Parent document ID
+            - generic [ref=f1e124]:
+              - generic [ref=f1e125]: start
+              - generic [ref=f1e126]:
+                - generic [ref=f1e127]: int
+                - generic [ref=f1e128]: Start offset (0-indexed, inclusive)
+            - generic [ref=f1e129]:
+              - generic [ref=f1e130]: end
+              - generic [ref=f1e131]:
+                - generic [ref=f1e132]: int
+                - generic [ref=f1e133]: End offset (exclusive, [start, end) half-open interval)
+            - generic [ref=f1e134]:
+              - generic [ref=f1e135]: expected_text_hash
+              - generic [ref=f1e136]:
+                - generic [ref=f1e137]: str
+                - generic [ref=f1e138]: SHA256 hash of text at [start, end)
+            - generic [ref=f1e139]:
+              - generic [ref=f1e140]: schema_version
+              - generic [ref=f1e141]:
+                - generic [ref=f1e142]: str = "0.1.0"
+                - generic [ref=f1e143]: Schema version
+        - generic [ref=f1e144]:
+          - heading "Methods" [level=4] [ref=f1e145]
+          - generic [ref=f1e146]: "validate(document: Document) → None"
+          - paragraph [ref=f1e147]: Validate anchor against canonical document. Raises AnchorResolutionError if hash mismatch or out of bounds.
+        - generic [ref=f1e148]:
+          - heading "Example" [level=4] [ref=f1e149]
+          - generic [ref=f1e150]:
+            - generic [ref=f1e151]:
+              - generic [ref=f1e152]: anchor.py
+              - button "Copy code to clipboard" [ref=f1e154]:
+                - generic [ref=f1e158]: Copy
+            - region "Code example in python" [ref=f1e159]:
+              - code [ref=f1e160]:
+                - generic [ref=f1e161]: "from spanchor import Anchor anchor = Anchor( document_id=\"docs/deployment.md\", start=142, end=288, expected_text_hash=\"a1b2c3d4e5f6...\" ) # Validate against canonical document doc = Document.from_text(\"docs/deployment.md\", raw_text) anchor.validate(doc) # Raises AnchorResolutionError if invalid"
+      - generic [ref=f1e162]:
+        - generic [ref=f1e163]:
+          - heading "Query" [level=3] [ref=f1e164]
+          - generic [ref=f1e165]: class
+        - paragraph [ref=f1e166]: Question + ground-truth Anchors tuple. The unit of evaluation in SPANCHOR.
+        - generic [ref=f1e167]:
+          - heading "Signature" [level=4] [ref=f1e168]
+          - generic [ref=f1e169]: "Query(query_id: str, question: str, anchors: tuple[Anchor, ...], schema_version: str = \"0.1.0\")"
+        - generic [ref=f1e170]:
+          - heading "Fields" [level=4] [ref=f1e171]
+          - generic [ref=f1e172]:
+            - generic [ref=f1e173]:
+              - generic [ref=f1e174]: query_id
+              - generic [ref=f1e175]:
+                - generic [ref=f1e176]: str
+                - generic [ref=f1e177]: Unique query identifier (e.g., "q1", "question-42")
+            - generic [ref=f1e178]:
+              - generic [ref=f1e179]: question
+              - generic [ref=f1e180]:
+                - generic [ref=f1e181]: str
+                - generic [ref=f1e182]: Question text to be evaluated against retrieval results
+            - generic [ref=f1e183]:
+              - generic [ref=f1e184]: anchors
+              - generic [ref=f1e185]:
+                - generic [ref=f1e186]: tuple[Anchor, ...]
+                - generic [ref=f1e187]: Immutable tuple of ground-truth evidence
+            - generic [ref=f1e188]:
+              - generic [ref=f1e189]: schema_version
+              - generic [ref=f1e190]:
+                - generic [ref=f1e191]: str = "0.1.0"
+                - generic [ref=f1e192]: Schema version
+        - generic [ref=f1e193]:
+          - heading "Example" [level=4] [ref=f1e194]
+          - generic [ref=f1e195]:
+            - generic [ref=f1e196]:
+              - generic [ref=f1e197]: query.py
+              - button "Copy code to clipboard" [ref=f1e199]:
+                - generic [ref=f1e203]: Copy
+            - region "Code example in python" [ref=f1e204]:
+              - code [ref=f1e205]:
+                - generic [ref=f1e206]: "from spanchor import Query, Anchor anchor1 = Anchor( document_id=\"docs/deployment.md\", start=142, end=288, expected_text_hash=\"a1b2c3d4...\" ) query = Query( query_id=\"q1\", question=\"How do I set up database SSL connections?\", anchors=(anchor1,) # Single anchor, can be multiple )"
+      - generic [ref=f1e207]:
+        - generic [ref=f1e208]:
+          - heading "RetrievalResult" [level=3] [ref=f1e209]
+          - generic [ref=f1e210]: class
+        - paragraph [ref=f1e211]: Retrieval output (span form or chunk-text form). Supports both pre-mapped spans and raw text requiring span mapping.
+        - generic [ref=f1e212]:
+          - heading "Signature" [level=4] [ref=f1e213]
+          - generic [ref=f1e214]:
+            - generic [ref=f1e215]: RetrievalResult(
+            - generic [ref=f1e216]: "rank: int, score: float,"
+            - generic [ref=f1e217]: "document_id: str | None = None,"
+            - generic [ref=f1e218]: "start: int | None = None, end: int | None = None,"
+            - generic [ref=f1e219]: "text: str | None = None,"
+            - generic [ref=f1e220]: "span_type: str = \"text\", metadata: dict = , schema_version: str = \"0.1.0\""
+            - generic [ref=f1e221]: )
+        - generic [ref=f1e222]:
+          - heading "Fields" [level=4] [ref=f1e223]
+          - generic [ref=f1e224]:
+            - generic [ref=f1e225]:
+              - generic [ref=f1e226]: rank
+              - generic [ref=f1e227]:
+                - generic [ref=f1e228]: int
+                - generic [ref=f1e229]: Positive integer rank (1-indexed from retriever)
+            - generic [ref=f1e230]:
+              - generic [ref=f1e231]: score
+              - generic [ref=f1e232]:
+                - generic [ref=f1e233]: float
+                - generic [ref=f1e234]: Numeric relevance score from retriever
+            - generic [ref=f1e235]:
+              - generic [ref=f1e236]: document_id
+              - generic [ref=f1e237]:
+                - generic [ref=f1e238]: str | None
+                - generic [ref=f1e239]: Document ID (required for span form)
+            - generic [ref=f1e240]:
+              - generic [ref=f1e241]: start, end
+              - generic [ref=f1e242]:
+                - generic [ref=f1e243]: int | None
+                - generic [ref=f1e244]: Character offsets (required for span form, None for text form)
+            - generic [ref=f1e245]:
+              - generic [ref=f1e246]: text
+              - generic [ref=f1e247]:
+                - generic [ref=f1e248]: str | None
+                - generic [ref=f1e249]: Text chunk (required for text form, None for span form)
+            - generic [ref=f1e250]:
+              - generic [ref=f1e251]: span_type
+              - generic [ref=f1e252]:
+                - generic [ref=f1e253]: str = "text"
+                - generic [ref=f1e254]: Type classifier (e.g., "text", "table", "metadata")
+            - generic [ref=f1e255]:
+              - generic [ref=f1e256]: metadata
+              - generic [ref=f1e257]:
+                - generic [ref=f1e258]: dict[str, Any]
+                - generic [ref=f1e259]: Optional additional information for tracking
+        - generic [ref=f1e260]:
+          - heading "Example" [level=4] [ref=f1e261]
+          - generic [ref=f1e262]:
+            - generic [ref=f1e263]:
+              - generic [ref=f1e264]: retrieval_result.py
+              - button "Copy code to clipboard" [ref=f1e266]:
+                - generic [ref=f1e270]: Copy
+            - region "Code example in python" [ref=f1e271]:
+              - code [ref=f1e272]:
+                - generic [ref=f1e273]: "from spanchor import RetrievalResult # Span form (pre-mapped to document) result1 = RetrievalResult( rank=1, score=0.95, document_id=\"docs/deployment.md\", start=142, end=288, span_type=\"text\" ) # Text form (needs mapping) result2 = RetrievalResult( rank=2, score=0.87, text=\"SSL configuration requires certificate paths...\", span_type=\"text\" )"
+      - generic [ref=f1e274]:
+        - generic [ref=f1e275]:
+          - heading "Run" [level=3] [ref=f1e276]
+          - generic [ref=f1e277]: class
+        - paragraph [ref=f1e278]:
+          - text: Complete evaluation output from
+          - code [ref=f1e279]: evaluate()
+          - text: . Contains all metrics, statistics, and configuration.
+        - generic [ref=f1e280]:
+          - heading "Signature" [level=4] [ref=f1e281]
+          - generic [ref=f1e282]:
+            - generic [ref=f1e283]: Run(
+            - generic [ref=f1e284]: "timestamp: str,"
+            - generic [ref=f1e285]: "queries: tuple[Query, ...],"
+            - generic [ref=f1e286]: "per_query_metrics: dict[str, dict[str, float]],"
+            - generic [ref=f1e287]: "aggregate_metrics: dict[str, float],"
+            - generic [ref=f1e288]: "config: dict[str, Any],"
+            - generic [ref=f1e289]: "mapper_stats: dict[str, int],"
+            - generic [ref=f1e290]: "schema_version: str = \"0.1.0\""
+            - generic [ref=f1e291]: )
+        - generic [ref=f1e292]:
+          - heading "Fields" [level=4] [ref=f1e293]
+          - generic [ref=f1e294]:
+            - generic [ref=f1e295]:
+              - generic [ref=f1e296]: timestamp
+              - generic [ref=f1e297]:
+                - generic [ref=f1e298]: str
+                - generic [ref=f1e299]: ISO format timestamp (e.g., "2024-01-15T10:30:00Z")
+            - generic [ref=f1e300]:
+              - generic [ref=f1e301]: queries
+              - generic [ref=f1e302]:
+                - generic [ref=f1e303]: tuple[Query, ...]
+                - generic [ref=f1e304]: Immutable tuple of evaluated Query objects
+            - generic [ref=f1e305]:
+              - generic [ref=f1e306]: per_query_metrics
+              - generic [ref=f1e307]:
+                - generic [ref=f1e308]: dict[str, dict[str, float]]
+                - generic [ref=f1e309]:
+                  - text: Metrics per query_id (e.g.,
+                  - code [ref=f1e310]: "\"q1\": {\"recall@5\": 0.85, \"precision@5\": 0.90}"
+                  - text: )
+            - generic [ref=f1e311]:
+              - generic [ref=f1e312]: aggregate_metrics
+              - generic [ref=f1e313]:
+                - generic [ref=f1e314]: dict[str, float]
+                - generic [ref=f1e315]:
+                  - text: Macro-averaged metrics (e.g.,
+                  - code [ref=f1e316]: "\"mean_recall@5\": 0.85"
+                  - text: )
+            - generic [ref=f1e317]:
+              - generic [ref=f1e318]: config
+              - generic [ref=f1e319]:
+                - generic [ref=f1e320]: dict[str, Any]
+                - generic [ref=f1e321]: "Configuration used: k, min_overlap, ambiguity_policy, aggregation_method"
+            - generic [ref=f1e322]:
+              - generic [ref=f1e323]: mapper_stats
+              - generic [ref=f1e324]:
+                - generic [ref=f1e325]: dict[str, int]
+                - generic [ref=f1e326]: "Chunk-to-span mapping stats: MAPPED_EXACT, MAPPED_NORMALIZED, AMBIGUOUS, UNMAPPED"
+        - generic [ref=f1e327]:
+          - heading "Example" [level=4] [ref=f1e328]
+          - generic [ref=f1e329]:
+            - generic [ref=f1e330]:
+              - generic [ref=f1e331]: run.py
+              - button "Copy code to clipboard" [ref=f1e333]:
+                - generic [ref=f1e337]: Copy
+            - region "Code example in python" [ref=f1e338]:
+              - code [ref=f1e339]:
+                - generic [ref=f1e340]:
+                  - text: "from spanchor import evaluate run = evaluate( documents=[doc1, doc2], queries=[query1, query2], retrieval_results={\"q1\": [result1, result2], \"q2\": [result3]}, k=5 ) # Access results print("
+                  - generic [ref=f1e341]: "f\"Timestamp: {run.timestamp}\""
+                  - text: ) print(
+                  - generic [ref=f1e342]:
+                    - text: "f\"Queries:"
+                    - generic [ref=f1e343]: "{len(run.queries)}"
+                    - text: "\""
+                  - text: ) print(
+                  - generic [ref=f1e344]:
+                    - text: "f\"Recall@5:"
+                    - generic [ref=f1e345]: "{run.aggregate_metrics['mean_recall@5']}"
+                    - text: "\""
+                  - text: ) print(
+                  - generic [ref=f1e346]: "f\"Mapper: {run.mapper_stats}\""
+                  - text: )
+      - generic [ref=f1e347]:
+        - generic [ref=f1e348]:
+          - heading "ComparisonResult" [level=3] [ref=f1e349]
+          - generic [ref=f1e350]: class
+        - paragraph [ref=f1e351]:
+          - text: Output from
+          - code [ref=f1e352]: compare()
+          - text: . Detects regressions by comparing baseline vs candidate Run objects with policy thresholds.
+        - generic [ref=f1e353]:
+          - heading "Signature" [level=4] [ref=f1e354]
+          - generic [ref=f1e355]:
+            - generic [ref=f1e356]: ComparisonResult(
+            - generic [ref=f1e357]: "per_query_deltas: dict[str, dict[str, float]],"
+            - generic [ref=f1e358]: "per_query_status: dict[str, Literal[\"IMPROVED\", \"REGRESSION\", \"UNCHANGED\"]],"
+            - generic [ref=f1e359]: "aggregate_deltas: dict[str, float],"
+            - generic [ref=f1e360]: "has_regression: bool"
+            - generic [ref=f1e361]: )
+        - generic [ref=f1e362]:
+          - heading "Fields" [level=4] [ref=f1e363]
+          - generic [ref=f1e364]:
+            - generic [ref=f1e365]:
+              - generic [ref=f1e366]: per_query_deltas
+              - generic [ref=f1e367]:
+                - generic [ref=f1e368]: dict[str, dict[str, float]]
+                - generic [ref=f1e369]: Metric deltas (candidate - baseline) per query_id
+            - generic [ref=f1e370]:
+              - generic [ref=f1e371]: per_query_status
+              - generic [ref=f1e372]:
+                - generic [ref=f1e373]: dict[str, str]
+                - generic [ref=f1e374]: "Status per query: \"IMPROVED\", \"REGRESSION\", or \"UNCHANGED\""
+            - generic [ref=f1e375]:
+              - generic [ref=f1e376]: aggregate_deltas
+              - generic [ref=f1e377]:
+                - generic [ref=f1e378]: dict[str, float]
+                - generic [ref=f1e379]: Macro-averaged metric deltas across all queries
+            - generic [ref=f1e380]:
+              - generic [ref=f1e381]: has_regression
+              - generic [ref=f1e382]:
+                - generic [ref=f1e383]: bool
+                - generic [ref=f1e384]: True if any query regressed beyond policy threshold
+        - generic [ref=f1e385]:
+          - heading "Example" [level=4] [ref=f1e386]
+          - generic [ref=f1e387]:
+            - generic [ref=f1e388]:
+              - generic [ref=f1e389]: comparison.py
+              - button "Copy code to clipboard" [ref=f1e391]:
+                - generic [ref=f1e395]: Copy
+            - region "Code example in python" [ref=f1e396]:
+              - code [ref=f1e397]:
+                - generic [ref=f1e398]:
+                  - text: "from spanchor import compare result = compare( baseline=baseline_run, candidate=candidate_run, policy={\"mean_recall@5\": -0.05} # Fail if recall drops > 5% ) if result.has_regression: print(\"❌ Regression detected!\") for q_id, status in result.per_query_status.items(): if status == \"REGRESSION\": print("
+                  - generic [ref=f1e399]: "f\"Query {q_id}: {result.per_query_deltas[q_id]}\""
+                  - text: ") else: print(\"✅ All tests passed\")"
+    - generic [ref=f1e400]:
+      - generic [ref=f1e401]:
+        - heading "02 Evaluation" [level=2] [ref=f1e402]
+        - paragraph [ref=f1e403]: Core evaluation function with configurable policies.
+      - generic [ref=f1e404]:
+        - heading "evaluate()" [level=3] [ref=f1e405]
+        - generic [ref=f1e406]:
+          - heading "Signature" [level=4] [ref=f1e407]
+          - generic [ref=f1e408]:
+            - generic [ref=f1e409]: evaluate(
+            - generic [ref=f1e410]: "documents: list[Document],"
+            - generic [ref=f1e411]: "queries: list[Query],"
+            - generic [ref=f1e412]: "retrieval_results: dict[str, list[RetrievalResult]],"
+            - generic [ref=f1e413]: "k: int = 5,"
+            - generic [ref=f1e414]: "min_overlap: float = 0.5,"
+            - generic [ref=f1e415]: "max_unmapped_rate: float = 0.1,"
+            - generic [ref=f1e416]: "ambiguity_policy: str = \"first_unclaimed\","
+            - generic [ref=f1e417]: "aggregation_method: str = \"macro\""
+            - generic [ref=f1e418]: ) → Run
+        - generic [ref=f1e419]:
+          - heading "Parameters" [level=4] [ref=f1e420]
+          - generic [ref=f1e421]:
+            - generic [ref=f1e422]:
+              - generic [ref=f1e423]: documents
+              - generic [ref=f1e424]:
+                - generic [ref=f1e425]: list[Document]
+                - generic [ref=f1e426]: Canonical source documents (use Document.from_text())
+            - generic [ref=f1e427]:
+              - generic [ref=f1e428]: queries
+              - generic [ref=f1e429]:
+                - generic [ref=f1e430]: list[Query]
+                - generic [ref=f1e431]: Evaluation questions with ground-truth anchors
+            - generic [ref=f1e432]:
+              - generic [ref=f1e433]: retrieval_results
+              - generic [ref=f1e434]:
+                - generic [ref=f1e435]: dict[str, list[RetrievalResult]]
+                - generic [ref=f1e436]: Results indexed by query_id
+            - generic [ref=f1e437]:
+              - generic [ref=f1e438]: k
+              - generic [ref=f1e439]:
+                - generic [ref=f1e440]: int = 5
+                - generic [ref=f1e441]: Cutoff for @k metrics (recall@k, precision@k, etc.)
+            - generic [ref=f1e442]:
+              - generic [ref=f1e443]: min_overlap
+              - generic [ref=f1e444]:
+                - generic [ref=f1e445]: float = 0.5
+                - generic [ref=f1e446]: Minimum IoU (intersection over union) for span match (0.0–1.0)
+            - generic [ref=f1e447]:
+              - generic [ref=f1e448]: max_unmapped_rate
+              - generic [ref=f1e449]:
+                - generic [ref=f1e450]: float = 0.1
+                - generic [ref=f1e451]: Max allowed unmapped text-form results (0.0–1.0). Raises if exceeded.
+            - generic [ref=f1e452]:
+              - generic [ref=f1e453]: ambiguity_policy
+              - generic [ref=f1e454]:
+                - generic [ref=f1e455]: str = "first_unclaimed"
+                - generic [ref=f1e456]: "Conflict resolution: \"first_unclaimed\", \"all_matches\", \"longest\""
+            - generic [ref=f1e457]:
+              - generic [ref=f1e458]: aggregation_method
+              - generic [ref=f1e459]:
+                - generic [ref=f1e460]: str = "macro"
+                - generic [ref=f1e461]: "Averaging method: \"macro\" (unweighted mean), \"micro\" (global)"
+        - generic [ref=f1e462]:
+          - heading "Returns" [level=4] [ref=f1e463]
+          - generic [ref=f1e464]: Run — Complete evaluation output with metrics and config
+        - generic [ref=f1e465]:
+          - heading "Example" [level=4] [ref=f1e466]
+          - generic [ref=f1e467]:
+            - generic [ref=f1e468]:
+              - generic [ref=f1e469]: evaluate_example.py
+              - button "Copy code to clipboard" [ref=f1e471]:
+                - generic [ref=f1e475]: Copy
+            - region "Code example in python" [ref=f1e476]:
+              - code [ref=f1e477]:
+                - generic [ref=f1e478]: "from spanchor import evaluate run = evaluate( documents=[doc1, doc2, doc3], queries=[q1, q2, q3], retrieval_results={ \"q1\": [res1, res2, res3], \"q2\": [res4, res5], \"q3\": [res6, res7, res8] }, k=5, min_overlap=0.5, max_unmapped_rate=0.1, ambiguity_policy=\"first_unclaimed\", aggregation_method=\"macro\" ) print(run.aggregate_metrics) print(run.mapper_stats)"
+    - generic [ref=f1e479]:
+      - generic [ref=f1e480]:
+        - heading "03 Metrics" [level=2] [ref=f1e481]
+        - paragraph [ref=f1e482]: Five verified metrics computed per query and aggregated. Keys in Run objects use @k notation.
+      - generic [ref=f1e483]:
+        - generic [ref=f1e484]:
+          - heading "recall@k" [level=3] [ref=f1e485]
+          - paragraph [ref=f1e486]: Fraction of ground-truth anchors covered by top-k results. Higher is better (0.0–1.0).
+          - paragraph [ref=f1e487]: "Definition: (anchors hit in top-k) / (total anchors)"
+          - paragraph [ref=f1e488]: Intersection-over-Union (IoU) ≥ min_overlap required for a hit.
+        - generic [ref=f1e489]:
+          - heading "precision@k" [level=3] [ref=f1e490]
+          - paragraph [ref=f1e491]: Fraction of top-k results that hit ground-truth anchors. Higher is better (0.0–1.0).
+          - paragraph [ref=f1e492]: "Definition: (results hit) / (top-k results)"
+          - paragraph [ref=f1e493]: Measures retriever quality; penalizes false positives.
+        - generic [ref=f1e494]:
+          - heading "hit@k" [level=3] [ref=f1e495]
+          - paragraph [ref=f1e496]: "Binary: 1.0 if any anchor is covered in top-k, else 0.0."
+          - paragraph [ref=f1e497]: "Definition: 1.0 if ∃ result in top-k with IoU ≥ min_overlap else 0.0"
+          - paragraph [ref=f1e498]: Useful for ranking-agnostic evaluation ("does the answer exist?").
+        - generic [ref=f1e499]:
+          - heading "full_evidence@k" [level=3] [ref=f1e500]
+          - paragraph [ref=f1e501]: "Binary: 1.0 if ALL ground-truth anchors are covered in top-k, else 0.0."
+          - paragraph [ref=f1e502]: "Definition: 1.0 if all anchors covered in top-k else 0.0"
+          - paragraph [ref=f1e503]: "Strict mode: all evidence must be retrievable in the result set."
+        - generic [ref=f1e504]:
+          - heading "iou" [level=3] [ref=f1e505]
+          - paragraph [ref=f1e506]: Mean intersection-over-union across all query-result pairs in top-k. Measures span overlap quality.
+          - paragraph [ref=f1e507]: "Definition: mean(|intersection| / |union|) for each query-result pair"
+          - paragraph [ref=f1e508]: Complements recall/precision; penalizes close-but-wrong spans.
+    - generic [ref=f1e509]:
+      - generic [ref=f1e510]:
+        - heading "04 Comparison" [level=2] [ref=f1e511]
+        - paragraph [ref=f1e512]: Compare baseline and candidate Runs with policy-based regression detection.
+      - generic [ref=f1e513]:
+        - heading "compare()" [level=3] [ref=f1e514]
+        - generic [ref=f1e515]:
+          - heading "Signature" [level=4] [ref=f1e516]
+          - generic [ref=f1e517]:
+            - generic [ref=f1e518]: compare(
+            - generic [ref=f1e519]: "baseline: Run,"
+            - generic [ref=f1e520]: "candidate: Run,"
+            - generic [ref=f1e521]: "policy: dict[str, float],"
+            - generic [ref=f1e522]: "min_query_count: int | None = None"
+            - generic [ref=f1e523]: ) → ComparisonResult
+        - generic [ref=f1e524]:
+          - heading "Parameters" [level=4] [ref=f1e525]
+          - generic [ref=f1e526]:
+            - generic [ref=f1e527]:
+              - generic [ref=f1e528]: baseline
+              - generic [ref=f1e529]:
+                - generic [ref=f1e530]: Run
+                - generic [ref=f1e531]: Baseline evaluation run
+            - generic [ref=f1e532]:
+              - generic [ref=f1e533]: candidate
+              - generic [ref=f1e534]:
+                - generic [ref=f1e535]: Run
+                - generic [ref=f1e536]: Candidate evaluation run
+            - generic [ref=f1e537]:
+              - generic [ref=f1e538]: policy
+              - generic [ref=f1e539]:
+                - generic [ref=f1e540]: dict[str, float]
+                - generic [ref=f1e541]:
+                  - text: Thresholds by metric name (e.g.,
+                  - code [ref=f1e542]: "\"mean_recall@5\": -0.05"
+                  - text: = fail if recall drops > 5%)
+            - generic [ref=f1e543]:
+              - generic [ref=f1e544]: min_query_count
+              - generic [ref=f1e545]:
+                - generic [ref=f1e546]: int | None = None
+                - generic [ref=f1e547]: Minimum queries to run on. If None, uses baseline query count.
+        - generic [ref=f1e548]:
+          - heading "Returns" [level=4] [ref=f1e549]
+          - generic [ref=f1e550]: ComparisonResult — Deltas, status, and has_regression flag
+        - generic [ref=f1e551]:
+          - heading "Example" [level=4] [ref=f1e552]
+          - generic [ref=f1e553]:
+            - generic [ref=f1e554]:
+              - generic [ref=f1e555]: compare_example.py
+              - button "Copy code to clipboard" [ref=f1e557]:
+                - generic [ref=f1e561]: Copy
+            - region "Code example in python" [ref=f1e562]:
+              - code [ref=f1e563]:
+                - generic [ref=f1e564]: "from spanchor import compare # CI policy: fail if recall drops more than 5% policy = { \"mean_recall@5\": -0.05, \"mean_precision@5\": -0.03 } result = compare( baseline=baseline_run, candidate=candidate_run, policy=policy, min_query_count=None ) if result.has_regression: print(\"❌ Regression: metrics fell below policy thresholds\") exit(1) else: print(\"✅ All metrics within policy\") exit(0)"
+    - generic [ref=f1e565]:
+      - generic [ref=f1e566]:
+        - heading "05 Regression / CI" [level=2] [ref=f1e567]
+        - paragraph [ref=f1e568]: Detect regressions in CI/CD pipelines by comparing baseline and candidate retrieval runs.
+      - generic [ref=f1e569]:
+        - heading "Workflow" [level=3] [ref=f1e570]
+        - generic [ref=f1e571]:
+          - generic [ref=f1e572]:
+            - generic [ref=f1e573]: "1."
+            - generic [ref=f1e574]:
+              - strong [ref=f1e575]: "Establish Baseline:"
+              - text: Run
+              - code [ref=f1e576]: evaluate()
+              - text: on production or main branch. Save the Run to disk.
+          - generic [ref=f1e577]:
+            - generic [ref=f1e578]: "2."
+            - generic [ref=f1e579]:
+              - strong [ref=f1e580]: "Run Candidate:"
+              - text: On PR or feature branch, run
+              - code [ref=f1e581]: evaluate()
+              - text: with new retrieval model.
+          - generic [ref=f1e582]:
+            - generic [ref=f1e583]: "3."
+            - generic [ref=f1e584]:
+              - strong [ref=f1e585]: "Compare:"
+              - text: Call
+              - code [ref=f1e586]: compare(baseline, candidate, policy)
+              - text: with thresholds.
+          - generic [ref=f1e587]:
+            - generic [ref=f1e588]: "4."
+            - generic [ref=f1e589]:
+              - strong [ref=f1e590]: "Gate Decision:"
+              - text: If
+              - code [ref=f1e591]: result.has_regression == True
+              - text: ", fail the CI job. Otherwise, merge."
+      - generic [ref=f1e592]:
+        - heading "CI Integration Example" [level=4] [ref=f1e593]
+        - generic [ref=f1e594]:
+          - generic [ref=f1e595]:
+            - generic [ref=f1e596]: ci_workflow.sh
+            - button "Copy code to clipboard" [ref=f1e598]:
+              - generic [ref=f1e602]: Copy
+          - region "Code example in bash" [ref=f1e603]:
+            - code [ref=f1e604]:
+              - generic [ref=f1e605]: "# .github/workflows/ci.yml (pseudo) - name: Evaluate candidate model run: | python -m spanchor evaluate \\ --documents docs/ \\ --queries queries.json \\ --results retrieval_results.json \\ --output candidate_run.json - name: Compare with baseline run: | python -c \" from spanchor import Run, compare import json with open('baseline_run.json') as f: baseline = Run.from_json(f.read()) with open('candidate_run.json') as f: candidate = Run.from_json(f.read()) policy = {'mean_recall@5': -0.05} result = compare(baseline, candidate, policy) if result.has_regression: print('REGRESSION DETECTED') exit(1) else: print('All tests passed') exit(0) \""
+    - generic [ref=f1e606]:
+      - generic [ref=f1e607]:
+        - heading "06 CLI Reference" [level=2] [ref=f1e608]
+        - paragraph [ref=f1e609]: Command-line interface for SPANCHOR evaluation, comparison, and debugging.
+      - generic [ref=f1e610]:
+        - generic [ref=f1e611]:
+          - heading "spanchor validate" [level=3] [ref=f1e612]
+          - paragraph [ref=f1e613]: Validate corpus health and anchor integrity.
+          - generic [ref=f1e614]: spanchor validate [--documents DIR] [--queries FILE]
+          - paragraph [ref=f1e615]: "Output: List of validation errors or \"✅ All anchors valid\"."
+        - generic [ref=f1e616]:
+          - heading "spanchor evaluate" [level=3] [ref=f1e617]
+          - paragraph [ref=f1e618]: Run full evaluation and output metrics to JSON.
+          - generic [ref=f1e619]: spanchor evaluate --documents DIR --queries FILE --results FILE [--output FILE] [--k 5]
+          - paragraph [ref=f1e620]: "Output: Run object serialized to JSON. Includes per-query and aggregate metrics."
+        - generic [ref=f1e621]:
+          - heading "spanchor compare" [level=3] [ref=f1e622]
+          - paragraph [ref=f1e623]: Compare baseline and candidate runs with policy thresholds.
+          - generic [ref=f1e624]: spanchor compare --baseline FILE --candidate FILE [--policy FILE] [--json]
+          - paragraph [ref=f1e625]: "Output: Table or JSON. Exit code 0 if no regression, 1 if regression detected."
+        - generic [ref=f1e626]:
+          - heading "spanchor locate" [level=3] [ref=f1e627]
+          - paragraph [ref=f1e628]: "Debug: Find and display the text at an anchor's character span."
+          - generic [ref=f1e629]: spanchor locate --document FILE --start INT --end INT
+          - paragraph [ref=f1e630]: "Output: Text snippet at [start, end), useful for verifying anchors."
+        - generic [ref=f1e631]:
+          - heading "spanchor check-corpus" [level=3] [ref=f1e632]
+          - paragraph [ref=f1e633]: "Validate corpus health: check for orphaned anchors, hash mismatches, etc."
+          - generic [ref=f1e634]: spanchor check-corpus --documents DIR --queries FILE [--fix]
+          - paragraph [ref=f1e635]: "Output: List of issues or \"✅ Corpus is healthy\". With --fix, attempt automatic repair."
+        - generic [ref=f1e636]:
+          - heading "spanchor anchor" [level=3] [ref=f1e637]
+          - paragraph [ref=f1e638]: Create or extract anchors from document text (interactive tool).
+          - generic [ref=f1e639]: spanchor anchor --document FILE [--query TEXT]
+          - paragraph [ref=f1e640]: "Output: Anchor JSON object with document_id, start, end, and expected_text_hash."
+    - generic [ref=f1e641]:
+      - generic [ref=f1e642]:
+        - heading "07 Exceptions" [level=2] [ref=f1e643]
+        - paragraph [ref=f1e644]: Ten exception types for error handling and debugging.
+      - generic [ref=f1e645]:
+        - generic [ref=f1e646]:
+          - heading "SpanchorError" [level=3] [ref=f1e647]
+          - paragraph [ref=f1e648]: Base exception for all SPANCHOR errors.
+        - generic [ref=f1e649]:
+          - heading "AnchorResolutionError" [level=3] [ref=f1e650]
+          - paragraph [ref=f1e651]: "Anchor validation failed: span out of bounds, hash mismatch, or text not found."
+        - generic [ref=f1e652]:
+          - heading "DocumentNotFoundError" [level=3] [ref=f1e653]
+          - paragraph [ref=f1e654]: Document ID referenced in anchor or query does not exist in corpus.
+        - generic [ref=f1e655]:
+          - heading "EvaluationError" [level=3] [ref=f1e656]
+          - paragraph [ref=f1e657]: Evaluation failed (invalid config, unmapped rate exceeded, etc.).
+        - generic [ref=f1e658]:
+          - heading "HashMismatchError" [level=3] [ref=f1e659]
+          - paragraph [ref=f1e660]: Document text changed but SHA256 hash in anchor does not match.
+        - generic [ref=f1e661]:
+          - heading "InvalidRetrievalResultError" [level=3] [ref=f1e662]
+          - paragraph [ref=f1e663]: RetrievalResult is malformed (missing required fields, conflicting form, etc.).
+        - generic [ref=f1e664]:
+          - heading "InvalidSchemaError" [level=3] [ref=f1e665]
+          - paragraph [ref=f1e666]: Object schema version unsupported or data structure invalid.
+        - generic [ref=f1e667]:
+          - heading "OrphanedAnchorError" [level=3] [ref=f1e668]
+          - paragraph [ref=f1e669]: Anchor's document_id does not exist in corpus.
+        - generic [ref=f1e670]:
+          - heading "ComparisonError" [level=3] [ref=f1e671]
+          - paragraph [ref=f1e672]: "Comparison failed: baseline and candidate have incompatible schemas or query sets."
+        - generic [ref=f1e673]:
+          - heading "CorpusIssue" [level=3] [ref=f1e674]
+          - paragraph [ref=f1e675]: Corpus validation detected issues (via check_corpus()). Contains list of problems.
+    - generic [ref=f1e676]:
+      - generic [ref=f1e677]:
+        - heading "08 Type Reference" [level=2] [ref=f1e678]
+        - paragraph [ref=f1e679]: Compact reference for type aliases and serialization.
+      - generic [ref=f1e680]:
+        - heading "Serialization" [level=4] [ref=f1e681]
+        - paragraph [ref=f1e682]:
+          - text: All core objects support JSON serialization via
+          - code [ref=f1e683]: .to_json()
+          - text: and
+          - code [ref=f1e684]: .from_json()
+          - text: .
+        - generic [ref=f1e685]:
+          - generic [ref=f1e686]:
+            - generic [ref=f1e687]: serialization.py
+            - button "Copy code to clipboard" [ref=f1e689]:
+              - generic [ref=f1e693]: Copy
+          - region "Code example in python" [ref=f1e694]:
+            - code [ref=f1e695]:
+              - generic [ref=f1e696]: "from spanchor import Document, Query, Run # Serialize doc = Document.from_text(\"docs/deployment.md\", raw_text) json_str = doc.to_json() # Deserialize doc2 = Document.from_json(json_str) # Run objects save/load from file run.save(\"run_output.json\") loaded_run = Run.load(\"run_output.json\")"
+      - generic [ref=f1e697]:
+        - heading "Type Aliases" [level=4] [ref=f1e698]
+        - generic [ref=f1e699]:
+          - generic [ref=f1e700]:
+            - generic [ref=f1e701]: DocumentMap
+            - generic [ref=f1e702]:
+              - generic [ref=f1e703]: dict[str, Document]
+              - generic [ref=f1e704]: Indexed documents by document_id
+          - generic [ref=f1e705]:
+            - generic [ref=f1e706]: MetricsDict
+            - generic [ref=f1e707]:
+              - generic [ref=f1e708]: dict[str, float]
+              - generic [ref=f1e709]: Metric name → value mapping
+          - generic [ref=f1e710]:
+            - generic [ref=f1e711]: StatusLiteral
+            - generic [ref=f1e712]:
+              - generic [ref=f1e713]: Literal["IMPROVED", "REGRESSION", "UNCHANGED"]
+              - generic [ref=f1e714]: Comparison status per query
+    - generic [ref=f1e715]:
+      - heading "Learn More" [level=2] [ref=f1e716]
+      - generic [ref=f1e717]:
+        - link "📖 Documentation Comprehensive guide to SPANCHOR concepts and workflow" [ref=f1e718] [cursor=pointer]:
+          - /url: /docs
+          - generic [ref=f1e719]: 📖
+          - generic [ref=f1e720]:
+            - generic [ref=f1e721]: Documentation
+            - generic [ref=f1e722]: Comprehensive guide to SPANCHOR concepts and workflow
+        - 'link "💻 Examples Real-world use cases: evaluation, comparison, CI/CD" [ref=f1e723] [cursor=pointer]':
+          - /url: /examples
+          - generic [ref=f1e724]: 💻
+          - generic [ref=f1e725]:
+            - generic [ref=f1e726]: Examples
+            - generic [ref=f1e727]: "Real-world use cases: evaluation, comparison, CI/CD"
+        - link "🚀 Quickstart Get up and running in 5 minutes" [ref=f1e728] [cursor=pointer]:
+          - /url: /quickstart
+          - generic [ref=f1e729]: 🚀
+          - generic [ref=f1e730]:
+            - generic [ref=f1e731]: Quickstart
+            - generic [ref=f1e732]: Get up and running in 5 minutes
+        - link "🏗️ Architecture How SPANCHOR works under the hood" [ref=f1e733] [cursor=pointer]:
+          - /url: /architecture
+          - generic [ref=f1e734]: 🏗️
+          - generic [ref=f1e735]:
+            - generic [ref=f1e736]: Architecture
+            - generic [ref=f1e737]: How SPANCHOR works under the hood
+  - contentinfo [ref=f1e738]:
+    - generic [ref=f1e739]:
+      - generic [ref=f1e740]:
+        - generic [ref=f1e741]:
+          - heading "SPANCHOR" [level=2] [ref=f1e742]
+          - paragraph [ref=f1e743]: Source-anchored regression testing for RAG retrieval pipelines.
+        - generic [ref=f1e744]:
+          - heading "Resources" [level=3] [ref=f1e745]
+          - navigation "Footer resources" [ref=f1e746]:
+            - link "Documentation" [ref=f1e747] [cursor=pointer]:
+              - /url: /docs
+            - link "GitHub (opens in new tab)" [ref=f1e748] [cursor=pointer]:
+              - /url: https://github.com/Mukeshram-07/spanchor
+              - text: GitHub
+            - link "PyPI (opens in new tab)" [ref=f1e749] [cursor=pointer]:
+              - /url: https://pypi.org/project/spanchor/
+              - text: PyPI
+            - link "Examples" [ref=f1e750] [cursor=pointer]:
+              - /url: /examples
+            - link "API" [ref=f1e751] [cursor=pointer]:
+              - /url: /api
+        - generic [ref=f1e752]:
+          - heading "Info" [level=3] [ref=f1e753]
+          - list [ref=f1e754]:
+            - listitem [ref=f1e755]: "License: Apache-2.0"
+            - listitem [ref=f1e756]: "Python: 3.11 – 3.13"
+            - listitem [ref=f1e757]: "Type: Package"
+      - paragraph [ref=f1e759]: © 2026 SPANCHOR. All rights reserved.
