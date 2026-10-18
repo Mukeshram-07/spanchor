@@ -56,10 +56,13 @@ class TestGoldReviewCommand:
         """Help text displays correctly for gold review command."""
         result = runner.invoke(app, ["gold", "review", "--help"])
         assert result.exit_code == 0
-        assert "review" in result.stdout.lower()
-        assert "candidate" in result.stdout.lower()
-        assert "--approve" in result.stdout
-        assert "--reject" in result.stdout
+        # Strip ANSI color codes for assertion
+        import re
+        clean_output = re.sub(r'\x1b\[[0-9;]*m', '', result.stdout)
+        assert "review" in clean_output.lower()
+        assert "candidate" in clean_output.lower()
+        assert "--approve" in clean_output
+        assert "--reject" in clean_output
 
     def test_gold_review_missing_args(self) -> None:
         """Command fails without required arguments."""
