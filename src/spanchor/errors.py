@@ -134,7 +134,8 @@ class HashMismatchError(SpanchorError):
                 f"  - actual_hash: {actual_hash[:16]}...",
                 "Suggested action: The source document has changed. Either:",
                 "  1. Restore the original document version, or",
-                "  2. Re-validate and update the anchor with the new hash using 'spanchor validate'",
+                "  2. Re-validate and update the anchor with the new hash",
+                "     using 'spanchor validate'",
             ]
         )
 

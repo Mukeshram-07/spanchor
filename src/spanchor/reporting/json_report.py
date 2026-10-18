@@ -73,6 +73,8 @@ def generate_comparison_json(
     - has_regression flag
     - Baseline and candidate timestamps / configs
     - Schema versions for both runs
+    - Optional bootstrap confidence intervals (Feature 8.1)
+    - Optional set-wise metric deltas (Feature 8.3)
 
     If redact=True, query question text is omitted from the per-query
     entries so source text is never exposed in the output (Req 22.6).
@@ -110,7 +112,7 @@ def generate_comparison_json(
                 entry["question"] = question
         per_query[query_id] = entry
 
-    return {
+    result: dict[str, object] = {
         "has_regression": comparison.has_regression,
         "aggregate_deltas": dict(comparison.aggregate_deltas),
         "per_query": per_query,
@@ -125,3 +127,30 @@ def generate_comparison_json(
             "config": dict(candidate.config),
         },
     }
+
+    # Add bootstrap confidence intervals if available (Feature 8.1)
+    if comparison.statistics_enabled and comparison.bootstrap_results:
+        ci_data: dict[str, dict[str, object]] = {}
+        for metric_name, bootstrap_result in comparison.bootstrap_results.items():
+            ci_data[metric_name] = {
+                "mean_delta": bootstrap_result.mean_delta,
+                "lower_ci": bootstrap_result.lower_ci,
+                "upper_ci": bootstrap_result.upper_ci,
+                "ci_level": bootstrap_result.ci_level,
+                "num_paired_queries": bootstrap_result.num_paired_queries,
+                "num_resamples": bootstrap_result.num_resamples,
+            }
+        result["aggregate_confidence_intervals"] = ci_data
+        result["statistics_enabled"] = True
+        result["num_paired_queries"] = comparison.num_paired_queries
+
+    # Add set-wise metric deltas if available (Feature 8.3)
+    if comparison.setwise_aggregate_deltas:
+        result["setwise_aggregate_deltas"] = dict(comparison.setwise_aggregate_deltas)
+
+    if comparison.setwise_deltas is not None:
+        result["per_query_setwise_deltas"] = {
+            qid: dict(deltas) for qid, deltas in comparison.setwise_deltas.items()
+        }
+
+    return result

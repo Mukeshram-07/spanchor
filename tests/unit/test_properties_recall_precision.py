@@ -173,7 +173,7 @@ class TestRecallPrecisionProperties:
         ),  # At least 3 for K and K+1
         k=st.integers(min_value=1, max_value=10),  # Independently generate K
     )
-    @settings(suppress_health_check=[HealthCheck.filter_too_much])
+    @settings(suppress_health_check=[HealthCheck.filter_too_much, HealthCheck.too_slow])
     def test_recall_monotonicity(
         self,
         gold_spans: list[Interval],
@@ -252,6 +252,7 @@ class TestRecallPrecisionProperties:
         gold_spans=intervals_strategy(min_intervals=1, max_intervals=10),
         retrieved_spans=intervals_strategy(min_intervals=0, max_intervals=10),
     )
+    @settings(suppress_health_check=[HealthCheck.too_slow])
     def test_recall_error_on_invalid_k(
         self,
         gold_spans: list[Interval],
@@ -291,6 +292,7 @@ class TestRecallPrecisionProperties:
         gold_spans=intervals_strategy(min_intervals=0, max_intervals=10),
         retrieved_spans=intervals_strategy(min_intervals=0, max_intervals=10),
     )
+    @settings(suppress_health_check=[HealthCheck.too_slow])
     def test_precision_error_on_invalid_k(
         self,
         gold_spans: list[Interval],

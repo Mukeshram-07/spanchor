@@ -164,8 +164,10 @@ def merge_policy(
 
         if key == "min_query_count":
             if not isinstance(value, int):
+                val_type = type(value).__name__
                 raise ValueError(
-                    f"min_query_count override must be an integer, got {type(value).__name__}: {value!r}"
+                    f"min_query_count override must be an integer, "
+                    f"got {val_type}: {value!r}"
                 )
             new_min_query_count = value
         elif key == "thresholds":
@@ -237,7 +239,7 @@ def _parse_policy_dict(data: dict[str, Any], source: str = "<dict>") -> Regressi
 
 def _validate_threshold(metric: str, value: Any, source: str = "<dict>") -> None:
     """Raise ValueError if a threshold value is not a valid non-negative number."""
-    if not isinstance(value, (int, float)):
+    if not isinstance(value, int | float):
         raise ValueError(
             f"Threshold for metric '{metric}' must be a number, "
             f"got {type(value).__name__}: {value!r}  [{source}]"

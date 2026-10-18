@@ -6,6 +6,8 @@ This module provides the main evaluate() API that orchestrates:
 - Metric computation (Recall@K, Precision@K, Hit@K, FullEvidence@K, IoU)
 - Aggregate metric calculation
 - Unmapped rate checking
+- Corpus and gold-set versioning (hashing and mismatch detection)
+- Pluggable metric registry (optional)
 """
 
 import warnings
@@ -13,13 +15,11 @@ from collections import defaultdict
 from datetime import UTC, datetime
 from typing import Literal
 
+from spanchor.corpus.fingerprint import compute_corpus_hash, compute_gold_set_hash
 from spanchor.errors import DocumentNotFoundError, EvaluationError
 from spanchor.evaluation.aggregation import aggregate_metrics
-from spanchor.evaluation.hit import full_evidence_at_k, hit_at_k
 from spanchor.evaluation.intervals import Interval
-from spanchor.evaluation.iou import iou
-from spanchor.evaluation.precision import precision_at_k
-from spanchor.evaluation.recall import recall_at_k
+from spanchor.evaluation.metrics import MetricRegistry
 from spanchor.mapping.mapper import ChunkMapper
 from spanchor.models.document import Document
 from spanchor.models.query import Query
@@ -36,6 +36,9 @@ def evaluate(
     max_unmapped_rate: float = 0.1,
     ambiguity_policy: Literal["first_unclaimed", "all_occurrences", "fail"] = "first_unclaimed",
     aggregation_method: Literal["macro", "micro"] = "macro",
+    gold_set_hash: str | None = None,
+    corpus_mismatch_policy: Literal["warn", "fail", "ignore"] = "warn",
+    metric_registry: MetricRegistry | None = None,
 ) -> Run:
     """Evaluate retrieval results against gold anchors.
 
@@ -45,6 +48,8 @@ def evaluate(
     3. Computes per-query metrics (Recall@K, Precision@K, Hit@K, FullEvidence@K, IoU)
     4. Computes aggregate metrics (macro-average across queries by default)
     5. Checks unmapped rate against threshold
+    6. Computes corpus and gold-set hashes for versioning
+    7. Validates mismatch (if gold_set_hash provided)
 
     Args:
         documents: Dictionary mapping document_id to Document objects
@@ -53,17 +58,27 @@ def evaluate(
         k: K value for metrics (Recall@K, Precision@K, etc.) (default: 5)
         min_overlap: Minimum overlap fraction for Hit@K and FullEvidence@K (default: 0.5)
         max_unmapped_rate: Maximum allowed unmapped chunk rate (default: 0.1)
-        ambiguity_policy: How to handle ambiguous chunk mappings (default: "first_unclaimed")
+        ambiguity_policy: How to handle ambiguous chunk mappings
+            (default: "first_unclaimed")
         aggregation_method: Aggregation strategy - "macro" (default) or "micro"
             - "macro": Equal weight per query (average metric values)
-            - "micro": Weight proportional to gold span size (aggregate spans first)
+            - "micro": Weight proportional to gold span size
+              (aggregate spans first)
+        gold_set_hash: Expected SHA256 hash of gold-set structure (str | None).
+            If provided, computed hash must match or mismatch policy is applied.
+        corpus_mismatch_policy: How to handle hash mismatches ("warn", "fail", "ignore")
+            - "warn": Emit UserWarning if hash mismatch detected, continue
+            - "fail": Raise EvaluationError if hash mismatch detected
+            - "ignore": Don't check hash, skip mismatch detection
+        metric_registry: Optional MetricRegistry for pluggable metrics.
+            If None, a default registry is created with all 5 standard metrics.
 
     Returns:
-        Run object containing all metrics, statistics, and configuration
+        Run object containing all metrics, statistics, configuration, and hashes
 
     Raises:
         DocumentNotFoundError: If an anchor references a missing document
-        EvaluationError: If validation or metric computation fails
+        EvaluationError: If validation, metric computation, or hash mismatch fails
         AnchorResolutionError: If an anchor cannot be validated against its document
         HashMismatchError: If document hash doesn't match anchor expectations
 
@@ -84,9 +99,15 @@ def evaluate(
         ... )
         >>> run.aggregate_metrics["mean_recall@5"]
         1.0
+        >>> len(run.corpus_hash) > 0  # SHA256 hash computed
+        True
 
     **Validates: Requirements 11.3, 11.4, 11.5, 11.6, 11.7, 5.11, 5.12, 10.1, 10.2**
     """
+    # Create default registry if not provided (Requirement: backward compat)
+    if metric_registry is None:
+        metric_registry = MetricRegistry(k=k, min_overlap=min_overlap)
+
     # Validate K parameter
     if k <= 0:
         raise EvaluationError(
@@ -161,7 +182,7 @@ def evaluate(
                 mapper_stats[mapping_result.status] += 1
 
                 # Add mapped spans to query results
-                for doc_id, start, end in mapping_result.spans:
+                for _, start, end in mapping_result.spans:
                     # Create interval for this span
                     interval = (start, end)
                     query_spans.append((interval, result.rank, result.score))
@@ -184,8 +205,12 @@ def evaluate(
     if total_chunks > 0:
         unmapped_rate = unmapped_count / total_chunks
         if unmapped_rate > max_unmapped_rate:
+            message = (
+                f"Unmapped chunk rate ({unmapped_rate:.2%}) "
+                f"exceeds threshold ({max_unmapped_rate:.2%})"
+            )
             raise EvaluationError(
-                message=f"Unmapped chunk rate ({unmapped_rate:.2%}) exceeds threshold ({max_unmapped_rate:.2%})",
+                message=message,
                 metric_name="evaluate",
                 values={
                     "unmapped_count": unmapped_count,
@@ -209,40 +234,70 @@ def evaluate(
         # Skip queries with no gold spans (cannot compute meaningful metrics)
         if not gold_spans:
             # Store zeros for queries with no gold anchors
-            per_query_metrics[query_id] = {
-                f"recall@{k}": 0.0,
-                f"precision@{k}": 0.0,
-                f"hit@{k}": 0.0,
-                f"full_evidence@{k}": 0.0,
-                "iou": 0.0,
-                "retrieved_chars": 0,
-            }
+            # Match the exact keys from the registry
+            default_metrics: dict[str, float] = {}
+            for metric_name in metric_registry.get_all_metrics():
+                default_metrics[metric_name] = 0.0
+            default_metrics["retrieved_chars"] = 0.0
+            per_query_metrics[query_id] = default_metrics
             continue
 
         # Get retrieved spans for this query
         query_spans = mapped_retrieval_spans.get(query_id, [])
         retrieved_spans: list[Interval] = [span for span, _, _ in query_spans]
 
-        # Compute metrics (Requirement 11.5)
+        # Compute metrics using registry (Requirement 11.5)
         metrics: dict[str, float] = {}
 
         try:
-            # Recall@K (Requirement 11.5)
-            metrics[f"recall@{k}"] = recall_at_k(gold_spans, retrieved_spans, k)
+            # For standard metrics (Recall, Precision, Hit, FullEvidence, IoU)
+            # Compute from gold and retrieved spans
+            registry_metrics = metric_registry.compute_all(gold_spans, retrieved_spans)
+            metrics.update(registry_metrics)
 
-            # Precision@K (Requirement 11.5)
-            metrics[f"precision@{k}"] = precision_at_k(gold_spans, retrieved_spans, k)
+            # For set-level metrics (Span Concentration, Fragmentation, Pairwise Overlap)
+            # Build retrieved_spans with document_id info
+            # Map back from intervals to their original document_id by re-scanning
+            # mapped_retrieval_spans. We need to reconstruct: list[tuple[doc_id, start, end]]
+            #
+            # Unfortunately, after mapping, we've lost document_id info on the query_spans.
+            # We need to track document_id through the mapping process.
+            #
+            # For now, we'll compute set-level metrics separately by building the info from
+            # the results
+            retrieved_spans_with_doc: list[tuple[str, int, int]] = []
+            for result in retrieval_results.get(query_id, []):
+                if result.needs_mapping():
+                    # This was chunk-text form that got mapped
+                    # The mapping gives us (doc_id, start, end) from the ChunkMapper
+                    mapping_result = mapper.map_chunk(
+                        chunk_text=result.text or "",
+                        document_id=result.document_id,
+                    )
+                    for _, start, end in mapping_result.spans:
+                        if result.document_id:  # Use the mapped document_id
+                            retrieved_spans_with_doc.append((result.document_id, start, end))
+                else:
+                    # Span form - already has document_id
+                    if result.document_id and result.start is not None and result.end is not None:
+                        retrieved_spans_with_doc.append(
+                            (result.document_id, result.start, result.end)
+                        )
 
-            # Hit@K (Requirement 11.5)
-            metrics[f"hit@{k}"] = float(hit_at_k(gold_spans, retrieved_spans, k, min_overlap))
-
-            # FullEvidence@K (Requirement 11.5)
-            metrics[f"full_evidence@{k}"] = float(
-                full_evidence_at_k(gold_spans, retrieved_spans, k, min_overlap)
-            )
-
-            # IoU (Requirement 11.5)
-            metrics["iou"] = iou(gold_spans, retrieved_spans)
+            # Compute set-level metrics only if they're registered in the metric registry
+            # This respects custom registries that may not include these metrics
+            for metric_name in ["span_concentration", "fragmentation_ratio", "pairwise_overlap"]:
+                if metric_registry.get(metric_name):
+                    if retrieved_spans_with_doc:
+                        # Compute via registry
+                        metrics[metric_name] = metric_registry.compute_metric(
+                            metric_name=metric_name,
+                            gold_spans=[],  # Set-wise metrics don't use gold spans
+                            retrieved_spans=retrieved_spans_with_doc,  # type: ignore
+                        )
+                    else:
+                        # No retrieved spans - set to 0.0
+                        metrics[metric_name] = 0.0
 
             # Retrieved character count (token-cost proxy) (Requirement 10.3)
             from spanchor.evaluation.intervals import length, union
@@ -257,7 +312,7 @@ def evaluate(
                 query_id=query_id,
                 metric_name=e.metric_name,
                 values=e.values,
-            )
+            ) from e
 
         per_query_metrics[query_id] = metrics
 
@@ -267,6 +322,39 @@ def evaluate(
         queries=queries,
         aggregation_method=aggregation_method,  # Use the parameter (Requirement 10.1, 10.2)
     )
+
+    # Step 6.5: Compute corpus hash and validate gold-set hash (Feature 1)
+    # Per D1: Corpus hash = SHA256(JSON of sorted documents by doc_id)
+    documents_list = list(documents.values())
+    computed_corpus_hash = compute_corpus_hash(documents_list)
+
+    # Per D2: Gold-set hash = SHA256(JSON of query structure only (not text))
+    computed_gold_set_hash = compute_gold_set_hash(queries)
+
+    # Validate gold-set hash mismatch if provided
+    if gold_set_hash is not None and corpus_mismatch_policy != "ignore":
+        if computed_gold_set_hash != gold_set_hash:
+            mismatch_msg = (
+                f"Gold-set hash mismatch: "
+                f"expected {gold_set_hash[:16]}..., "
+                f"got {computed_gold_set_hash[:16]}..."
+            )
+
+            if corpus_mismatch_policy == "warn":
+                warnings.warn(
+                    f"{mismatch_msg}. This may indicate changes to anchors or queries.",
+                    UserWarning,
+                    stacklevel=2,
+                )
+            elif corpus_mismatch_policy == "fail":
+                raise EvaluationError(
+                    message=mismatch_msg,
+                    metric_name="evaluate",
+                    values={
+                        "expected_hash": gold_set_hash,
+                        "computed_hash": computed_gold_set_hash,
+                    },
+                )
 
     # Step 7: Create Run object (Requirement 11.7)
     timestamp = datetime.now(UTC).isoformat()
@@ -286,6 +374,8 @@ def evaluate(
         aggregate_metrics=aggregate_metrics_result,
         config=config,
         mapper_stats=dict(mapper_stats),
+        corpus_hash=computed_corpus_hash,
+        gold_set_hash=computed_gold_set_hash,
     )
 
     return run

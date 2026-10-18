@@ -47,6 +47,9 @@ def make_comparison_result(
     per_query_deltas: dict[str, dict[str, float]],
     per_query_status: dict,
     aggregate_deltas: dict[str, float] | None = None,
+    statistics_enabled: bool = False,
+    bootstrap_results: dict | None = None,
+    num_paired_queries: int = 0,
 ) -> ComparisonResult:
     """Build a ComparisonResult for testing."""
     has_regression = any(s == "REGRESSION" for s in per_query_status.values())
@@ -55,6 +58,9 @@ def make_comparison_result(
         per_query_status=per_query_status,
         aggregate_deltas=aggregate_deltas or {},
         has_regression=has_regression,
+        statistics_enabled=statistics_enabled,
+        bootstrap_results=bootstrap_results,
+        num_paired_queries=num_paired_queries,
     )
 
 
@@ -619,3 +625,721 @@ class TestEdgeCases:
         candidate = make_run()
         report = generate_comparison_report(comparison, baseline, candidate)
         assert "No regressions detected" in report
+
+
+
+# ---------------------------------------------------------------------------
+# Feature 8.1: Confidence Intervals in Markdown Report
+# ---------------------------------------------------------------------------
+
+
+class TestComparisonMarkdownRegressionGrouping:
+    """Test regression and improvement grouping in markdown reports."""
+
+    def test_regression_section_present_when_regressions_exist(self):
+        """Regressions section should appear when there are regressed queries."""
+        comparison = make_comparison_result(
+            per_query_deltas={
+                "q1": {"recall@5": -0.15},
+                "q2": {"recall@5": 0.05},
+            },
+            per_query_status={"q1": "REGRESSION", "q2": "IMPROVED"},
+        )
+        baseline = make_run()
+        candidate = make_run()
+        report = generate_comparison_report(comparison, baseline, candidate)
+
+        assert "## Regressions (Sorted by Severity)" in report
+        assert "q1" in report
+
+    def test_regression_section_absent_when_no_regressions(self):
+        """Regressions section should be absent when there are no regressions."""
+        comparison = make_comparison_result(
+            per_query_deltas={"q1": {"recall@5": 0.05}},
+            per_query_status={"q1": "IMPROVED"},
+        )
+        baseline = make_run()
+        candidate = make_run()
+        report = generate_comparison_report(comparison, baseline, candidate)
+
+        assert "## Regressions" not in report
+
+    def test_regression_sorted_by_severity(self):
+        """Regressions should be sorted by severity (largest violations first)."""
+        comparison = make_comparison_result(
+            per_query_deltas={
+                "q1": {"recall@5": -0.05},  # Small violation
+                "q2": {"recall@5": -0.20},  # Large violation
+                "q3": {"recall@5": -0.10},  # Medium violation
+            },
+            per_query_status={"q1": "REGRESSION", "q2": "REGRESSION", "q3": "REGRESSION"},
+        )
+        baseline = make_run()
+        candidate = make_run()
+        report = generate_comparison_report(comparison, baseline, candidate)
+
+        # Find positions of each query in the report
+        pos_q2 = report.find("q2")
+        pos_q3 = report.find("q3", pos_q2 + 1)
+        pos_q1 = report.find("q1", pos_q3 + 1)
+
+        # q2 (largest) should appear before q3, q3 before q1
+        assert pos_q2 < pos_q3 < pos_q1
+
+    def test_improvement_section_present_when_improvements_exist(self):
+        """Improvements section should appear when there are improved queries."""
+        comparison = make_comparison_result(
+            per_query_deltas={
+                "q1": {"recall@5": 0.15},
+                "q2": {"recall@5": -0.05},
+            },
+            per_query_status={"q1": "IMPROVED", "q2": "REGRESSION"},
+        )
+        baseline = make_run()
+        candidate = make_run()
+        report = generate_comparison_report(comparison, baseline, candidate)
+
+        assert "## Improvements (Sorted by Impact)" in report
+        assert "q1" in report
+
+    def test_improvement_section_absent_when_no_improvements(self):
+        """Improvements section should be absent when there are no improvements."""
+        comparison = make_comparison_result(
+            per_query_deltas={"q1": {"recall@5": -0.05}},
+            per_query_status={"q1": "REGRESSION"},
+        )
+        baseline = make_run()
+        candidate = make_run()
+        report = generate_comparison_report(comparison, baseline, candidate)
+
+        assert "## Improvements" not in report
+
+    def test_improvement_sorted_by_impact(self):
+        """Improvements should be sorted by impact (largest gains first)."""
+        comparison = make_comparison_result(
+            per_query_deltas={
+                "q1": {"recall@5": 0.05},  # Small gain
+                "q2": {"recall@5": 0.20},  # Large gain
+                "q3": {"recall@5": 0.10},  # Medium gain
+            },
+            per_query_status={"q1": "IMPROVED", "q2": "IMPROVED", "q3": "IMPROVED"},
+        )
+        baseline = make_run()
+        candidate = make_run()
+        report = generate_comparison_report(comparison, baseline, candidate)
+
+        # Find positions of each query in the improvements section
+        imp_section_start = report.find("## Improvements")
+        pos_q2 = report.find("q2", imp_section_start)
+        pos_q3 = report.find("q3", pos_q2 + 1)
+        pos_q1 = report.find("q1", pos_q3 + 1)
+
+        # q2 (largest) should appear before q3, q3 before q1
+        assert pos_q2 < pos_q3 < pos_q1
+
+    def test_regression_and_improvement_sections_both_present(self):
+        """Both regressions and improvements sections should appear when appropriate."""
+        comparison = make_comparison_result(
+            per_query_deltas={
+                "q1": {"recall@5": -0.10},
+                "q2": {"recall@5": 0.15},
+                "q3": {"recall@5": 0.00},
+            },
+            per_query_status={"q1": "REGRESSION", "q2": "IMPROVED", "q3": "UNCHANGED"},
+        )
+        baseline = make_run()
+        candidate = make_run()
+        report = generate_comparison_report(comparison, baseline, candidate)
+
+        assert "## Regressions" in report
+        assert "## Improvements" in report
+
+    def test_regression_with_redaction(self):
+        """Regression section should respect redaction mode."""
+        queries = (make_query("q1", "Confidential question"),)
+        comparison = make_comparison_result(
+            per_query_deltas={"q1": {"recall@5": -0.15}},
+            per_query_status={"q1": "REGRESSION"},
+        )
+        baseline = make_run(queries=queries)
+        candidate = make_run(queries=queries)
+        report = generate_comparison_report(comparison, baseline, candidate, redact=True)
+
+        # Query ID should be present but question should not
+        assert "q1" in report
+        assert "Confidential question" not in report
+
+    def test_improvement_with_redaction(self):
+        """Improvement section should respect redaction mode."""
+        queries = (make_query("q1", "Secret question"),)
+        comparison = make_comparison_result(
+            per_query_deltas={"q1": {"recall@5": 0.15}},
+            per_query_status={"q1": "IMPROVED"},
+        )
+        baseline = make_run(queries=queries)
+        candidate = make_run(queries=queries)
+        report = generate_comparison_report(comparison, baseline, candidate, redact=True)
+
+        # Query ID should be present but question should not
+        assert "q1" in report
+        assert "Secret question" not in report
+
+    def test_regression_with_multiple_metrics(self):
+        """Regression section should display all metrics for each regressed query."""
+        comparison = make_comparison_result(
+            per_query_deltas={
+                "q1": {"recall@5": -0.10, "precision@5": -0.05, "hit@5": 0.02},
+            },
+            per_query_status={"q1": "REGRESSION"},
+        )
+        baseline = make_run()
+        candidate = make_run()
+        report = generate_comparison_report(comparison, baseline, candidate)
+
+        # All metrics should be displayed in regressions section
+        reg_section = report[report.find("## Regressions") :]
+        next_section = reg_section.find("##", 2)
+        reg_text = reg_section[:next_section] if next_section > 0 else reg_section
+
+        assert "recall@5" in reg_text
+        assert "precision@5" in reg_text
+        assert "hit@5" in reg_text
+
+    def test_improvement_with_multiple_metrics(self):
+        """Improvement section should display all metrics for each improved query."""
+        comparison = make_comparison_result(
+            per_query_deltas={
+                "q1": {"recall@5": 0.10, "precision@5": 0.05, "hit@5": 0.02},
+            },
+            per_query_status={"q1": "IMPROVED"},
+        )
+        baseline = make_run()
+        candidate = make_run()
+        report = generate_comparison_report(comparison, baseline, candidate)
+
+        # All metrics should be displayed in improvements section
+        imp_section = report[report.find("## Improvements") :]
+        next_section = imp_section.find("##", 2)
+        imp_text = imp_section[:next_section] if next_section > 0 else imp_section
+
+        assert "recall@5" in imp_text
+        assert "precision@5" in imp_text
+        assert "hit@5" in imp_text
+
+    def test_regression_section_preserves_other_sections(self):
+        """Adding regression section should preserve all other sections."""
+        comparison = make_comparison_result(
+            per_query_deltas={"q1": {"recall@5": -0.15}},
+            per_query_status={"q1": "REGRESSION"},
+        )
+        baseline = make_run(aggregate_metrics={"mean_recall@5": 0.80})
+        candidate = make_run(aggregate_metrics={"mean_recall@5": 0.65})
+        report = generate_comparison_report(comparison, baseline, candidate)
+
+        # All sections should be present
+        assert "## Summary" in report
+        assert "## Per-Query Deltas" in report
+        assert "## Aggregate Summary" in report
+        assert "## Regressions" in report
+
+    def test_regression_with_policy_threshold_display(self):
+        """When policy provided, regression section should show thresholds."""
+        comparison = make_comparison_result(
+            per_query_deltas={"q1": {"recall@5": -0.15, "precision@5": -0.08}},
+            per_query_status={"q1": "REGRESSION"},
+        )
+        baseline = make_run()
+        candidate = make_run()
+        policy = {"recall@5": 0.05, "precision@5": 0.10}
+        report = generate_comparison_report(comparison, baseline, candidate, policy=policy)
+
+        # Thresholds should appear in report
+        assert "0.0500" in report  # recall threshold
+        assert "0.1000" in report  # precision threshold
+        # Deltas should also appear
+        assert "-0.1500" in report
+        assert "-0.0800" in report
+
+    def test_regression_without_policy_backward_compatible(self):
+        """Without policy, report should work as before (no thresholds)."""
+        comparison = make_comparison_result(
+            per_query_deltas={"q1": {"recall@5": -0.15}},
+            per_query_status={"q1": "REGRESSION"},
+        )
+        baseline = make_run()
+        candidate = make_run()
+        # No policy parameter passed
+        report = generate_comparison_report(comparison, baseline, candidate)
+
+        # Regression section should exist
+        assert "## Regressions" in report
+        # Deltas should be shown
+        assert "-0.1500" in report
+        # But no threshold columns
+
+
+class TestComparisonMarkdownConfidenceIntervals:
+    """Test bootstrap CI display in markdown comparison reports."""
+
+    def test_markdown_with_confidence_intervals_section_present(self):
+        """When CI data available, markdown should include CI section."""
+        from spanchor.comparison.statistics import BootstrapResult
+
+        bootstrap_results = {
+            "recall@5": BootstrapResult(
+                metric_name="recall@5",
+                num_paired_queries=25,
+                mean_delta=0.05,
+                lower_ci=0.01,
+                upper_ci=0.09,
+                ci_level=0.95,
+                num_resamples=10000,
+                seed=42,
+            )
+        }
+
+        comparison = make_comparison_result(
+            per_query_deltas={"q1": {"recall@5": 0.05}},
+            per_query_status={"q1": "IMPROVED"},
+            statistics_enabled=True,
+            bootstrap_results=bootstrap_results,
+            num_paired_queries=25,
+        )
+
+        report = generate_comparison_report(comparison, make_run(), make_run())
+
+        # Verify CI section is present
+        assert "## Aggregate Confidence Intervals" in report
+        assert "Statistical analysis on 25 paired queries" in report
+
+    def test_markdown_without_statistics_no_ci_section(self):
+        """When statistics disabled, no CI section in markdown."""
+        comparison = make_comparison_result(
+            per_query_deltas={"q1": {"recall@5": 0.05}},
+            per_query_status={"q1": "IMPROVED"},
+            statistics_enabled=False,
+            bootstrap_results=None,
+            num_paired_queries=0,
+        )
+
+        report = generate_comparison_report(comparison, make_run(), make_run())
+
+        # Verify CI section is NOT present (backward compatible)
+        assert "Aggregate Confidence Intervals" not in report
+
+    def test_markdown_ci_table_has_correct_columns(self):
+        """CI table should display metric, mean delta, lower CI, upper CI."""
+        from spanchor.comparison.statistics import BootstrapResult
+
+        bootstrap_results = {
+            "recall@5": BootstrapResult(
+                metric_name="recall@5",
+                num_paired_queries=25,
+                mean_delta=0.05,
+                lower_ci=0.01,
+                upper_ci=0.09,
+                ci_level=0.95,
+                num_resamples=10000,
+                seed=42,
+            )
+        }
+
+        comparison = make_comparison_result(
+            per_query_deltas={"q1": {"recall@5": 0.05}},
+            per_query_status={"q1": "IMPROVED"},
+            statistics_enabled=True,
+            bootstrap_results=bootstrap_results,
+            num_paired_queries=25,
+        )
+
+        report = generate_comparison_report(comparison, make_run(), make_run())
+
+        # Verify CI values appear in report
+        assert "recall@5" in report
+        assert "0.0500" in report  # mean delta
+        assert "0.0100" in report  # lower CI
+        assert "0.0900" in report  # upper CI
+
+    def test_markdown_ci_multiple_metrics(self):
+        """Multiple metrics should each appear in CI table."""
+        from spanchor.comparison.statistics import BootstrapResult
+
+        bootstrap_results = {
+            "recall@5": BootstrapResult(
+                metric_name="recall@5",
+                num_paired_queries=25,
+                mean_delta=0.05,
+                lower_ci=0.01,
+                upper_ci=0.09,
+                ci_level=0.95,
+                num_resamples=10000,
+                seed=42,
+            ),
+            "precision@5": BootstrapResult(
+                metric_name="precision@5",
+                num_paired_queries=25,
+                mean_delta=-0.02,
+                lower_ci=-0.06,
+                upper_ci=0.02,
+                ci_level=0.95,
+                num_resamples=10000,
+                seed=42,
+            ),
+        }
+
+        comparison = make_comparison_result(
+            per_query_deltas={"q1": {"recall@5": 0.05, "precision@5": -0.02}},
+            per_query_status={"q1": "IMPROVED"},
+            statistics_enabled=True,
+            bootstrap_results=bootstrap_results,
+            num_paired_queries=25,
+        )
+
+        report = generate_comparison_report(comparison, make_run(), make_run())
+
+        # Verify both metrics appear in report
+        assert "recall@5" in report
+        assert "precision@5" in report
+        assert "0.0500" in report
+        assert "-0.0200" in report
+
+    def test_markdown_ci_preserves_other_sections(self):
+        """Adding CI section should not remove existing sections."""
+        from spanchor.comparison.statistics import BootstrapResult
+
+        bootstrap_results = {
+            "recall@5": BootstrapResult(
+                metric_name="recall@5",
+                num_paired_queries=25,
+                mean_delta=0.05,
+                lower_ci=0.01,
+                upper_ci=0.09,
+                ci_level=0.95,
+                num_resamples=10000,
+                seed=42,
+            )
+        }
+
+        comparison = make_comparison_result(
+            per_query_deltas={"q1": {"recall@5": 0.05}},
+            per_query_status={"q1": "IMPROVED"},
+            statistics_enabled=True,
+            bootstrap_results=bootstrap_results,
+            num_paired_queries=25,
+        )
+
+        report = generate_comparison_report(comparison, make_run(), make_run())
+
+        # Verify existing sections still present
+        assert "## Summary" in report
+        assert "## Per-Query Deltas" in report
+        assert "## Aggregate Summary" in report
+        assert "## Aggregate Confidence Intervals" in report
+
+    def test_markdown_ci_confidence_level_shown(self):
+        """Report should display confidence level in CI section."""
+        from spanchor.comparison.statistics import BootstrapResult
+
+        bootstrap_results = {
+            "recall@5": BootstrapResult(
+                metric_name="recall@5",
+                num_paired_queries=25,
+                mean_delta=0.05,
+                lower_ci=0.01,
+                upper_ci=0.09,
+                ci_level=0.95,
+                num_resamples=10000,
+                seed=42,
+            )
+        }
+
+        comparison = make_comparison_result(
+            per_query_deltas={"q1": {"recall@5": 0.05}},
+            per_query_status={"q1": "IMPROVED"},
+            statistics_enabled=True,
+            bootstrap_results=bootstrap_results,
+            num_paired_queries=25,
+        )
+
+        report = generate_comparison_report(comparison, make_run(), make_run())
+
+        # Verify 95% confidence level is shown
+        assert "95% confidence level" in report or "0.95" in report
+
+
+# ---------------------------------------------------------------------------
+# Feature 8.3: Set-wise Metrics in Markdown Report
+# ---------------------------------------------------------------------------
+
+
+class TestComparisonMarkdownSetwiseMetrics:
+    """Test set-wise metrics integration in markdown reports."""
+
+    def make_comparison_with_setwise(
+        self,
+        per_query_deltas=None,
+        per_query_status=None,
+        aggregate_deltas=None,
+        setwise_deltas=None,
+        setwise_aggregate_deltas=None,
+    ):
+        """Helper to create comparison with setwise data."""
+        return ComparisonResult(
+            per_query_deltas=per_query_deltas or {},
+            per_query_status=per_query_status or {},
+            aggregate_deltas=aggregate_deltas or {},
+            has_regression=False,
+            setwise_deltas=setwise_deltas,
+            setwise_aggregate_deltas=setwise_aggregate_deltas,
+        )
+
+    def test_markdown_setwise_section_present(self):
+        """Setwise section should appear when setwise_aggregate_deltas available."""
+        comparison = self.make_comparison_with_setwise(
+            setwise_aggregate_deltas={
+                "span_concentration": 0.05,
+                "fragmentation_ratio": -0.03,
+                "pairwise_overlap": 0.01,
+            }
+        )
+        baseline = make_run()
+        candidate = make_run()
+        report = generate_comparison_report(comparison, baseline, candidate)
+        assert "## Set-wise Metrics" in report
+
+    def test_markdown_setwise_section_absent_when_no_data(self):
+        """Setwise section should be omitted when setwise_aggregate_deltas is None."""
+        comparison = self.make_comparison_with_setwise(
+            setwise_aggregate_deltas=None
+        )
+        baseline = make_run()
+        candidate = make_run()
+        report = generate_comparison_report(comparison, baseline, candidate)
+        assert "## Set-wise Metrics" not in report
+
+    def test_markdown_setwise_metrics_displayed(self):
+        """All three setwise metrics should be displayed in the section."""
+        comparison = self.make_comparison_with_setwise(
+            setwise_aggregate_deltas={
+                "span_concentration": 0.05,
+                "fragmentation_ratio": -0.03,
+                "pairwise_overlap": 0.01,
+            }
+        )
+        baseline = make_run()
+        candidate = make_run()
+        report = generate_comparison_report(comparison, baseline, candidate)
+        assert "span_concentration" in report
+        assert "fragmentation_ratio" in report
+        assert "pairwise_overlap" in report
+
+    def test_markdown_setwise_deltas_with_signs(self):
+        """Setwise deltas should appear with +/- signs."""
+        comparison = self.make_comparison_with_setwise(
+            setwise_aggregate_deltas={
+                "span_concentration": 0.05,
+                "fragmentation_ratio": -0.03,
+                "pairwise_overlap": 0.01,
+            }
+        )
+        baseline = make_run()
+        candidate = make_run()
+        report = generate_comparison_report(comparison, baseline, candidate)
+        # Check for formatted delta values with signs
+        assert "+0.0500" in report  # span_concentration
+        assert "-0.0300" in report  # fragmentation_ratio
+        assert "+0.0100" in report  # pairwise_overlap
+
+    def test_markdown_setwise_per_query_section_when_significant_changes(self):
+        """Per-query setwise section should appear for queries with |delta| > 0.01."""
+        comparison = self.make_comparison_with_setwise(
+            setwise_deltas={
+                "q1": {
+                    "span_concentration": 0.15,  # > 0.01, significant
+                    "fragmentation_ratio": -0.05,
+                },
+                "q2": {
+                    "span_concentration": 0.005,  # < 0.01, not significant
+                    "fragmentation_ratio": 0.002,
+                },
+            },
+            setwise_aggregate_deltas={
+                "span_concentration": 0.075,
+                "fragmentation_ratio": -0.024,
+            }
+        )
+        baseline = make_run()
+        candidate = make_run()
+        report = generate_comparison_report(comparison, baseline, candidate)
+        assert "### Per-Query Set-wise Changes" in report
+        # q1 should appear (has significant changes)
+        assert "q1" in report
+
+    def test_markdown_setwise_per_query_absent_when_no_significant_changes(self):
+        """Per-query setwise subsection should be absent if no significant changes."""
+        comparison = self.make_comparison_with_setwise(
+            setwise_deltas={
+                "q1": {
+                    "span_concentration": 0.005,  # < 0.01, not significant
+                    "fragmentation_ratio": 0.003,
+                },
+                "q2": {
+                    "span_concentration": 0.008,  # < 0.01, not significant
+                    "fragmentation_ratio": -0.002,
+                },
+            },
+            setwise_aggregate_deltas={
+                "span_concentration": 0.0065,
+                "fragmentation_ratio": 0.0005,
+            }
+        )
+        baseline = make_run()
+        candidate = make_run()
+        report = generate_comparison_report(comparison, baseline, candidate)
+        # Aggregate section should be present but not per-query section
+        assert "## Set-wise Metrics" in report
+        assert "### Per-Query Set-wise Changes" not in report
+
+    def test_markdown_setwise_question_text_shown_when_not_redacted(self):
+        """Query questions should appear in per-query setwise section when not redacted."""
+        queries = (make_query("q1", "Test question about setwise metrics"),)
+        comparison = self.make_comparison_with_setwise(
+            setwise_deltas={
+                "q1": {"span_concentration": 0.15}
+            },
+            setwise_aggregate_deltas={
+                "span_concentration": 0.15,
+                "fragmentation_ratio": 0.0,
+                "pairwise_overlap": 0.0,
+            }
+        )
+        baseline = make_run(queries=queries)
+        candidate = make_run(queries=queries)
+        report = generate_comparison_report(comparison, baseline, candidate, redact=False)
+        assert "Test question about setwise metrics" in report
+
+    def test_markdown_setwise_question_text_omitted_when_redacted(self):
+        """Query questions should be omitted from setwise section when redacted."""
+        queries = (make_query("q1", "Secret setwise query"),)
+        comparison = self.make_comparison_with_setwise(
+            setwise_deltas={
+                "q1": {"span_concentration": 0.15}
+            },
+            setwise_aggregate_deltas={
+                "span_concentration": 0.15,
+                "fragmentation_ratio": 0.0,
+                "pairwise_overlap": 0.0,
+            }
+        )
+        baseline = make_run(queries=queries)
+        candidate = make_run(queries=queries)
+        report = generate_comparison_report(comparison, baseline, candidate, redact=True)
+        assert "Secret setwise query" not in report
+        # But query ID should still be present
+        assert "q1" in report
+
+    def test_markdown_setwise_and_statistics_in_same_report(self):
+        """Both setwise metrics and statistics should appear in the same report."""
+        from spanchor.comparison.statistics import BootstrapResult
+
+        bootstrap_results = {
+            "recall@5": BootstrapResult(
+                metric_name="recall@5",
+                num_paired_queries=25,
+                mean_delta=0.05,
+                lower_ci=0.01,
+                upper_ci=0.09,
+                ci_level=0.95,
+                num_resamples=10000,
+                seed=42,
+            )
+        }
+
+        comparison = self.make_comparison_with_setwise(
+            per_query_deltas={"q1": {"recall@5": 0.05}},
+            per_query_status={"q1": "IMPROVED"},
+            aggregate_deltas={"recall@5": 0.05},
+            setwise_aggregate_deltas={
+                "span_concentration": 0.05,
+                "fragmentation_ratio": -0.03,
+                "pairwise_overlap": 0.01,
+            },
+            setwise_deltas={
+                "q1": {
+                    "span_concentration": 0.05,
+                    "fragmentation_ratio": -0.03,
+                    "pairwise_overlap": 0.01,
+                }
+            }
+        )
+
+        comparison = ComparisonResult(
+            per_query_deltas=comparison.per_query_deltas,
+            per_query_status=comparison.per_query_status,
+            aggregate_deltas=comparison.aggregate_deltas,
+            has_regression=False,
+            statistics_enabled=True,
+            bootstrap_results=bootstrap_results,
+            num_paired_queries=25,
+            setwise_deltas=comparison.setwise_deltas,
+            setwise_aggregate_deltas=comparison.setwise_aggregate_deltas,
+        )
+
+        report = generate_comparison_report(comparison, make_run(), make_run())
+
+        # Both sections should be present
+        assert "## Set-wise Metrics" in report
+        assert "## Aggregate Confidence Intervals" in report
+        # Check ordering: setwise should come before confidence intervals
+        pos_setwise = report.find("## Set-wise Metrics")
+        pos_ci = report.find("## Aggregate Confidence Intervals")
+        assert pos_setwise < pos_ci
+
+    def test_markdown_setwise_placement_after_improvements(self):
+        """Setwise section should appear after Improvements section."""
+        from spanchor.comparison.statistics import BootstrapResult
+
+        bootstrap_results = {
+            "recall@5": BootstrapResult(
+                metric_name="recall@5",
+                num_paired_queries=25,
+                mean_delta=0.05,
+                lower_ci=0.01,
+                upper_ci=0.09,
+                ci_level=0.95,
+                num_resamples=10000,
+                seed=42,
+            )
+        }
+
+        comparison = self.make_comparison_with_setwise(
+            per_query_deltas={
+                "q1": {"recall@5": 0.15},
+                "q2": {"recall@5": -0.05},
+            },
+            per_query_status={"q1": "IMPROVED", "q2": "REGRESSION"},
+            setwise_aggregate_deltas={
+                "span_concentration": 0.05,
+                "fragmentation_ratio": -0.03,
+                "pairwise_overlap": 0.01,
+            }
+        )
+
+        comparison = ComparisonResult(
+            per_query_deltas=comparison.per_query_deltas,
+            per_query_status=comparison.per_query_status,
+            aggregate_deltas=comparison.aggregate_deltas,
+            has_regression=True,
+            setwise_deltas=comparison.setwise_deltas,
+            setwise_aggregate_deltas=comparison.setwise_aggregate_deltas,
+        )
+
+        report = generate_comparison_report(comparison, make_run(), make_run())
+
+        # Find positions
+        pos_improvements = report.find("## Improvements")
+        pos_setwise = report.find("## Set-wise Metrics")
+
+        # Setwise should appear after improvements
+        if pos_improvements >= 0 and pos_setwise >= 0:
+            assert pos_improvements < pos_setwise

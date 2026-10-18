@@ -85,7 +85,7 @@ def generate_evaluation_report(run: Run, redact: bool = False) -> str:
     # -------------------------------------------------------------------
     sections.append("## Aggregate Metrics\n")
 
-    agg_metrics = {k: v for k, v in run.aggregate_metrics.items()}
+    agg_metrics = dict(run.aggregate_metrics.items())
     if agg_metrics:
         headers = ["Metric", "Value"]
         rows = [[metric, _fmt(value)] for metric, value in sorted(agg_metrics.items())]
@@ -217,6 +217,7 @@ def generate_comparison_report(
     baseline: Run,
     candidate: Run,
     redact: bool = False,
+    policy: dict[str, float] | None = None,
 ) -> str:
     """Generate a markdown comparison report between two evaluation runs.
 
@@ -224,6 +225,9 @@ def generate_comparison_report(
     - Summary counts (improved / regressed / unchanged)
     - Per-query delta table with IMPROVED/REGRESSION/UNCHANGED statuses
     - Aggregate summary table with baseline, candidate, and delta values
+    - Optional: Regressions section with severity and policy thresholds (Feature 8.2)
+    - Optional: Improvements section (Feature 8.2)
+    - Optional: Bootstrap confidence intervals (Feature 8.1)
 
     If redact=True, source text (query questions) is omitted from the report.
 
@@ -232,11 +236,15 @@ def generate_comparison_report(
         baseline: The baseline Run used as reference.
         candidate: The candidate Run being evaluated.
         redact: If True, omit source text (question text) from the report.
+        policy: Optional per-metric policy thresholds used during comparison.
+            When provided, threshold violations are displayed for regressions.
+            Example: {"recall@5": 0.05, "hit@5": 0.10}
+            If None, only actual deltas are shown (backward compatible).
 
     Returns:
         A markdown string representing the comparison report.
 
-    Validates: Requirements 21.5, 21.6, 21.7
+    Validates: Requirements 21.5, 21.6, 21.7, 23.2 (with policy)
     """
     sections: list[str] = []
 
@@ -369,5 +377,287 @@ def generate_comparison_report(
             sections.append("*No aggregate metrics available.*")
 
     sections.append("")
+
+    # -------------------------------------------------------------------
+    # 4. Regression Grouping (Feature 8.2, optional)
+    # -------------------------------------------------------------------
+    regressed_queries = [
+        qid for qid, status in per_query_status.items() if status == "REGRESSION"
+    ]
+    if regressed_queries:
+        sections.append("## Regressions (Sorted by Severity)\n")
+
+        # Build query_id -> question lookup for non-redacted mode
+        query_map_regs: dict[str, str] = {}
+        if not redact:
+            for query in baseline.queries:
+                query_map_regs[query.query_id] = query.question
+            for query in candidate.queries:
+                if query.query_id not in query_map_regs:
+                    query_map_regs[query.query_id] = query.question
+
+        # Collect all metric names
+        all_metric_names_regs = sorted(
+            {
+                metric
+                for q_deltas in per_query_deltas.values()
+                for metric in q_deltas
+            }
+        )
+
+        # Compute severity (sum of absolute negative deltas) for each regressed query
+        severity_map: dict[str, float] = {}
+        for qid in regressed_queries:
+            q_deltas = per_query_deltas[qid]
+            total_violation = 0.0
+            for metric, delta in q_deltas.items():
+                if delta < 0:
+                    # Sum of magnitudes of all negative deltas (drops)
+                    total_violation += abs(delta)
+            severity_map[qid] = total_violation
+
+        # Sort by severity (largest violations first)
+        sorted_regressed = sorted(
+            regressed_queries,
+            key=lambda qid: severity_map[qid],
+            reverse=True,
+        )
+
+        # Build table — include policy threshold if available
+        delta_headers_regs = [f"{m} Δ" for m in all_metric_names_regs]
+        if policy:
+            # When policy available, show threshold and actual delta for failed metrics
+            threshold_headers = [f"{m} Threshold" for m in all_metric_names_regs]
+            if redact:
+                headers_regs = (
+                    ["Query ID", "Severity"] + threshold_headers + delta_headers_regs
+                )
+            else:
+                headers_regs = (
+                    ["Query ID", "Question", "Severity"]
+                    + threshold_headers
+                    + delta_headers_regs
+                )
+        else:
+            # Without policy, show only actual deltas (backward compatible)
+            if redact:
+                headers_regs = ["Query ID", "Severity"] + delta_headers_regs
+            else:
+                headers_regs = (
+                    ["Query ID", "Question", "Severity"] + delta_headers_regs
+                )
+
+        rows_regs: list[list[str]] = []
+        for qid in sorted_regressed:
+            q_deltas = per_query_deltas[qid]
+            severity_val: float = severity_map[qid]
+
+            # Build delta and threshold values
+            threshold_cols: list[str] = []
+            delta_cols: list[str] = []
+            for m in all_metric_names_regs:
+                delta_val = q_deltas.get(m)
+
+                # Threshold column (when policy available)
+                if policy is not None:
+                    threshold_val: float | None = policy.get(m)
+                    if threshold_val is not None:
+                        threshold_cols.append(_fmt(threshold_val))
+                    else:
+                        threshold_cols.append("N/A")
+
+                # Delta column
+                if delta_val is not None:
+                    delta_cols.append(_fmt_delta(delta_val))
+                else:
+                    delta_cols.append("N/A")
+
+            # Build row with consistent list type
+            row_cols: list[str] = []
+            if redact:
+                row_cols.append(qid)
+            else:
+                row_cols.append(qid)
+                row_cols.append(query_map_regs.get(qid, ""))
+
+            row_cols.append(_fmt(severity_val))
+
+            if policy is not None:
+                row_cols.extend(threshold_cols)
+
+            row_cols.extend(delta_cols)
+            rows_regs.append(row_cols)
+
+        sections.append(_md_table(headers_regs, rows_regs))
+        sections.append("")
+
+    # -------------------------------------------------------------------
+    # 5. Improvement Grouping (Feature 8.2, optional)
+    # -------------------------------------------------------------------
+    improved_queries = [qid for qid, status in per_query_status.items() if status == "IMPROVED"]
+    if improved_queries:
+        sections.append("## Improvements (Sorted by Impact)\n")
+
+        # Build query_id -> question lookup for non-redacted mode
+        query_map_imps: dict[str, str] = {}
+        if not redact:
+            for query in baseline.queries:
+                query_map_imps[query.query_id] = query.question
+            for query in candidate.queries:
+                if query.query_id not in query_map_imps:
+                    query_map_imps[query.query_id] = query.question
+
+        # Collect all metric names
+        all_metric_names_imps = sorted(
+            {
+                metric
+                for q_deltas in per_query_deltas.values()
+                for metric in q_deltas
+            }
+        )
+
+        # Compute impact (sum of positive deltas) for each improved query
+        impact_map: dict[str, float] = {}
+        for qid in improved_queries:
+            q_deltas = per_query_deltas[qid]
+            total_improvement = 0.0
+            for metric, delta in q_deltas.items():
+                if delta > 0:
+                    total_improvement += delta
+            impact_map[qid] = total_improvement
+
+        # Sort by impact (largest improvements first)
+        sorted_improved = sorted(
+            improved_queries,
+            key=lambda qid: impact_map[qid],
+            reverse=True,
+        )
+
+        # Build table
+        delta_headers_imps = [f"{m} Δ" for m in all_metric_names_imps]
+        if redact:
+            headers_imps = ["Query ID", "Impact"] + delta_headers_imps
+        else:
+            headers_imps = ["Query ID", "Question", "Impact"] + delta_headers_imps
+
+        rows_imps = []
+        for qid in sorted_improved:
+            q_deltas = per_query_deltas[qid]
+            impact = impact_map[qid]
+            delta_values = [
+                _fmt_delta(q_deltas[m]) if m in q_deltas else "N/A" for m in all_metric_names_imps
+            ]
+            if redact:
+                row = [qid, _fmt(impact)] + delta_values
+            else:
+                question = query_map_imps.get(qid, "")
+                row = [qid, question, _fmt(impact)] + delta_values
+            rows_imps.append(row)
+
+        sections.append(_md_table(headers_imps, rows_imps))
+        sections.append("")
+
+    # -------------------------------------------------------------------
+    # 6. Set-wise Metrics (Feature 8.3, optional)
+    # -------------------------------------------------------------------
+    if comparison.setwise_aggregate_deltas:
+        sections.append("## Set-wise Metrics\n")
+
+        # Aggregate set-wise deltas table
+        aggregate_setwise = comparison.setwise_aggregate_deltas
+        if aggregate_setwise:
+            setwise_headers = ["Metric", "Baseline", "Candidate", "Delta"]
+            setwise_rows = []
+
+            # Display aggregate set-wise deltas.
+            # Note: We only have deltas in the comparison result, not the original
+            # baseline/candidate values, so we show "N/A" for those columns.
+            for metric_name in sorted(aggregate_setwise.keys()):
+                delta_val = aggregate_setwise[metric_name]
+                setwise_rows.append([metric_name, "N/A", "N/A", _fmt_delta(delta_val)])
+
+            sections.append(_md_table(setwise_headers, setwise_rows))
+            sections.append("")
+
+        # Per-query set-wise changes (show queries with significant changes: |delta| > 0.01)
+        if comparison.setwise_deltas:
+            significant_queries = []
+            for qid, q_deltas in comparison.setwise_deltas.items():
+                for metric, delta in q_deltas.items():
+                    if abs(delta) > 0.01:
+                        significant_queries.append(qid)
+                        break
+
+            if significant_queries:
+                sections.append("### Per-Query Set-wise Changes\n")
+
+                # Build query_id -> question lookup for non-redacted mode
+                query_map_setwise: dict[str, str] = {}
+                if not redact:
+                    for query in baseline.queries:
+                        query_map_setwise[query.query_id] = query.question
+                    for query in candidate.queries:
+                        if query.query_id not in query_map_setwise:
+                            query_map_setwise[query.query_id] = query.question
+
+                # Collect all setwise metric names
+                all_setwise_metrics = sorted(
+                    {
+                        metric
+                        for q_deltas in comparison.setwise_deltas.values()
+                        for metric in q_deltas
+                    }
+                )
+
+                setwise_delta_headers = [f"{m} Δ" for m in all_setwise_metrics]
+                if redact:
+                    per_query_headers_setwise = ["Query ID"] + setwise_delta_headers
+                else:
+                    per_query_headers_setwise = ["Query ID", "Question"] + setwise_delta_headers
+
+                per_query_rows_setwise = []
+                for qid in sorted(significant_queries):
+                    q_deltas = comparison.setwise_deltas[qid]
+                    delta_values = [
+                        _fmt_delta(q_deltas[m]) if m in q_deltas else "N/A"
+                        for m in all_setwise_metrics
+                    ]
+                    if redact:
+                        row = [qid] + delta_values
+                    else:
+                        question = query_map_setwise.get(qid, "")
+                        row = [qid, question] + delta_values
+                    per_query_rows_setwise.append(row)
+
+                sections.append(_md_table(per_query_headers_setwise, per_query_rows_setwise))
+                sections.append("")
+
+    # -------------------------------------------------------------------
+    # 7. Aggregate Confidence Intervals (Feature 8.1, optional)
+    # -------------------------------------------------------------------
+    if comparison.statistics_enabled and comparison.bootstrap_results:
+        sections.append("## Aggregate Confidence Intervals\n")
+        sections.append(
+            f"*(Statistical analysis on {comparison.num_paired_queries} "
+            f"paired queries, 95% confidence level)*\n"
+        )
+
+        bootstrap_results = comparison.bootstrap_results
+        ci_headers = ["Metric", "Mean Δ", "Lower CI", "Upper CI"]
+        ci_rows = []
+
+        for metric_name in sorted(bootstrap_results.keys()):
+            result = bootstrap_results[metric_name]
+            ci_rows.append(
+                [
+                    metric_name,
+                    _fmt(result.mean_delta),
+                    _fmt(result.lower_ci),
+                    _fmt(result.upper_ci),
+                ]
+            )
+
+        sections.append(_md_table(ci_headers, ci_rows))
+        sections.append("")
 
     return "\n".join(sections)

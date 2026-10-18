@@ -24,10 +24,12 @@ def aggregate_metrics(
         queries: List of Query objects for context (used for micro-average)
         aggregation_method: Aggregation strategy to use (default: "macro")
             - "macro": Average metric values across queries (equal weight per query)
-            - "micro": Aggregate characters first, then compute metrics (proportional to gold span size)
+            - "micro": Aggregate characters first, then compute metrics
+              (proportional to gold span size)
 
     Returns:
-        Dictionary of aggregated metrics with mean_ prefix for macro, micro_ prefix for micro
+        Dictionary of aggregated metrics with mean_ prefix for macro, micro_ prefix
+        for micro
 
     Examples:
         >>> per_query_metrics = {
@@ -79,7 +81,8 @@ def aggregate_metrics(
         # based on retrieved_chars as a proxy
         micro_metrics_dict: dict[str, float] = {}
 
-        # Calculate weights based on retrieved_chars (queries with more retrieved chars get more weight)
+        # Calculate weights based on retrieved_chars (queries with more retrieved chars
+        # get more weight)
         total_retrieved_chars = sum(
             per_query_metrics[q.query_id].get("retrieved_chars", 0.0)
             for q in queries

@@ -1,8 +1,8 @@
-"""JSONL storage for gold sets with schema validation.
+"""JSONL storage for gold sets and candidate pools with schema validation.
 
 This module provides line-by-line reading and writing of Query objects
-in JSONL format (one JSON object per line), with strict schema validation
-and duplicate detection.
+and Candidate objects in JSONL format (one JSON object per line), with
+strict schema validation and duplicate detection.
 """
 
 import json
@@ -10,6 +10,7 @@ from pathlib import Path
 
 from spanchor.errors import InvalidSchemaError
 from spanchor.models.anchor import Anchor
+from spanchor.models.candidate import Candidate
 from spanchor.models.query import Query
 
 
@@ -224,6 +225,7 @@ def read_gold_set(path: Path) -> list[Query]:
                         question=data["question"],
                         anchors=tuple(anchors),
                         schema_version=data["schema_version"],
+                        candidate_id=data.get("candidate_id", None),
                     )
                     queries.append(query)
                 except (TypeError, ValueError) as e:
@@ -290,8 +292,212 @@ def write_gold_set(path: Path, queries: list[Query]) -> None:
                     "schema_version": query.schema_version,
                 }
 
+                # Add optional candidate_id if present
+                if query.candidate_id is not None:
+                    query_dict["candidate_id"] = query.candidate_id
+
                 # Write as single line
                 json.dump(query_dict, f, ensure_ascii=False)
+                f.write("\n")
+
+    except PermissionError:
+        raise InvalidSchemaError(
+            message=f"Permission denied writing to: {path}",
+            file_path=str(path),
+        ) from None
+    except OSError as e:
+        raise InvalidSchemaError(
+            message=f"Error writing file: {e}",
+            file_path=str(path),
+        ) from e
+
+
+
+def read_candidate_pool(path: Path) -> list[Candidate]:
+    """Read JSONL candidate pool with line-by-line parsing and validation.
+
+    Reads a JSONL file where each line contains a Candidate object as JSON.
+    Validates schema_version and detects duplicate candidate_id values.
+
+    Args:
+        path: Path to the JSONL file
+
+    Returns:
+        List of Candidate objects
+
+    Raises:
+        InvalidSchemaError: If JSON is malformed, schema is invalid,
+            required fields are missing, or duplicate candidate_id is found.
+            Error includes file path, line number, and field details.
+
+    Examples:
+        >>> candidates = read_candidate_pool(Path("candidates.jsonl"))
+        >>> len(candidates)
+        10
+        >>> candidates[0].candidate_id
+        'doc1_0'
+    """
+    candidates = []
+    seen_ids: set[str] = set()
+
+    try:
+        with path.open("r", encoding="utf-8") as f:
+            for line_num, line in enumerate(f, start=1):
+                line = line.strip()
+
+                # Skip empty lines
+                if not line:
+                    continue
+
+                try:
+                    data = json.loads(line)
+                except json.JSONDecodeError as e:
+                    raise InvalidSchemaError(
+                        message=f"Invalid JSON: {e.msg}",
+                        file_path=str(path),
+                        line_number=line_num,
+                    ) from e
+
+                # Validate it's a dictionary
+                if not isinstance(data, dict):
+                    raise InvalidSchemaError(
+                        message=f"Expected JSON object, got {type(data).__name__}",
+                        file_path=str(path),
+                        line_number=line_num,
+                    )
+
+                # Validate schema_version presence
+                if "schema_version" not in data:
+                    raise InvalidSchemaError(
+                        message="Missing required field 'schema_version'",
+                        file_path=str(path),
+                        line_number=line_num,
+                        field_name="schema_version",
+                    )
+
+                # Validate required fields
+                required_fields = ["candidate_id", "text", "document_id", "confidence"]
+                for field in required_fields:
+                    if field not in data:
+                        raise InvalidSchemaError(
+                            message=f"Missing required field '{field}'",
+                            file_path=str(path),
+                            line_number=line_num,
+                            field_name=field,
+                        )
+
+                # Check for duplicate candidate_id
+                candidate_id = data["candidate_id"]
+                if not isinstance(candidate_id, str):
+                    raise InvalidSchemaError(
+                        message=(
+                            f"Field 'candidate_id' must be a string, "
+                            f"got {type(candidate_id).__name__}"
+                        ),
+                        file_path=str(path),
+                        line_number=line_num,
+                        field_name="candidate_id",
+                    )
+
+                if candidate_id in seen_ids:
+                    raise InvalidSchemaError(
+                        message=f"Duplicate candidate_id: '{candidate_id}'",
+                        file_path=str(path),
+                        line_number=line_num,
+                        field_name="candidate_id",
+                    )
+                seen_ids.add(candidate_id)
+
+                # Validate required string fields
+                for field in ["text", "document_id"]:
+                    if not isinstance(data[field], str):
+                        raise InvalidSchemaError(
+                            message=(
+                                f"Field '{field}' must be a string, "
+                                f"got {type(data[field]).__name__}"
+                            ),
+                            file_path=str(path),
+                            line_number=line_num,
+                            field_name=field,
+                        )
+
+                # Validate confidence
+                if not isinstance(data["confidence"], int | float):
+                    raise InvalidSchemaError(
+                        message=(
+                            f"Field 'confidence' must be a number, "
+                            f"got {type(data['confidence']).__name__}"
+                        ),
+                        file_path=str(path),
+                        line_number=line_num,
+                        field_name="confidence",
+                    )
+
+                try:
+                    candidate = Candidate(
+                        candidate_id=candidate_id,
+                        text=data["text"],
+                        document_id=data["document_id"],
+                        confidence=float(data["confidence"]),
+                        schema_version=data.get("schema_version", "0.2.0"),
+                        review=None,  # Review field not supported in JSONL (for now)
+                    )
+                    candidates.append(candidate)
+                except (TypeError, ValueError) as e:
+                    raise InvalidSchemaError(
+                        message=f"Error creating Candidate object: {e}",
+                        file_path=str(path),
+                        line_number=line_num,
+                    ) from e
+
+    except FileNotFoundError:
+        raise InvalidSchemaError(
+            message=f"File not found: {path}",
+            file_path=str(path),
+        ) from None
+    except PermissionError:
+        raise InvalidSchemaError(
+            message=f"Permission denied: {path}",
+            file_path=str(path),
+        ) from None
+
+    return candidates
+
+
+def write_candidate_pool(path: Path, candidates: list[Candidate]) -> None:
+    """Write candidates to JSONL format (one per line).
+
+    Each candidate is serialized as JSON with all fields including schema_version.
+    Review field is omitted (candidates in pool are not yet reviewed).
+
+    Args:
+        path: Path to the output JSONL file
+        candidates: List of Candidate objects to write
+
+    Raises:
+        InvalidSchemaError: If file cannot be written (permissions, disk space, etc.)
+
+    Examples:
+        >>> candidates = [Candidate("c1", "Example text", "doc1", 1.0, None, "0.2.0")]
+        >>> write_candidate_pool(Path("output.jsonl"), candidates)
+    """
+    try:
+        # Ensure parent directory exists
+        path.parent.mkdir(parents=True, exist_ok=True)
+
+        with path.open("w", encoding="utf-8") as f:
+            for candidate in candidates:
+                # Create candidate dict (review field omitted)
+                candidate_dict = {
+                    "candidate_id": candidate.candidate_id,
+                    "text": candidate.text,
+                    "document_id": candidate.document_id,
+                    "confidence": candidate.confidence,
+                    "schema_version": candidate.schema_version,
+                }
+
+                # Write as single line
+                json.dump(candidate_dict, f, ensure_ascii=False)
                 f.write("\n")
 
     except PermissionError:

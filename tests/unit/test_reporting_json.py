@@ -663,3 +663,403 @@ class TestEdgeCases:
         # Verify it's JSON serialisable and values are preserved
         round_tripped = json.loads(json.dumps(result))
         assert round_tripped["config"] == cfg
+
+
+# ---------------------------------------------------------------------------
+# Feature 8.1: Confidence Intervals in JSON Report
+# ---------------------------------------------------------------------------
+
+
+class TestComparisonJsonConfidenceIntervals:
+    """Test bootstrap CI serialization in comparison JSON reports."""
+
+    def test_comparison_json_with_bootstrap_results_included(self):
+        """When statistics_enabled=True, bootstrap results should appear in JSON."""
+        from spanchor.comparison.statistics import BootstrapResult
+
+        bootstrap_results = {
+            "recall@5": BootstrapResult(
+                metric_name="recall@5",
+                num_paired_queries=25,
+                mean_delta=0.05,
+                lower_ci=0.01,
+                upper_ci=0.09,
+                ci_level=0.95,
+                num_resamples=10000,
+                seed=42,
+            )
+        }
+
+        comparison = ComparisonResult(
+            per_query_deltas={"q1": {"recall@5": 0.05}},
+            per_query_status={"q1": "IMPROVED"},
+            aggregate_deltas={"recall@5": 0.05},
+            has_regression=False,
+            statistics_enabled=True,
+            bootstrap_results=bootstrap_results,
+            num_paired_queries=25,
+        )
+
+        result = generate_comparison_json(comparison, make_run(), make_run())
+
+        # Verify CI data is present
+        assert "aggregate_confidence_intervals" in result
+        assert "recall@5" in result["aggregate_confidence_intervals"]
+        assert "statistics_enabled" in result
+        assert result["statistics_enabled"] is True
+        assert result["num_paired_queries"] == 25
+
+        # Verify CI values are correctly serialized
+        ci_data = result["aggregate_confidence_intervals"]["recall@5"]
+        assert ci_data["mean_delta"] == 0.05
+        assert ci_data["lower_ci"] == 0.01
+        assert ci_data["upper_ci"] == 0.09
+        assert ci_data["ci_level"] == 0.95
+        assert ci_data["num_paired_queries"] == 25
+        assert ci_data["num_resamples"] == 10000
+
+    def test_comparison_json_without_statistics_backward_compatible(self):
+        """When statistics disabled, JSON should not include CI fields."""
+        comparison = ComparisonResult(
+            per_query_deltas={"q1": {"recall@5": 0.05}},
+            per_query_status={"q1": "IMPROVED"},
+            aggregate_deltas={"recall@5": 0.05},
+            has_regression=False,
+            statistics_enabled=False,
+            bootstrap_results=None,
+            num_paired_queries=0,
+        )
+
+        result = generate_comparison_json(comparison, make_run(), make_run())
+
+        # Verify CI data is NOT present (backward compatible)
+        assert "aggregate_confidence_intervals" not in result
+        assert "statistics_enabled" not in result
+        assert "num_paired_queries" not in result
+
+    def test_comparison_json_multiple_metrics_with_ci(self):
+        """Multiple metrics should each have their own CI entry."""
+        from spanchor.comparison.statistics import BootstrapResult
+
+        bootstrap_results = {
+            "recall@5": BootstrapResult(
+                metric_name="recall@5",
+                num_paired_queries=25,
+                mean_delta=0.05,
+                lower_ci=0.01,
+                upper_ci=0.09,
+                ci_level=0.95,
+                num_resamples=10000,
+                seed=42,
+            ),
+            "precision@5": BootstrapResult(
+                metric_name="precision@5",
+                num_paired_queries=25,
+                mean_delta=-0.02,
+                lower_ci=-0.06,
+                upper_ci=0.02,
+                ci_level=0.95,
+                num_resamples=10000,
+                seed=42,
+            ),
+        }
+
+        comparison = ComparisonResult(
+            per_query_deltas={"q1": {"recall@5": 0.05, "precision@5": -0.02}},
+            per_query_status={"q1": "IMPROVED"},
+            aggregate_deltas={"recall@5": 0.05, "precision@5": -0.02},
+            has_regression=False,
+            statistics_enabled=True,
+            bootstrap_results=bootstrap_results,
+            num_paired_queries=25,
+        )
+
+        result = generate_comparison_json(comparison, make_run(), make_run())
+
+        # Verify both metrics present
+        assert len(result["aggregate_confidence_intervals"]) == 2
+        assert "recall@5" in result["aggregate_confidence_intervals"]
+        assert "precision@5" in result["aggregate_confidence_intervals"]
+
+        # Verify each has correct data
+        assert result["aggregate_confidence_intervals"]["recall@5"]["mean_delta"] == 0.05
+        assert result["aggregate_confidence_intervals"]["precision@5"]["mean_delta"] == -0.02
+
+    def test_comparison_json_ci_is_json_serializable(self):
+        """CI data in JSON should be directly JSON-serializable."""
+        from spanchor.comparison.statistics import BootstrapResult
+
+        bootstrap_results = {
+            "recall@5": BootstrapResult(
+                metric_name="recall@5",
+                num_paired_queries=25,
+                mean_delta=0.05,
+                lower_ci=0.01,
+                upper_ci=0.09,
+                ci_level=0.95,
+                num_resamples=10000,
+                seed=42,
+            )
+        }
+
+        comparison = ComparisonResult(
+            per_query_deltas={"q1": {"recall@5": 0.05}},
+            per_query_status={"q1": "IMPROVED"},
+            aggregate_deltas={"recall@5": 0.05},
+            has_regression=False,
+            statistics_enabled=True,
+            bootstrap_results=bootstrap_results,
+            num_paired_queries=25,
+        )
+
+        result = generate_comparison_json(comparison, make_run(), make_run())
+
+        # Should be directly JSON-serializable
+        json_str = json.dumps(result)
+        round_tripped = json.loads(json_str)
+
+        # Verify round-trip preserves CI values
+        assert round_tripped["aggregate_confidence_intervals"]["recall@5"]["mean_delta"] == 0.05
+
+
+# ---------------------------------------------------------------------------
+# Feature 8.3: Set-wise Metrics in JSON Report
+# ---------------------------------------------------------------------------
+
+
+class TestComparisonJsonSetwiseMetrics:
+    """Test set-wise metrics integration in JSON reports."""
+
+    def test_json_setwise_aggregate_deltas_field_present(self):
+        """JSON should include setwise_aggregate_deltas field when data available."""
+        comparison = ComparisonResult(
+            per_query_deltas={},
+            per_query_status={},
+            aggregate_deltas={},
+            has_regression=False,
+            setwise_aggregate_deltas={
+                "span_concentration": 0.05,
+                "fragmentation_ratio": -0.03,
+                "pairwise_overlap": 0.01,
+            },
+        )
+        result = generate_comparison_json(comparison, make_run(), make_run())
+        assert "setwise_aggregate_deltas" in result
+
+    def test_json_setwise_aggregate_deltas_values_correct(self):
+        """Setwise aggregate deltas should have accurate values in JSON."""
+        setwise_data = {
+            "span_concentration": 0.05,
+            "fragmentation_ratio": -0.03,
+            "pairwise_overlap": 0.01,
+        }
+        comparison = ComparisonResult(
+            per_query_deltas={},
+            per_query_status={},
+            aggregate_deltas={},
+            has_regression=False,
+            setwise_aggregate_deltas=setwise_data,
+        )
+        result = generate_comparison_json(comparison, make_run(), make_run())
+        assert result["setwise_aggregate_deltas"] == setwise_data
+
+    def test_json_per_query_setwise_deltas_field_present(self):
+        """JSON should include per_query_setwise_deltas field when data available."""
+        comparison = ComparisonResult(
+            per_query_deltas={},
+            per_query_status={},
+            aggregate_deltas={},
+            has_regression=False,
+            setwise_deltas={
+                "q1": {
+                    "span_concentration": 0.05,
+                    "fragmentation_ratio": -0.03,
+                    "pairwise_overlap": 0.01,
+                }
+            },
+            setwise_aggregate_deltas={
+                "span_concentration": 0.05,
+                "fragmentation_ratio": -0.03,
+                "pairwise_overlap": 0.01,
+            },
+        )
+        result = generate_comparison_json(comparison, make_run(), make_run())
+        assert "per_query_setwise_deltas" in result
+
+    def test_json_per_query_setwise_deltas_values_correct(self):
+        """Per-query setwise deltas should have accurate values in JSON."""
+        setwise_deltas = {
+            "q1": {
+                "span_concentration": 0.05,
+                "fragmentation_ratio": -0.03,
+            },
+            "q2": {
+                "span_concentration": -0.02,
+                "pairwise_overlap": 0.04,
+            },
+        }
+        comparison = ComparisonResult(
+            per_query_deltas={},
+            per_query_status={},
+            aggregate_deltas={},
+            has_regression=False,
+            setwise_deltas=setwise_deltas,
+            setwise_aggregate_deltas={
+                "span_concentration": 0.015,
+                "fragmentation_ratio": -0.015,
+                "pairwise_overlap": 0.02,
+            },
+        )
+        result = generate_comparison_json(comparison, make_run(), make_run())
+        assert result["per_query_setwise_deltas"] == setwise_deltas
+
+    def test_json_setwise_fields_absent_when_disabled(self):
+        """JSON should omit setwise fields when setwise data is None."""
+        comparison = ComparisonResult(
+            per_query_deltas={},
+            per_query_status={},
+            aggregate_deltas={},
+            has_regression=False,
+            setwise_deltas=None,
+            setwise_aggregate_deltas=None,
+        )
+        result = generate_comparison_json(comparison, make_run(), make_run())
+        assert "setwise_aggregate_deltas" not in result
+        assert "per_query_setwise_deltas" not in result
+
+    def test_json_setwise_backward_compatibility_no_setwise(self):
+        """JSON without setwise data should maintain backward compatibility."""
+        comparison = ComparisonResult(
+            per_query_deltas={"q1": {"recall@5": 0.05}},
+            per_query_status={"q1": "IMPROVED"},
+            aggregate_deltas={"recall@5": 0.05},
+            has_regression=False,
+        )
+        result = generate_comparison_json(comparison, make_run(), make_run())
+
+        # Verify core fields still present and unchanged
+        assert "has_regression" in result
+        assert "aggregate_deltas" in result
+        assert "per_query" in result
+        assert "baseline" in result
+        assert "candidate" in result
+
+    def test_json_setwise_all_three_metrics_in_aggregate(self):
+        """All three setwise metrics should appear in aggregate_deltas."""
+        setwise_data = {
+            "span_concentration": 0.05,
+            "fragmentation_ratio": -0.03,
+            "pairwise_overlap": 0.01,
+        }
+        comparison = ComparisonResult(
+            per_query_deltas={},
+            per_query_status={},
+            aggregate_deltas={},
+            has_regression=False,
+            setwise_aggregate_deltas=setwise_data,
+        )
+        result = generate_comparison_json(comparison, make_run(), make_run())
+        agg = result["setwise_aggregate_deltas"]
+        assert "span_concentration" in agg
+        assert "fragmentation_ratio" in agg
+        assert "pairwise_overlap" in agg
+
+    def test_json_setwise_is_json_serializable(self):
+        """JSON with setwise data should be serializable with json.dumps."""
+        comparison = ComparisonResult(
+            per_query_deltas={},
+            per_query_status={},
+            aggregate_deltas={},
+            has_regression=False,
+            setwise_deltas={
+                "q1": {"span_concentration": 0.05, "fragmentation_ratio": -0.03},
+                "q2": {"pairwise_overlap": 0.01},
+            },
+            setwise_aggregate_deltas={
+                "span_concentration": 0.02,
+                "fragmentation_ratio": -0.01,
+                "pairwise_overlap": 0.005,
+            },
+        )
+        result = generate_comparison_json(comparison, make_run(), make_run())
+        # Should not raise
+        json_str = json.dumps(result)
+        assert isinstance(json_str, str)
+
+    def test_json_setwise_and_statistics_together(self):
+        """JSON should contain both setwise and statistics when both available."""
+        from spanchor.comparison.statistics import BootstrapResult
+
+        bootstrap_results = {
+            "recall@5": BootstrapResult(
+                metric_name="recall@5",
+                num_paired_queries=25,
+                mean_delta=0.05,
+                lower_ci=0.01,
+                upper_ci=0.09,
+                ci_level=0.95,
+                num_resamples=10000,
+                seed=42,
+            )
+        }
+
+        comparison = ComparisonResult(
+            per_query_deltas={"q1": {"recall@5": 0.05}},
+            per_query_status={"q1": "IMPROVED"},
+            aggregate_deltas={"recall@5": 0.05},
+            has_regression=False,
+            statistics_enabled=True,
+            bootstrap_results=bootstrap_results,
+            num_paired_queries=25,
+            setwise_deltas={
+                "q1": {"span_concentration": 0.05},
+            },
+            setwise_aggregate_deltas={
+                "span_concentration": 0.05,
+                "fragmentation_ratio": 0.0,
+                "pairwise_overlap": 0.0,
+            },
+        )
+        result = generate_comparison_json(comparison, make_run(), make_run())
+
+        # Both should be present
+        assert "aggregate_confidence_intervals" in result
+        assert "setwise_aggregate_deltas" in result
+        assert "per_query_setwise_deltas" in result
+
+    def test_json_setwise_empty_per_query_deltas_dict(self):
+        """JSON should handle empty per_query_setwise_deltas gracefully."""
+        comparison = ComparisonResult(
+            per_query_deltas={},
+            per_query_status={},
+            aggregate_deltas={},
+            has_regression=False,
+            setwise_deltas={},  # Empty dict (no per-query deltas)
+            setwise_aggregate_deltas={
+                "span_concentration": 0.0,
+                "fragmentation_ratio": 0.0,
+                "pairwise_overlap": 0.0,
+            },
+        )
+        result = generate_comparison_json(comparison, make_run(), make_run())
+        # Should include empty dict for per_query_setwise_deltas
+        assert "per_query_setwise_deltas" in result
+        assert result["per_query_setwise_deltas"] == {}
+
+    def test_json_setwise_only_aggregate_no_per_query(self):
+        """JSON should handle case where only aggregate setwise data available."""
+        comparison = ComparisonResult(
+            per_query_deltas={},
+            per_query_status={},
+            aggregate_deltas={},
+            has_regression=False,
+            setwise_deltas=None,  # No per-query data
+            setwise_aggregate_deltas={
+                "span_concentration": 0.05,
+                "fragmentation_ratio": -0.03,
+            },
+        )
+        result = generate_comparison_json(comparison, make_run(), make_run())
+        # Should include aggregate but not per-query
+        assert "setwise_aggregate_deltas" in result
+        assert "per_query_setwise_deltas" not in result

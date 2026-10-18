@@ -5,7 +5,7 @@ across all possible Anchor instances and their validation behavior.
 """
 
 import pytest
-from hypothesis import given
+from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
 from spanchor.canonical.normalize import compute_hash
@@ -22,6 +22,7 @@ class TestAnchorProperties:
         st.text(min_size=1, max_size=1000),  # document text (non-empty for valid spans)
         st.data(),  # data strategy for generating dependent values
     )
+    @settings(suppress_health_check=[HealthCheck.too_slow])
     def test_anchor_offset_slice_semantics(
         self, document_id: str, document_text: str, data: st.DataObject
     ) -> None:

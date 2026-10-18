@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "spanchor"
-version = "0.3.0"
+version = "0.4.0"
 description = "Source-anchored regression testing for RAG retrieval pipelines"
 readme = "README.md"
 license = "Apache-2.0"
@@ -63,7 +63,7 @@ select = [
     "C4",  # flake8-comprehensions
     "UP",  # pyupgrade
 ]
-ignore = []
+ignore = ["B008", "B007"]  # B008 is incompatible with Typer framework patterns; B007 has false positives in set comprehensions
 
 [tool.ruff.lint.isort]
 known-first-party = ["spanchor"]

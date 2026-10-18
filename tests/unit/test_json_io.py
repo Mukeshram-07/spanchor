@@ -63,7 +63,10 @@ class TestReadRun:
         assert run.aggregate_metrics["mean_recall@5"] == 0.85
         assert run.config["k"] == 5
         assert run.mapper_stats["MAPPED_EXACT"] == 10
-        assert run.schema_version == "0.1.0"
+        # v0.1.0 automatically migrated to v0.2.0
+        assert run.schema_version == "0.2.0"
+        assert run.corpus_hash is None
+        assert run.gold_set_hash is None
 
     def test_read_run_with_multiple_queries(self, tmp_path: Path) -> None:
         """Test reading a Run with multiple queries."""
@@ -782,14 +785,17 @@ class TestWriteRun:
             aggregate_metrics={"mean_recall@5": 0.85},
             config={"k": 5, "min_overlap": 0.5},
             mapper_stats={"MAPPED_EXACT": 42, "UNMAPPED": 3},
-            schema_version="0.1.0",
+            schema_version="0.2.0",
+            corpus_hash=None,
+            gold_set_hash=None,
         )
 
         write_run(json_file, original_run)
         loaded_run = read_run(json_file)
 
         assert loaded_run.timestamp == original_run.timestamp
-        assert loaded_run.schema_version == original_run.schema_version
+        # write_run always writes v0.2.0 format
+        assert loaded_run.schema_version == "0.2.0"
         assert len(loaded_run.queries) == len(original_run.queries)
         assert loaded_run.queries[0].query_id == original_run.queries[0].query_id
         assert loaded_run.queries[0].question == original_run.queries[0].question
@@ -810,7 +816,9 @@ class TestWriteRun:
             aggregate_metrics={},
             config={},
             mapper_stats={},
-            schema_version="0.1.0",
+            schema_version="0.2.0",
+            corpus_hash=None,
+            gold_set_hash=None,
         )
 
         write_run(json_file, original_run, redact=True)
@@ -821,6 +829,7 @@ class TestWriteRun:
         # Other data should be intact
         assert loaded_run.queries[0].query_id == "q1"
         assert loaded_run.timestamp == original_run.timestamp
+
 
     def test_write_with_complex_config(self, tmp_path: Path) -> None:
         """Test writing a Run with complex nested config."""
@@ -871,3 +880,291 @@ class TestWriteRun:
 
         assert loaded_run.per_query_metrics["q1"]["recall@5"] == pytest.approx(0.85123456)
         assert loaded_run.per_query_metrics["q1"]["precision@5"] == pytest.approx(0.72987654)
+
+
+class TestBackwardCompatibility:
+    """Tests for schema versioning and backward compatibility."""
+
+    def test_read_v0_1_0_run_auto_migrates_to_v0_2_0(self, tmp_path: Path) -> None:
+        """Test that v0.1.0 Runs are automatically migrated to v0.2.0.
+
+        **Validates: Feature 4 — Schema Versioning**
+
+        This test verifies:
+        - v0.1.0 format loads successfully (no corpus_hash/gold_set_hash)
+        - Migration adds corpus_hash=None, gold_set_hash=None
+        - schema_version becomes "0.2.0"
+        - All other fields preserved
+        """
+        json_file = tmp_path / "run_v0.1.0.json"
+        # Create a v0.1.0 format Run (without corpus_hash, gold_set_hash)
+        v0_1_data = {
+            "timestamp": "2024-01-15T10:30:00Z",
+            "queries": [
+                {
+                    "query_id": "q1",
+                    "question": "What is Python?",
+                    "anchors": [
+                        {
+                            "document_id": "doc1",
+                            "start": 0,
+                            "end": 10,
+                            "expected_text_hash": "hash123",
+                            "schema_version": "0.1.0",
+                        }
+                    ],
+                    "schema_version": "0.1.0",
+                }
+            ],
+            "per_query_metrics": {"q1": {"recall@5": 0.85}},
+            "aggregate_metrics": {"mean_recall@5": 0.85},
+            "config": {"k": 5},
+            "mapper_stats": {"MAPPED_EXACT": 10},
+            "schema_version": "0.1.0",
+            # Note: NO corpus_hash or gold_set_hash
+        }
+        json_file.write_text(json.dumps(v0_1_data))
+
+        # Read the v0.1.0 file
+        run = read_run(json_file)
+
+        # Verify migration occurred
+        assert run.schema_version == "0.2.0"
+        assert run.corpus_hash is None
+        assert run.gold_set_hash is None
+
+        # Verify all other fields preserved
+        assert run.timestamp == "2024-01-15T10:30:00Z"
+        assert len(run.queries) == 1
+        assert run.queries[0].query_id == "q1"
+        assert run.per_query_metrics["q1"]["recall@5"] == 0.85
+        assert run.mapper_stats["MAPPED_EXACT"] == 10
+
+    def test_read_v0_1_0_run_emits_deprecation_warning(self, tmp_path: Path) -> None:
+        """Test that reading v0.1.0 Runs emits DeprecationWarning.
+
+        **Validates: Feature 4 — Schema Versioning**
+        """
+        json_file = tmp_path / "run_v0.1.0.json"
+        v0_1_data = {
+            "timestamp": "2024-01-15T10:30:00Z",
+            "queries": [],
+            "per_query_metrics": {},
+            "aggregate_metrics": {},
+            "config": {},
+            "mapper_stats": {},
+            "schema_version": "0.1.0",
+        }
+        json_file.write_text(json.dumps(v0_1_data))
+
+        with pytest.warns(DeprecationWarning, match="Migrating Run from schema v0.1.0 to v0.2.0"):
+            read_run(json_file)
+
+    def test_read_v0_2_0_run_no_migration(self, tmp_path: Path) -> None:
+        """Test that v0.2.0 Runs do not trigger migration.
+
+        **Validates: Feature 4 — Schema Versioning**
+
+        No warning should be emitted for v0.2.0 Runs (already current).
+        """
+        json_file = tmp_path / "run_v0.2.0.json"
+        v0_2_data = {
+            "timestamp": "2024-01-15T10:30:00Z",
+            "queries": [],
+            "per_query_metrics": {},
+            "aggregate_metrics": {},
+            "config": {},
+            "mapper_stats": {},
+            "schema_version": "0.2.0",
+            "corpus_hash": None,
+            "gold_set_hash": None,
+        }
+        json_file.write_text(json.dumps(v0_2_data))
+
+        # Should not emit DeprecationWarning
+        import warnings
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            run = read_run(json_file)
+
+            deprecation_warnings = [
+                warn for warn in w if issubclass(warn.category, DeprecationWarning)
+            ]
+            assert len(deprecation_warnings) == 0
+
+        assert run.schema_version == "0.2.0"
+
+    def test_write_run_always_writes_v0_2_0(self, tmp_path: Path) -> None:
+        """Test that write_run() always writes v0.2.0 format.
+
+        **Validates: Feature 4 — Schema Versioning**
+
+        Even if a Run is migrated from v0.1.0, write_run should preserve
+        the v0.2.0 schema_version, corpus_hash, and gold_set_hash fields.
+        """
+        json_file = tmp_path / "output.json"
+        query = Query("q1", "What is X?", (), "0.1.0")
+        run = Run(
+            timestamp="2024-01-15T10:30:00Z",
+            queries=(query,),
+            per_query_metrics={"q1": {"recall@5": 0.85}},
+            aggregate_metrics={"mean_recall@5": 0.85},
+            config={"k": 5},
+            mapper_stats={"MAPPED_EXACT": 10},
+            schema_version="0.2.0",
+            corpus_hash=None,
+            gold_set_hash=None,
+        )
+
+        write_run(json_file, run)
+
+        # Load the written file
+        data = json.loads(json_file.read_text())
+
+        # Verify v0.2.0 fields present
+        assert data["schema_version"] == "0.2.0"
+        assert "corpus_hash" in data
+        assert data["corpus_hash"] is None
+        assert "gold_set_hash" in data
+        assert data["gold_set_hash"] is None
+
+    def test_round_trip_v0_1_0_to_v0_2_0(self, tmp_path: Path) -> None:
+        """Test round-trip: load v0.1.0 → save → load.
+
+        **Validates: Feature 4 — Schema Versioning**
+
+        Verifies:
+        1. Load v0.1.0 format
+        2. Save as v0.2.0
+        3. Load again as v0.2.0
+        4. All fields identical
+        """
+        # Step 1: Create v0.1.0 file
+        v0_1_file = tmp_path / "run_v0.1.0.json"
+        v0_1_data = {
+            "timestamp": "2024-01-15T10:30:00Z",
+            "queries": [
+                {
+                    "query_id": "q1",
+                    "question": "What is Python?",
+                    "anchors": [
+                        {
+                            "document_id": "doc1",
+                            "start": 0,
+                            "end": 10,
+                            "expected_text_hash": "hash123",
+                            "schema_version": "0.1.0",
+                        }
+                    ],
+                    "schema_version": "0.1.0",
+                }
+            ],
+            "per_query_metrics": {"q1": {"recall@5": 0.85, "precision@5": 0.72}},
+            "aggregate_metrics": {"mean_recall@5": 0.85, "mean_precision@5": 0.72},
+            "config": {"k": 5, "min_overlap": 0.5},
+            "mapper_stats": {"MAPPED_EXACT": 10, "MAPPED_NORMALIZED": 2},
+            "schema_version": "0.1.0",
+        }
+        v0_1_file.write_text(json.dumps(v0_1_data))
+
+        # Step 2: Load v0.1.0 (will be migrated)
+        with pytest.warns(DeprecationWarning):
+            run_migrated = read_run(v0_1_file)
+
+        # Step 3: Save as v0.2.0
+        v0_2_file = tmp_path / "run_v0.2.0.json"
+        write_run(v0_2_file, run_migrated)
+
+        # Step 4: Load v0.2.0 again
+        run_reloaded = read_run(v0_2_file)
+
+        # Verify equivalence
+        assert run_reloaded.timestamp == run_migrated.timestamp
+        assert len(run_reloaded.queries) == len(run_migrated.queries)
+        assert run_reloaded.queries[0].query_id == run_migrated.queries[0].query_id
+        assert run_reloaded.per_query_metrics == run_migrated.per_query_metrics
+        assert run_reloaded.aggregate_metrics == run_migrated.aggregate_metrics
+        assert run_reloaded.config == run_migrated.config
+        assert run_reloaded.mapper_stats == run_migrated.mapper_stats
+        assert run_reloaded.schema_version == "0.2.0"
+        assert run_reloaded.corpus_hash is None
+        assert run_reloaded.gold_set_hash is None
+
+    def test_read_v0_2_0_with_corpus_hash(self, tmp_path: Path) -> None:
+        """Test reading v0.2.0 Run with populated corpus_hash and gold_set_hash.
+
+        **Validates: Feature 4 — Schema Versioning**
+        """
+        json_file = tmp_path / "run_v0.2.0_with_hashes.json"
+        v0_2_data = {
+            "timestamp": "2024-01-15T10:30:00Z",
+            "queries": [],
+            "per_query_metrics": {},
+            "aggregate_metrics": {},
+            "config": {},
+            "mapper_stats": {},
+            "schema_version": "0.2.0",
+            "corpus_hash": "sha256:abc123def456",
+            "gold_set_hash": "sha256:xyz789pqr012",
+        }
+        json_file.write_text(json.dumps(v0_2_data))
+
+        run = read_run(json_file)
+
+        assert run.schema_version == "0.2.0"
+        assert run.corpus_hash == "sha256:abc123def456"
+        assert run.gold_set_hash == "sha256:xyz789pqr012"
+
+    def test_write_run_preserves_corpus_and_gold_set_hash(self, tmp_path: Path) -> None:
+        """Test that write_run() preserves corpus_hash and gold_set_hash.
+
+        **Validates: Feature 4 — Schema Versioning**
+        """
+        json_file = tmp_path / "output.json"
+        query = Query("q1", "Test?", (), "0.1.0")
+        run = Run(
+            timestamp="2024-01-15T10:30:00Z",
+            queries=(query,),
+            per_query_metrics={},
+            aggregate_metrics={},
+            config={},
+            mapper_stats={},
+            schema_version="0.2.0",
+            corpus_hash="sha256:abc123",
+            gold_set_hash="sha256:xyz789",
+        )
+
+        write_run(json_file, run)
+        loaded_run = read_run(json_file)
+
+        assert loaded_run.corpus_hash == "sha256:abc123"
+        assert loaded_run.gold_set_hash == "sha256:xyz789"
+
+    def test_read_v0_1_0_with_missing_optional_fields(self, tmp_path: Path) -> None:
+        """Test that v0.1.0 without corpus_hash/gold_set_hash works fine.
+
+        **Validates: Feature 4 — Schema Versioning**
+
+        This is the default case: old v0.1.0 files have no corpus_hash or
+        gold_set_hash fields at all (not even null).
+        """
+        json_file = tmp_path / "run_v0.1.0_minimal.json"
+        v0_1_data = {
+            "timestamp": "2024-01-15T10:30:00Z",
+            "queries": [],
+            "per_query_metrics": {},
+            "aggregate_metrics": {},
+            "config": {},
+            "mapper_stats": {},
+            "schema_version": "0.1.0",
+            # No corpus_hash or gold_set_hash fields at all
+        }
+        json_file.write_text(json.dumps(v0_1_data))
+
+        with pytest.warns(DeprecationWarning):
+            run = read_run(json_file)
+
+        assert run.schema_version == "0.2.0"
+        assert run.corpus_hash is None
+        assert run.gold_set_hash is None

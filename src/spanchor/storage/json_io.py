@@ -2,7 +2,8 @@
 
 This module provides read_run and write_run functions for Run objects
 in JSON format, with strict schema validation and optional source text
-redaction for privacy and size optimization.
+redaction for privacy and size optimization. Includes automatic migration
+for backward compatibility (v0.1.0 → v0.2.0).
 """
 
 import json
@@ -12,6 +13,7 @@ from spanchor.errors import InvalidSchemaError
 from spanchor.models.anchor import Anchor
 from spanchor.models.query import Query
 from spanchor.models.run import Run
+from spanchor.storage.migration import apply_migrations
 
 
 def read_run(path: Path) -> Run:
@@ -316,7 +318,7 @@ def read_run(path: Path) -> Run:
                     file_path=str(path),
                     field_name=f"per_query_metrics[{query_id}]",
                 )
-            if not isinstance(value, (int, float)):
+            if not isinstance(value, int | float):
                 raise InvalidSchemaError(
                     message=(
                         f"Metric value for '{metric_name}' must be numeric, "
@@ -334,7 +336,7 @@ def read_run(path: Path) -> Run:
                 file_path=str(path),
                 field_name="aggregate_metrics",
             )
-        if not isinstance(value, (int, float)):
+        if not isinstance(value, int | float):
             raise InvalidSchemaError(
                 message=(
                     f"Metric value for '{metric_name}' must be numeric, "
@@ -372,7 +374,11 @@ def read_run(path: Path) -> Run:
             config=data["config"],
             mapper_stats=data["mapper_stats"],
             schema_version=data["schema_version"],
+            corpus_hash=data.get("corpus_hash"),
+            gold_set_hash=data.get("gold_set_hash"),
         )
+        # Apply migrations for backward compatibility
+        run = apply_migrations(run)
         return run
     except (TypeError, ValueError) as e:
         raise InvalidSchemaError(
@@ -439,6 +445,8 @@ def write_run(path: Path, run: Run, redact: bool = False) -> None:
             "config": run.config,
             "mapper_stats": run.mapper_stats,
             "schema_version": run.schema_version,
+            "corpus_hash": run.corpus_hash,
+            "gold_set_hash": run.gold_set_hash,
         }
 
         # Write to file

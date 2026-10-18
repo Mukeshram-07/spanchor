@@ -21,11 +21,17 @@ class MappingResult:
         status: Mapping status (MAPPED_EXACT, MAPPED_NORMALIZED, AMBIGUOUS, UNMAPPED)
         spans: List of (document_id, start, end) tuples for matched spans
         method: Description of mapping method used
+        confidence: Confidence score (0.0-1.0) for the mapping result
+        reason: Human-readable explanation of the mapping result
+        candidate_spans: All candidate spans found during mapping (before policy resolution)
     """
 
     status: Literal["MAPPED_EXACT", "MAPPED_NORMALIZED", "AMBIGUOUS", "UNMAPPED"]
     spans: list[tuple[str, int, int]] = field(default_factory=list)
     method: str = "none"
+    confidence: float = 0.0
+    reason: str = ""
+    candidate_spans: list[tuple[str, int, int]] = field(default_factory=list)
 
 
 class ChunkMapper:
@@ -78,7 +84,12 @@ class ChunkMapper:
         """
         # Handle empty chunk
         if not chunk_text or not chunk_text.strip():
-            return MappingResult(status="UNMAPPED", method="empty_chunk")
+            return MappingResult(
+                status="UNMAPPED",
+                method="empty_chunk",
+                confidence=0.0,
+                reason="Input chunk is empty or whitespace-only",
+            )
 
         # Normalize chunk text to canonical form (NFC + newline normalization)
         # This ensures we search for the same form that appears in canonical documents
@@ -86,12 +97,22 @@ class ChunkMapper:
 
         # Handle case where normalization resulted in empty/whitespace-only text
         if not canonical_chunk or not canonical_chunk.strip():
-            return MappingResult(status="UNMAPPED", method="empty_chunk")
+            return MappingResult(
+                status="UNMAPPED",
+                method="empty_chunk",
+                confidence=0.0,
+                reason="Chunk normalized to empty or whitespace-only text",
+            )
 
         # Determine search space
         if document_id:
             if document_id not in self.documents:
-                return MappingResult(status="UNMAPPED", method="document_not_found")
+                return MappingResult(
+                    status="UNMAPPED",
+                    method="document_not_found",
+                    confidence=0.0,
+                    reason=f"Specified document '{document_id}' not found in corpus",
+                )
             search_docs = {document_id: self.documents[document_id]}
         else:
             search_docs = self.documents
@@ -111,7 +132,12 @@ class ChunkMapper:
             )
 
         # No match found
-        return MappingResult(status="UNMAPPED", method="no_match")
+        return MappingResult(
+            status="UNMAPPED",
+            method="no_match",
+            confidence=0.0,
+            reason="No exact or normalized matches found in corpus",
+        )
 
     def _find_exact_matches(
         self, chunk_text: str, search_docs: dict[str, Document]
@@ -257,13 +283,26 @@ class ChunkMapper:
             AnchorResolutionError: If ambiguous and policy is 'fail'
         """
 
-        def get_status() -> Literal["MAPPED_EXACT", "MAPPED_NORMALIZED"]:
-            return "MAPPED_NORMALIZED" if is_normalized else "MAPPED_EXACT"
+        def get_status_and_confidence() -> tuple[
+            Literal["MAPPED_EXACT", "MAPPED_NORMALIZED"], float
+        ]:
+            if is_normalized:
+                return ("MAPPED_NORMALIZED", 0.8)
+            else:
+                return ("MAPPED_EXACT", 1.0)
 
         if len(matches) == 1:
             # Unique match
             self.claimed_spans.add(matches[0])
-            return MappingResult(status=get_status(), spans=matches, method=method)
+            status, confidence = get_status_and_confidence()
+            return MappingResult(
+                status=status,
+                spans=matches,
+                method=method,
+                confidence=confidence,
+                reason=f"Unique {status.lower()} match found",
+                candidate_spans=matches,
+            )
 
         # Multiple matches - handle ambiguity
         if len(matches) > 1:
@@ -278,19 +317,47 @@ class ChunkMapper:
                 for match in matches:
                     if match not in self.claimed_spans:
                         self.claimed_spans.add(match)
-                        return MappingResult(status=get_status(), spans=[match], method=method)
+                        status, confidence = get_status_and_confidence()
+                        return MappingResult(
+                            status=status,
+                            spans=[match],
+                            method=method,
+                            confidence=confidence,
+                            reason=f"Selected first unclaimed match from {len(matches)} candidates",
+                            candidate_spans=matches,
+                        )
 
                 # All matches claimed - mark as ambiguous
-                return MappingResult(status="AMBIGUOUS", spans=matches, method=method)
+                status, _ = get_status_and_confidence()
+                return MappingResult(
+                    status="AMBIGUOUS",
+                    spans=matches,
+                    method=method,
+                    confidence=0.5,
+                    reason=f"All {len(matches)} candidate matches already claimed by other chunks",
+                    candidate_spans=matches,
+                )
 
             elif self.policy == "all_occurrences":
                 # Return all occurrences
                 for match in matches:
                     self.claimed_spans.add(match)
-                return MappingResult(status="AMBIGUOUS", spans=matches, method=method)
+                return MappingResult(
+                    status="AMBIGUOUS",
+                    spans=matches,
+                    method=method,
+                    confidence=0.5,
+                    reason=f"Found {len(matches)} occurrences with all_occurrences policy",
+                    candidate_spans=matches,
+                )
 
         # Should not reach here
-        return MappingResult(status="UNMAPPED", method=method)
+        return MappingResult(
+            status="UNMAPPED",
+            method=method,
+            confidence=0.0,
+            reason="No matches could be resolved",
+        )
 
     def reset_claims(self) -> None:
         """Reset claimed spans tracker.

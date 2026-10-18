@@ -22,9 +22,12 @@ class Query:
         question: The question text
         anchors: Tuple of gold anchor references (immutable, hashable)
         schema_version: Schema version for forward compatibility
+        candidate_id: Optional: ID of the candidate that was promoted to create this query
+            (preserves provenance from extraction → review → promotion)
     """
 
     query_id: str
     question: str
     anchors: tuple[Anchor, ...]
     schema_version: str = "0.1.0"
+    candidate_id: str | None = None

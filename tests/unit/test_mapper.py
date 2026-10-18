@@ -344,6 +344,9 @@ class TestMappingResult:
         assert result.status == "UNMAPPED"
         assert result.spans == []
         assert result.method == "none"
+        assert result.confidence == 0.0
+        assert result.reason == ""
+        assert result.candidate_spans == []
 
     def test_mapping_result_frozen(self) -> None:
         """Test that MappingResult is immutable."""
@@ -351,6 +354,224 @@ class TestMappingResult:
 
         with pytest.raises(AttributeError):
             result.status = "UNMAPPED"  # type: ignore
+
+
+class TestConfidenceTracking:
+    """Test confidence scoring per mapping status."""
+
+    def test_confidence_mapped_exact(self, sample_docs: dict[str, Document]) -> None:
+        """Test that MAPPED_EXACT gets confidence 1.0."""
+        mapper = ChunkMapper(sample_docs)
+        result = mapper.map_chunk("quick brown fox", document_id="doc1")
+
+        assert result.status == "MAPPED_EXACT"
+        assert result.confidence == 1.0
+
+    def test_confidence_mapped_normalized(self, sample_docs: dict[str, Document]) -> None:
+        """Test that MAPPED_NORMALIZED gets confidence 0.8."""
+        mapper = ChunkMapper(sample_docs)
+        result = mapper.map_chunk("Text  with   extra    whitespace", document_id="doc3")
+
+        assert result.status == "MAPPED_NORMALIZED"
+        assert result.confidence == 0.8
+
+    def test_confidence_ambiguous(self, sample_docs: dict[str, Document]) -> None:
+        """Test that AMBIGUOUS gets confidence 0.5."""
+        mapper = ChunkMapper(sample_docs, ambiguity_policy="all_occurrences")
+        result = mapper.map_chunk("quick brown fox", document_id="doc2")
+
+        assert result.status == "AMBIGUOUS"
+        assert result.confidence == 0.5
+
+    def test_confidence_unmapped(self, sample_docs: dict[str, Document]) -> None:
+        """Test that UNMAPPED gets confidence 0.0."""
+        mapper = ChunkMapper(sample_docs)
+        result = mapper.map_chunk("nonexistent text", document_id="doc1")
+
+        assert result.status == "UNMAPPED"
+        assert result.confidence == 0.0
+
+
+class TestReasonField:
+    """Test reason field population for all outcomes."""
+
+    def test_reason_exact_match(self, sample_docs: dict[str, Document]) -> None:
+        """Test reason is populated for exact match."""
+        mapper = ChunkMapper(sample_docs)
+        result = mapper.map_chunk("quick brown fox", document_id="doc1")
+
+        assert result.status == "MAPPED_EXACT"
+        assert result.reason != ""
+        assert "unique" in result.reason.lower()
+
+    def test_reason_normalized_match(self, sample_docs: dict[str, Document]) -> None:
+        """Test reason is populated for normalized match."""
+        mapper = ChunkMapper(sample_docs)
+        result = mapper.map_chunk("Text  with   extra    whitespace", document_id="doc3")
+
+        assert result.status == "MAPPED_NORMALIZED"
+        assert result.reason != ""
+        assert "match" in result.reason.lower()
+
+    def test_reason_ambiguous_all_occurrences(self, sample_docs: dict[str, Document]) -> None:
+        """Test reason is populated for ambiguous (all_occurrences)."""
+        mapper = ChunkMapper(sample_docs, ambiguity_policy="all_occurrences")
+        result = mapper.map_chunk("quick brown fox", document_id="doc2")
+
+        assert result.status == "AMBIGUOUS"
+        assert result.reason != ""
+        assert "occurrences" in result.reason.lower()
+
+    def test_reason_ambiguous_all_claimed(self, sample_docs: dict[str, Document]) -> None:
+        """Test reason when all candidates are claimed."""
+        mapper = ChunkMapper(sample_docs, ambiguity_policy="first_unclaimed")
+
+        # Claim both occurrences
+        mapper.map_chunk("quick brown fox", document_id="doc2")
+        mapper.map_chunk("quick brown fox", document_id="doc2")
+
+        # Third attempt
+        result = mapper.map_chunk("quick brown fox", document_id="doc2")
+
+        assert result.status == "AMBIGUOUS"
+        assert "claimed" in result.reason.lower()
+
+    def test_reason_unmapped_no_match(self, sample_docs: dict[str, Document]) -> None:
+        """Test reason for unmapped (no match found)."""
+        mapper = ChunkMapper(sample_docs)
+        result = mapper.map_chunk("nonexistent", document_id="doc1")
+
+        assert result.status == "UNMAPPED"
+        assert "match" in result.reason.lower()
+
+    def test_reason_unmapped_empty_chunk(self, sample_docs: dict[str, Document]) -> None:
+        """Test reason for unmapped (empty chunk)."""
+        mapper = ChunkMapper(sample_docs)
+        result = mapper.map_chunk("", document_id="doc1")
+
+        assert result.status == "UNMAPPED"
+        assert "empty" in result.reason.lower()
+
+    def test_reason_unmapped_document_not_found(
+        self, sample_docs: dict[str, Document]
+    ) -> None:
+        """Test reason for unmapped (document not found)."""
+        mapper = ChunkMapper(sample_docs)
+        result = mapper.map_chunk("text", document_id="nonexistent")
+
+        assert result.status == "UNMAPPED"
+        assert "not found" in result.reason.lower()
+
+
+class TestCandidateSpansTracking:
+    """Test candidate_spans field tracks all possible matches."""
+
+    def test_candidate_spans_exact_match_single(self, sample_docs: dict[str, Document]) -> None:
+        """Test candidate_spans for single exact match."""
+        mapper = ChunkMapper(sample_docs)
+        result = mapper.map_chunk("quick brown fox", document_id="doc1")
+
+        assert result.status == "MAPPED_EXACT"
+        assert len(result.candidate_spans) == 1
+        assert result.candidate_spans[0] == ("doc1", 4, 19)
+
+    def test_candidate_spans_exact_match_multiple(self, sample_docs: dict[str, Document]) -> None:
+        """Test candidate_spans includes all matches."""
+        mapper = ChunkMapper(sample_docs, ambiguity_policy="all_occurrences")
+        result = mapper.map_chunk("quick brown fox", document_id="doc2")
+
+        assert result.status == "AMBIGUOUS"
+        assert len(result.candidate_spans) == 2
+        assert result.candidate_spans[0][1] == 4
+        assert result.candidate_spans[1][1] == 39
+
+    def test_candidate_spans_first_unclaimed_resolution(
+        self, sample_docs: dict[str, Document]
+    ) -> None:
+        """Test candidate_spans shows all candidates even when using first_unclaimed."""
+        mapper = ChunkMapper(sample_docs, ambiguity_policy="first_unclaimed")
+
+        # First mapping - should have candidates in candidate_spans
+        result1 = mapper.map_chunk("quick brown fox", document_id="doc2")
+        assert result1.status == "MAPPED_EXACT"
+        assert len(result1.candidate_spans) == 2
+        assert len(result1.spans) == 1  # But only 1 selected
+        assert result1.spans[0] == result1.candidate_spans[0]
+
+        # Second mapping - different candidates
+        result2 = mapper.map_chunk("quick brown fox", document_id="doc2")
+        assert result2.status == "MAPPED_EXACT"
+        assert len(result2.candidate_spans) == 2
+        assert len(result2.spans) == 1
+        assert result2.spans[0] == result2.candidate_spans[1]
+
+    def test_candidate_spans_normalized_match(self, sample_docs: dict[str, Document]) -> None:
+        """Test candidate_spans for normalized matches."""
+        mapper = ChunkMapper(sample_docs)
+        result = mapper.map_chunk("Text  with   extra    whitespace", document_id="doc3")
+
+        assert result.status == "MAPPED_NORMALIZED"
+        assert len(result.candidate_spans) >= 1
+        assert result.spans[0] == result.candidate_spans[0]
+
+    def test_candidate_spans_unmapped(self, sample_docs: dict[str, Document]) -> None:
+        """Test candidate_spans is empty for unmapped."""
+        mapper = ChunkMapper(sample_docs)
+        result = mapper.map_chunk("nonexistent text", document_id="doc1")
+
+        assert result.status == "UNMAPPED"
+        assert result.candidate_spans == []
+
+    def test_candidate_spans_multiple_documents(self, sample_docs: dict[str, Document]) -> None:
+        """Test candidate_spans when searching across documents."""
+        mapper = ChunkMapper(sample_docs, ambiguity_policy="all_occurrences")
+        # "quick brown fox" appears in both doc1 and doc2
+        result = mapper.map_chunk("quick brown fox")
+
+        assert result.status == "AMBIGUOUS"
+        # Should have all occurrences from all documents
+        assert len(result.candidate_spans) >= 2
+
+
+class TestBackwardCompatibility:
+    """Test backward compatibility with existing tests."""
+
+    def test_existing_result_structure_maintained(
+        self, sample_docs: dict[str, Document]
+    ) -> None:
+        """Test that existing result.status and result.spans still work."""
+        mapper = ChunkMapper(sample_docs)
+        result = mapper.map_chunk("quick brown fox", document_id="doc1")
+
+        # These should still work as before
+        assert isinstance(result.status, str)
+        assert isinstance(result.spans, list)
+        assert isinstance(result.method, str)
+
+    def test_all_policies_maintain_backward_compat(
+        self, sample_docs: dict[str, Document]
+    ) -> None:
+        """Test all policies work with new fields."""
+        for policy in ["first_unclaimed", "all_occurrences"]:
+            mapper = ChunkMapper(
+                sample_docs, ambiguity_policy=policy  # type: ignore[arg-type]
+            )
+            result = mapper.map_chunk("quick brown fox", document_id="doc2")
+
+            # All results should have new fields
+            assert hasattr(result, "confidence")
+            assert hasattr(result, "reason")
+            assert hasattr(result, "candidate_spans")
+
+    def test_unmapped_result_has_all_fields(self, sample_docs: dict[str, Document]) -> None:
+        """Test unmapped results have all fields initialized."""
+        mapper = ChunkMapper(sample_docs)
+        result = mapper.map_chunk("totally not here", document_id="doc1")
+
+        assert result.status == "UNMAPPED"
+        assert result.confidence == 0.0
+        assert result.reason != ""
+        assert result.candidate_spans == []
 
 
 class TestChunkMapperIntegration:
