@@ -58,7 +58,8 @@ class TestGoldReviewCommand:
         assert result.exit_code == 0
         # Strip ANSI color codes for assertion
         import re
-        clean_output = re.sub(r'\x1b\[[0-9;]*m', '', result.stdout)
+
+        clean_output = re.sub(r"\x1b\[[0-9;]*m", "", result.stdout)
         assert "review" in clean_output.lower()
         assert "candidate" in clean_output.lower()
         assert "--approve" in clean_output
@@ -730,6 +731,7 @@ class TestGoldReviewCommand:
             assert output_candidates[0].candidate_id == "doc1_0"
             assert output_candidates[1].candidate_id == "doc1_1"
             assert output_candidates[2].candidate_id == "doc1_2"
+
     def test_gold_review_does_not_modify_gold_files(self) -> None:
         """Review operations do NOT modify authoritative gold JSONL files.
 
@@ -797,9 +799,7 @@ class TestGoldReviewCommand:
             assert reviewed_candidates[0].candidate_id == "doc1_0"
 
             # Perform additional operations (reject, edit) on new candidates
-            candidate2 = self._create_test_candidate(
-                candidate_id="doc1_1", text="Second candidate"
-            )
+            candidate2 = self._create_test_candidate(candidate_id="doc1_1", text="Second candidate")
             candidates_list = read_candidate_pool(candidates_file)
             candidates_list.append(candidate2)
             write_candidate_pool(candidates_file, candidates_list)
