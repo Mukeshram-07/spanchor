@@ -279,7 +279,7 @@ The underlying benchmark and its scripts live in [`examples/real_world_validatio
 
 ## Release and versioning
 
-- **Current release:** `v0.3.0` (see `pyproject.toml` and [CHANGELOG.md](CHANGELOG.md))
+- **Current release:** `v0.4.0` (see `pyproject.toml` and [CHANGELOG.md](CHANGELOG.md))
 - **Versioning model:** `0.x.y` indicates alpha/early-stage development; breaking changes may occur between minor versions before `1.0.0`
 - **Python support:** 3.11, 3.12, 3.13
 - **Benchmark note:** benchmark values shown in this README are corpus-specific snapshots and should be treated as validation examples, not universal performance claims
@@ -328,7 +328,7 @@ Notes:
 
 ## Testing
 
-Current release `v0.3.0` is validated in CI with `pytest` across Python 3.11, 3.12, and 3.13.
+Current release `v0.4.0` is validated in CI with `pytest` across Python 3.11, 3.12, and 3.13.
 Code quality checks in CI run `ruff format`, `ruff check`, and `mypy --strict src/spanchor` (with configured adapter-module overrides in `pyproject.toml`).
 Adapter support for LangChain/LlamaIndex is optional: CI installs `.[dev]` only, so users should validate optional-framework behavior in their own environments.
 
@@ -345,16 +345,17 @@ pytest tests/unit/test_adapters_integration.py
 
 ## Roadmap
 
-**Current release: v0.3.0**
+**Current release: v0.4.0**
 
 Implemented:
 - Source-anchored evaluation and per-query regression detection
 - Generic, LangChain, and LlamaIndex adapters
 - CLI with CI exit codes
 - Adoption demo and real-world validation example
+- Schema versioning, corpus+gold versioning, and provenance tracking
+- Pluggable metric registry and gold-set generation (v0.4.0)
 
 **Planned / exploratory** (not committed to any release)
-- Schema versioning improvements
 - Richer policy configuration
 - Performance work
 - Additional framework adapters
