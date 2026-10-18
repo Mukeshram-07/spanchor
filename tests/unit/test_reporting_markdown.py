@@ -627,7 +627,6 @@ class TestEdgeCases:
         assert "No regressions detected" in report
 
 
-
 # ---------------------------------------------------------------------------
 # Feature 8.1: Confidence Intervals in Markdown Report
 # ---------------------------------------------------------------------------
@@ -1109,9 +1108,7 @@ class TestComparisonMarkdownSetwiseMetrics:
 
     def test_markdown_setwise_section_absent_when_no_data(self):
         """Setwise section should be omitted when setwise_aggregate_deltas is None."""
-        comparison = self.make_comparison_with_setwise(
-            setwise_aggregate_deltas=None
-        )
+        comparison = self.make_comparison_with_setwise(setwise_aggregate_deltas=None)
         baseline = make_run()
         candidate = make_run()
         report = generate_comparison_report(comparison, baseline, candidate)
@@ -1166,7 +1163,7 @@ class TestComparisonMarkdownSetwiseMetrics:
             setwise_aggregate_deltas={
                 "span_concentration": 0.075,
                 "fragmentation_ratio": -0.024,
-            }
+            },
         )
         baseline = make_run()
         candidate = make_run()
@@ -1191,7 +1188,7 @@ class TestComparisonMarkdownSetwiseMetrics:
             setwise_aggregate_deltas={
                 "span_concentration": 0.0065,
                 "fragmentation_ratio": 0.0005,
-            }
+            },
         )
         baseline = make_run()
         candidate = make_run()
@@ -1204,14 +1201,12 @@ class TestComparisonMarkdownSetwiseMetrics:
         """Query questions should appear in per-query setwise section when not redacted."""
         queries = (make_query("q1", "Test question about setwise metrics"),)
         comparison = self.make_comparison_with_setwise(
-            setwise_deltas={
-                "q1": {"span_concentration": 0.15}
-            },
+            setwise_deltas={"q1": {"span_concentration": 0.15}},
             setwise_aggregate_deltas={
                 "span_concentration": 0.15,
                 "fragmentation_ratio": 0.0,
                 "pairwise_overlap": 0.0,
-            }
+            },
         )
         baseline = make_run(queries=queries)
         candidate = make_run(queries=queries)
@@ -1222,14 +1217,12 @@ class TestComparisonMarkdownSetwiseMetrics:
         """Query questions should be omitted from setwise section when redacted."""
         queries = (make_query("q1", "Secret setwise query"),)
         comparison = self.make_comparison_with_setwise(
-            setwise_deltas={
-                "q1": {"span_concentration": 0.15}
-            },
+            setwise_deltas={"q1": {"span_concentration": 0.15}},
             setwise_aggregate_deltas={
                 "span_concentration": 0.15,
                 "fragmentation_ratio": 0.0,
                 "pairwise_overlap": 0.0,
-            }
+            },
         )
         baseline = make_run(queries=queries)
         candidate = make_run(queries=queries)
@@ -1270,7 +1263,7 @@ class TestComparisonMarkdownSetwiseMetrics:
                     "fragmentation_ratio": -0.03,
                     "pairwise_overlap": 0.01,
                 }
-            }
+            },
         )
 
         comparison = ComparisonResult(
@@ -1322,7 +1315,7 @@ class TestComparisonMarkdownSetwiseMetrics:
                 "span_concentration": 0.05,
                 "fragmentation_ratio": -0.03,
                 "pairwise_overlap": 0.01,
-            }
+            },
         )
 
         comparison = ComparisonResult(

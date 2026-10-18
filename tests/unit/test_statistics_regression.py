@@ -165,14 +165,8 @@ class TestBootstrapCIDeterminism:
     def test_different_seed_different_ci(self) -> None:
         """Different seeds produce different results with larger samples."""
         # Use more queries so CIs are more meaningful
-        baseline_metrics = {
-            f"q{i}": {"recall@5": 0.85 + (i % 5) * 0.01}
-            for i in range(15)
-        }
-        candidate_metrics = {
-            f"q{i}": {"recall@5": 0.87 + (i % 5) * 0.01}
-            for i in range(15)
-        }
+        baseline_metrics = {f"q{i}": {"recall@5": 0.85 + (i % 5) * 0.01} for i in range(15)}
+        candidate_metrics = {f"q{i}": {"recall@5": 0.87 + (i % 5) * 0.01} for i in range(15)}
 
         baseline = Run(
             timestamp="2024-01-01T00:00:00Z",
@@ -317,14 +311,8 @@ class TestBootstrapCIEdgeCases:
 
     def test_thirty_paired_queries_no_warning(self) -> None:
         """Thirty paired queries should not produce warning."""
-        baseline_metrics = {
-            f"q{i}": {"recall@5": 0.85 + (i % 10) * 0.01}
-            for i in range(30)
-        }
-        candidate_metrics = {
-            f"q{i}": {"recall@5": 0.87 + (i % 10) * 0.01}
-            for i in range(30)
-        }
+        baseline_metrics = {f"q{i}": {"recall@5": 0.85 + (i % 10) * 0.01} for i in range(30)}
+        candidate_metrics = {f"q{i}": {"recall@5": 0.87 + (i % 10) * 0.01} for i in range(30)}
 
         baseline = _make_run(per_query_metrics=baseline_metrics)
         candidate = _make_run(per_query_metrics=candidate_metrics)
@@ -420,9 +408,7 @@ class TestCompareIntegration:
         candidate = _make_run(per_query_metrics=candidate_metrics)
         config = StatisticsConfig(enabled=True, min_paired_queries=5)
 
-        with pytest.raises(
-            ComparisonError, match="Insufficient paired queries"
-        ):
+        with pytest.raises(ComparisonError, match="Insufficient paired queries"):
             compare(baseline, candidate, {}, statistics_config=config)
 
     def test_backward_compatible_existing_tests(self) -> None:

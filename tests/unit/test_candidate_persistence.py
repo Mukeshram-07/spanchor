@@ -402,10 +402,7 @@ class TestWriteCandidatePool:
         write_candidate_pool(jsonl_file, [candidate])
 
         loaded_candidates = read_candidate_pool(jsonl_file)
-        assert (
-            loaded_candidates[0].text
-            == 'Text with "quotes" and \\ backslashes and \n newlines.'
-        )
+        assert loaded_candidates[0].text == 'Text with "quotes" and \\ backslashes and \n newlines.'
 
 
 class TestCandidateRoundTrip:
@@ -614,9 +611,7 @@ class TestInvalidRecordsRejected:
         # This should fail when trying to create Candidate
         # (if review was in JSONL)
         # Currently, review is not in JSONL, so this just tests the model
-        candidate = Candidate(
-            "c1", "Test.", "doc1", 1.0, schema_version="0.2.0"
-        )
+        candidate = Candidate("c1", "Test.", "doc1", 1.0, schema_version="0.2.0")
         assert candidate.status == CandidateStatus.PENDING
 
     def test_missing_required_fields_error_message(self, tmp_path: Path) -> None:

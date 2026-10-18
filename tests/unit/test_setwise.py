@@ -433,21 +433,9 @@ class TestIntegration:
         gold_spans = [(0, 100)]
         retrieved_spans = [(0, 50), (100, 150)]
 
-        conc = registry.compute_metric(
-            "span_concentration",
-            gold_spans,
-            retrieved_spans
-        )
-        frag = registry.compute_metric(
-            "fragmentation_ratio",
-            gold_spans,
-            retrieved_spans
-        )
-        pair = registry.compute_metric(
-            "pairwise_overlap",
-            gold_spans,
-            retrieved_spans
-        )
+        conc = registry.compute_metric("span_concentration", gold_spans, retrieved_spans)
+        frag = registry.compute_metric("fragmentation_ratio", gold_spans, retrieved_spans)
+        pair = registry.compute_metric("pairwise_overlap", gold_spans, retrieved_spans)
 
         assert isinstance(conc, float)
         assert isinstance(frag, float)

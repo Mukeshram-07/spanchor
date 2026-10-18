@@ -166,8 +166,7 @@ def merge_policy(
             if not isinstance(value, int):
                 val_type = type(value).__name__
                 raise ValueError(
-                    f"min_query_count override must be an integer, "
-                    f"got {val_type}: {value!r}"
+                    f"min_query_count override must be an integer, " f"got {val_type}: {value!r}"
                 )
             new_min_query_count = value
         elif key == "thresholds":

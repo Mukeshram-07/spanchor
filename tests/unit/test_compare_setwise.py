@@ -191,12 +191,8 @@ class TestSetwiseMetricsComputation:
     def test_setwise_aggregate_deltas_computed(self):
         """Aggregate setwise deltas should be macro-average across queries."""
         baseline_results = {
-            "q1": (
-                RetrievalResult(rank=1, score=0.95, document_id="d1", start=0, end=50),
-            ),
-            "q2": (
-                RetrievalResult(rank=1, score=0.90, document_id="d1", start=100, end=150),
-            ),
+            "q1": (RetrievalResult(rank=1, score=0.95, document_id="d1", start=0, end=50),),
+            "q2": (RetrievalResult(rank=1, score=0.90, document_id="d1", start=100, end=150),),
         }
         baseline = make_run(
             {"q1": {"recall@5": 0.80}, "q2": {"recall@5": 0.75}},
@@ -204,12 +200,8 @@ class TestSetwiseMetricsComputation:
         )
 
         candidate_results = {
-            "q1": (
-                RetrievalResult(rank=1, score=0.98, document_id="d1", start=0, end=100),
-            ),
-            "q2": (
-                RetrievalResult(rank=1, score=0.92, document_id="d1", start=100, end=200),
-            ),
+            "q1": (RetrievalResult(rank=1, score=0.98, document_id="d1", start=0, end=100),),
+            "q2": (RetrievalResult(rank=1, score=0.92, document_id="d1", start=100, end=200),),
         }
         candidate = make_run(
             {"q1": {"recall@5": 0.90}, "q2": {"recall@5": 0.85}},
@@ -227,12 +219,8 @@ class TestSetwiseMetricsComputation:
     def test_setwise_deltas_only_for_common_queries(self):
         """Set-wise deltas should only be computed for queries in both runs."""
         baseline_results = {
-            "q1": (
-                RetrievalResult(rank=1, score=0.95, document_id="d1", start=0, end=50),
-            ),
-            "q2": (
-                RetrievalResult(rank=1, score=0.90, document_id="d1", start=100, end=150),
-            ),
+            "q1": (RetrievalResult(rank=1, score=0.95, document_id="d1", start=0, end=50),),
+            "q2": (RetrievalResult(rank=1, score=0.90, document_id="d1", start=100, end=150),),
         }
         baseline = make_run(
             {"q1": {"recall@5": 0.80}, "q2": {"recall@5": 0.75}},
@@ -241,9 +229,7 @@ class TestSetwiseMetricsComputation:
 
         # Candidate only has q1 (not q2)
         candidate_results = {
-            "q1": (
-                RetrievalResult(rank=1, score=0.98, document_id="d1", start=0, end=100),
-            ),
+            "q1": (RetrievalResult(rank=1, score=0.98, document_id="d1", start=0, end=100),),
         }
         candidate = make_run(
             {"q1": {"recall@5": 0.90}},
@@ -346,9 +332,7 @@ class TestSetwiseMetricsCombinedWithOtherFeatures:
     def test_setwise_with_policy_classification(self):
         """Set-wise metrics should not affect policy-based classification."""
         baseline_results = {
-            "q1": (
-                RetrievalResult(rank=1, score=0.95, document_id="d1", start=0, end=50),
-            ),
+            "q1": (RetrievalResult(rank=1, score=0.95, document_id="d1", start=0, end=50),),
         }
         baseline = make_run(
             {"q1": {"recall@5": 0.90}},
@@ -356,9 +340,7 @@ class TestSetwiseMetricsCombinedWithOtherFeatures:
         )
 
         candidate_results = {
-            "q1": (
-                RetrievalResult(rank=1, score=0.80, document_id="d1", start=0, end=100),
-            ),
+            "q1": (RetrievalResult(rank=1, score=0.80, document_id="d1", start=0, end=100),),
         }
         candidate = make_run(
             {"q1": {"recall@5": 0.80}},
@@ -408,9 +390,7 @@ class TestSetwiseMetricsEdgeCases:
     def test_setwise_with_single_result_per_query(self):
         """Set-wise metrics should handle queries with single results."""
         baseline_results = {
-            "q1": (
-                RetrievalResult(rank=1, score=0.95, document_id="d1", start=0, end=50),
-            ),
+            "q1": (RetrievalResult(rank=1, score=0.95, document_id="d1", start=0, end=50),),
         }
         baseline = make_run(
             {"q1": {"recall@5": 0.80}},
@@ -418,9 +398,7 @@ class TestSetwiseMetricsEdgeCases:
         )
 
         candidate_results = {
-            "q1": (
-                RetrievalResult(rank=1, score=0.98, document_id="d1", start=0, end=100),
-            ),
+            "q1": (RetrievalResult(rank=1, score=0.98, document_id="d1", start=0, end=100),),
         }
         candidate = make_run(
             {"q1": {"recall@5": 0.90}},

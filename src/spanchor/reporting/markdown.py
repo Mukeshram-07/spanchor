@@ -381,9 +381,7 @@ def generate_comparison_report(
     # -------------------------------------------------------------------
     # 4. Regression Grouping (Feature 8.2, optional)
     # -------------------------------------------------------------------
-    regressed_queries = [
-        qid for qid, status in per_query_status.items() if status == "REGRESSION"
-    ]
+    regressed_queries = [qid for qid, status in per_query_status.items() if status == "REGRESSION"]
     if regressed_queries:
         sections.append("## Regressions (Sorted by Severity)\n")
 
@@ -398,11 +396,7 @@ def generate_comparison_report(
 
         # Collect all metric names
         all_metric_names_regs = sorted(
-            {
-                metric
-                for q_deltas in per_query_deltas.values()
-                for metric in q_deltas
-            }
+            {metric for q_deltas in per_query_deltas.values() for metric in q_deltas}
         )
 
         # Compute severity (sum of absolute negative deltas) for each regressed query
@@ -429,23 +423,17 @@ def generate_comparison_report(
             # When policy available, show threshold and actual delta for failed metrics
             threshold_headers = [f"{m} Threshold" for m in all_metric_names_regs]
             if redact:
-                headers_regs = (
-                    ["Query ID", "Severity"] + threshold_headers + delta_headers_regs
-                )
+                headers_regs = ["Query ID", "Severity"] + threshold_headers + delta_headers_regs
             else:
                 headers_regs = (
-                    ["Query ID", "Question", "Severity"]
-                    + threshold_headers
-                    + delta_headers_regs
+                    ["Query ID", "Question", "Severity"] + threshold_headers + delta_headers_regs
                 )
         else:
             # Without policy, show only actual deltas (backward compatible)
             if redact:
                 headers_regs = ["Query ID", "Severity"] + delta_headers_regs
             else:
-                headers_regs = (
-                    ["Query ID", "Question", "Severity"] + delta_headers_regs
-                )
+                headers_regs = ["Query ID", "Question", "Severity"] + delta_headers_regs
 
         rows_regs: list[list[str]] = []
         for qid in sorted_regressed:
@@ -509,11 +497,7 @@ def generate_comparison_report(
 
         # Collect all metric names
         all_metric_names_imps = sorted(
-            {
-                metric
-                for q_deltas in per_query_deltas.values()
-                for metric in q_deltas
-            }
+            {metric for q_deltas in per_query_deltas.values() for metric in q_deltas}
         )
 
         # Compute impact (sum of positive deltas) for each improved query

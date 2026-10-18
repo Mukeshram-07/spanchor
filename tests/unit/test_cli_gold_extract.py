@@ -47,7 +47,9 @@ class TestGoldExtractCommand:
             assert result.exit_code != 0
             # Error message may be in stdout or mix/output parameter may not be recognized
             output = result.stdout + result.stderr if result.stderr else result.stdout
-            assert "missing" in output.lower() or "required" in output.lower() or result.exit_code == 2
+            assert (
+                "missing" in output.lower() or "required" in output.lower() or result.exit_code == 2
+            )
 
     def test_gold_extract_nonexistent_directory(self) -> None:
         """Command fails with non-existent directory."""
@@ -86,9 +88,7 @@ class TestGoldExtractCommand:
             output_file = Path(tmpdir) / "output.jsonl"
 
             # Create a sample document
-            (docs_dir / "test.txt").write_text(
-                "Hello world. How are you?", encoding="utf-8"
-            )
+            (docs_dir / "test.txt").write_text("Hello world. How are you?", encoding="utf-8")
 
             result = runner.invoke(
                 app,
@@ -105,9 +105,7 @@ class TestGoldExtractCommand:
             output_file = Path(tmpdir) / "output.jsonl"
 
             # Create a sample document
-            (docs_dir / "test.txt").write_text(
-                "First sentence. Second sentence.", encoding="utf-8"
-            )
+            (docs_dir / "test.txt").write_text("First sentence. Second sentence.", encoding="utf-8")
 
             result = runner.invoke(
                 app,

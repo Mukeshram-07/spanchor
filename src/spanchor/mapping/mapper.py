@@ -283,9 +283,9 @@ class ChunkMapper:
             AnchorResolutionError: If ambiguous and policy is 'fail'
         """
 
-        def get_status_and_confidence() -> tuple[
-            Literal["MAPPED_EXACT", "MAPPED_NORMALIZED"], float
-        ]:
+        def get_status_and_confidence() -> (
+            tuple[Literal["MAPPED_EXACT", "MAPPED_NORMALIZED"], float]
+        ):
             if is_normalized:
                 return ("MAPPED_NORMALIZED", 0.8)
             else:

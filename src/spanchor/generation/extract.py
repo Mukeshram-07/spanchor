@@ -86,10 +86,10 @@ def _split_sentences(text: str) -> list[str]:
 
     # Use regex to split on sentence boundaries
     # Look for: end-of-sentence punctuation followed by space and uppercase or digit
-    sentences_raw = re.split(r'(?<=[.!?])\s+(?=[A-Z0-9])', text)
+    sentences_raw = re.split(r"(?<=[.!?])\s+(?=[A-Z0-9])", text)
 
     # Also split on orphan periods/marks at end of text
-    sentences_raw = [s for segment in sentences_raw for s in re.split(r'(?<=[.!?])\s+', segment)]
+    sentences_raw = [s for segment in sentences_raw for s in re.split(r"(?<=[.!?])\s+", segment)]
 
     # Clean and filter
     sentences: list[str] = []

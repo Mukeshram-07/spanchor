@@ -134,11 +134,13 @@ def compute_gold_set_hash(queries: list[Query]) -> str:
         }
 
         for anchor in sorted_anchors:
-            query_entry["anchors"].append({
-                "document_id": anchor.document_id,
-                "start": anchor.start,
-                "end": anchor.end,
-            })
+            query_entry["anchors"].append(
+                {
+                    "document_id": anchor.document_id,
+                    "start": anchor.start,
+                    "end": anchor.end,
+                }
+            )
 
         gold_set_dict["queries"].append(query_entry)
 

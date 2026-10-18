@@ -1,4 +1,4 @@
-﻿"""CLI entry point for spanchor using Typer + Rich.
+"""CLI entry point for spanchor using Typer + Rich.
 
 Commands:
     validate     â€“ Validate gold set anchors against source documents.
@@ -1013,9 +1013,7 @@ def gold_review(
         raise typer.Exit(2)
 
     if action_count > 1:
-        err_console.print(
-            "[red]Error: Cannot combine --approve, --reject, and --edited-text[/red]"
-        )
+        err_console.print("[red]Error: Cannot combine --approve, --reject, and --edited-text[/red]")
         raise typer.Exit(2)
 
     # Approval requires question + source span
@@ -1024,9 +1022,7 @@ def gold_review(
         raise typer.Exit(2)
 
     if approval and (source_start is None or source_end is None):
-        err_console.print(
-            "[red]Error: Approval requires --source-start and --source-end[/red]"
-        )
+        err_console.print("[red]Error: Approval requires --source-start and --source-end[/red]")
         raise typer.Exit(2)
 
     # Load candidates
@@ -1044,9 +1040,7 @@ def gold_review(
             break
 
     if candidate_idx is None:
-        err_console.print(
-            f"[red]Candidate not found: {candidate_id}[/red]"
-        )
+        err_console.print(f"[red]Candidate not found: {candidate_id}[/red]")
         raise typer.Exit(2)
 
     candidate = candidates[candidate_idx]
@@ -1153,9 +1147,7 @@ def gold_review(
         err_console.print(f"[red]Error writing output file: {exc}[/red]")
         raise typer.Exit(2) from exc
 
-    console.print(
-        f"[green]âœ“ Candidate {candidate_id} {action_label}[/green]"
-    )
+    console.print(f"[green]âœ“ Candidate {candidate_id} {action_label}[/green]")
     if approval:
         console.print(f"  Question   : {question}")
         console.print(f"  Source span: [{source_start}, {source_end})")

@@ -452,9 +452,7 @@ class TestReasonField:
         assert result.status == "UNMAPPED"
         assert "empty" in result.reason.lower()
 
-    def test_reason_unmapped_document_not_found(
-        self, sample_docs: dict[str, Document]
-    ) -> None:
+    def test_reason_unmapped_document_not_found(self, sample_docs: dict[str, Document]) -> None:
         """Test reason for unmapped (document not found)."""
         mapper = ChunkMapper(sample_docs)
         result = mapper.map_chunk("text", document_id="nonexistent")
@@ -536,9 +534,7 @@ class TestCandidateSpansTracking:
 class TestBackwardCompatibility:
     """Test backward compatibility with existing tests."""
 
-    def test_existing_result_structure_maintained(
-        self, sample_docs: dict[str, Document]
-    ) -> None:
+    def test_existing_result_structure_maintained(self, sample_docs: dict[str, Document]) -> None:
         """Test that existing result.status and result.spans still work."""
         mapper = ChunkMapper(sample_docs)
         result = mapper.map_chunk("quick brown fox", document_id="doc1")
@@ -548,13 +544,12 @@ class TestBackwardCompatibility:
         assert isinstance(result.spans, list)
         assert isinstance(result.method, str)
 
-    def test_all_policies_maintain_backward_compat(
-        self, sample_docs: dict[str, Document]
-    ) -> None:
+    def test_all_policies_maintain_backward_compat(self, sample_docs: dict[str, Document]) -> None:
         """Test all policies work with new fields."""
         for policy in ["first_unclaimed", "all_occurrences"]:
             mapper = ChunkMapper(
-                sample_docs, ambiguity_policy=policy  # type: ignore[arg-type]
+                sample_docs,
+                ambiguity_policy=policy,  # type: ignore[arg-type]
             )
             result = mapper.map_chunk("quick brown fox", document_id="doc2")
 

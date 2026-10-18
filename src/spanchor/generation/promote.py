@@ -121,9 +121,7 @@ def promote_candidate_to_gold(
 
     # Check 4: Document ID must be valid
     if not candidate.document_id or not candidate.document_id.strip():
-        raise ValueError(
-            "Cannot promote APPROVED candidate: invalid document_id"
-        )
+        raise ValueError("Cannot promote APPROVED candidate: invalid document_id")
 
     # All safety checks passed - create Query + Anchor
     # Generate unique IDs

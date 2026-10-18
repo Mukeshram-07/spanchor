@@ -36,13 +36,9 @@ class StatisticsConfig:
     def __post_init__(self) -> None:
         """Validate configuration parameters."""
         if not (0.0 < self.confidence_level < 1.0):
-            raise ValueError(
-                f"confidence_level must be in (0, 1), got {self.confidence_level}"
-            )
+            raise ValueError(f"confidence_level must be in (0, 1), got {self.confidence_level}")
         if self.num_resamples <= 0:
-            raise ValueError(
-                f"num_resamples must be positive, got {self.num_resamples}"
-            )
+            raise ValueError(f"num_resamples must be positive, got {self.num_resamples}")
         if self.random_seed is not None and self.random_seed < 0:
             raise ValueError(f"random_seed must be non-negative, got {self.random_seed}")
 
@@ -182,9 +178,7 @@ def compute_bootstrap_ci(
         ValueError: If no paired queries or invalid configuration
     """
     # Extract deltas
-    deltas, paired_query_ids = _compute_deltas(
-        baseline_metrics, candidate_metrics, metric_name
-    )
+    deltas, paired_query_ids = _compute_deltas(baseline_metrics, candidate_metrics, metric_name)
 
     num_paired = len(deltas)
 

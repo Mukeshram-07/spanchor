@@ -312,7 +312,6 @@ def write_gold_set(path: Path, queries: list[Query]) -> None:
         ) from e
 
 
-
 def read_candidate_pool(path: Path) -> list[Candidate]:
     """Read JSONL candidate pool with line-by-line parsing and validation.
 

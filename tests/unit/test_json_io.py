@@ -830,7 +830,6 @@ class TestWriteRun:
         assert loaded_run.queries[0].query_id == "q1"
         assert loaded_run.timestamp == original_run.timestamp
 
-
     def test_write_with_complex_config(self, tmp_path: Path) -> None:
         """Test writing a Run with complex nested config."""
         json_file = tmp_path / "output.json"
