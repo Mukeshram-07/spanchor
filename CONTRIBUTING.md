@@ -346,8 +346,8 @@ Include:
 
 SPANCHOR is built by the open-source community:
 
-- Mukeshram S (Project maintainer)
-- Kelvin James P
+- Mukeshram S 
+- Kelvin James P (Project maintainer)
 
 ## License
 

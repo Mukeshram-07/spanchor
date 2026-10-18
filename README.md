@@ -97,7 +97,7 @@ SPANCHOR sits after retrieval: **RAG pipeline → retrieval → SPANCHOR → reg
 - **CLI** for validate, evaluate, compare, locate, check-corpus, and anchor add
 - **CI exit codes** for pass, regression, usage error, and unmapped-chunk-rate failures
 - **Local-first and deterministic**: no network access or API keys required
-- **Typed Python API**: checked with `mypy --strict`
+- **Typed Python API**: checked with `mypy --strict` (with adapter-module overrides in `pyproject.toml`)
 
 ## Installation
 
@@ -152,7 +152,7 @@ A gold set with only a handful of queries triggers a low-confidence warning; rea
 
 ## Regression example
 
-A validated benchmark from this repository: 100 gold queries over 4 technical documents (`examples/real_world_validation/`).
+A benchmark snapshot from this repository: 100 gold queries over 4 technical documents (`examples/real_world_validation/`).
 
 | | Baseline | Candidate |
 |---|---|---|
@@ -166,7 +166,7 @@ Status:       FAIL
 Exit code:    1
 ```
 
-This is a measured result from the included validation run, not a hypothetical. It is specific to this corpus and these configurations; it demonstrates the regression-testing mechanism and is not a general claim about chunk size or overlap.
+This is a measured historical snapshot from the included validation assets, not a hypothetical. It is specific to this corpus and these configurations; it demonstrates the regression-testing mechanism and is not a general claim about chunk size or overlap.
 
 ## Metrics
 
@@ -277,6 +277,13 @@ The underlying benchmark and its scripts live in [`examples/real_world_validatio
 | [Minimal demo](examples/demo/README.md) | Small CLI walkthrough with a gold set |
 | [Changelog](CHANGELOG.md) | Release history |
 
+## Release and versioning
+
+- **Current release:** `v0.3.0` (see `pyproject.toml` and [CHANGELOG.md](CHANGELOG.md))
+- **Versioning model:** `0.x.y` indicates alpha/early-stage development; breaking changes may occur between minor versions before `1.0.0`
+- **Python support:** 3.11, 3.12, 3.13
+- **Benchmark note:** benchmark values shown in this README are corpus-specific snapshots and should be treated as validation examples, not universal performance claims
+
 ## Scope
 
 SPANCHOR is an evaluation layer. It does not:
@@ -292,7 +299,13 @@ SPANCHOR is an evaluation layer. It does not:
 
 It is designed to sit next to whichever of these you already use.
 
-SPANCHOR is an early-stage open-source project; APIs and integrations may evolve.
+## Known considerations and limitations
+
+- SPANCHOR is an alpha/early-stage project; APIs and integration surfaces may evolve.
+- Dependency specifiers are intentionally broad in `pyproject.toml`; use locked environments for reproducible development/testing.
+- Source anchors are tied to canonicalized document content. If source documents are revised, anchors/gold sets should be reviewed and versioned with the corpus.
+- Very small or noisy gold sets can produce false-positive regressions for individual queries; treat regression policies as quality gates that still need human review.
+- SPANCHOR evaluates retrieval evidence overlap and regression behavior. It does not determine source authority/trustworthiness or answer correctness.
 
 ## Development
 
@@ -309,17 +322,30 @@ ruff format src/spanchor tests --check
 pip install build && python -m build
 ```
 
+Notes:
+- `pip install -e ".[dev]"` matches CI and includes the core test/quality toolchain.
+- Dev dependencies include pinned `ruff==0.1.6`; `uv.lock` provides a fully locked dependency set for reproducible contributor environments.
+
 ## Testing
 
-v0.2.0 is validated by 754 automated tests. Measured line and branch coverage is currently about 79%; this is a snapshot, not a guarantee.
+Current release `v0.3.0` is validated in CI with `pytest` across Python 3.11, 3.12, and 3.13.
+Code quality checks in CI run `ruff format`, `ruff check`, and `mypy --strict src/spanchor` (with configured adapter-module overrides in `pyproject.toml`).
+Adapter support for LangChain/LlamaIndex is optional: CI installs `.[dev]` only, so users should validate optional-framework behavior in their own environments.
 
 ```bash
 pytest
 ```
 
+Optional framework-adapter checks (when extras are installed):
+
+```bash
+pip install -e ".[dev,langchain,llamaindex]"
+pytest tests/unit/test_adapters_integration.py
+```
+
 ## Roadmap
 
-**Current release: v0.2.0**
+**Current release: v0.3.0**
 
 Implemented:
 - Source-anchored evaluation and per-query regression detection
