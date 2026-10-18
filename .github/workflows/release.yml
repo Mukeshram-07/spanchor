@@ -4,6 +4,16 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      publish_to_pypi:
+        description: "Publish to PyPI (only for intentional releases)"
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
 
 permissions:
   id-token: write
@@ -87,6 +97,7 @@ jobs:
     name: Publish to PyPI
     needs: build
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.publish_to_pypi == 'true')
     steps:
       - name: Download distributions
         uses: actions/download-artifact@v4
